@@ -1,0 +1,204 @@
+#!/usr/bin/env python
+
+import argparse
+import json
+import getpass
+from os import getenv, makedirs, urandom
+from os.path import expanduser, exists
+import string
+import subprocess
+from sys import exit, platform
+import time
+
+parser = argparse.ArgumentParser(description='A tiny password manager.')
+parser.add_argument('alias', nargs='?', help='Alias of the password to read')
+parser.add_argument('-i', '--init', action='store_true')
+parser.add_argument('-r','--read', help='Password to fetch')
+parser.add_argument('-w','--write', action='store_true', help='Write a new password to the safe')
+
+DEFAULT_SAFE_DIR = expanduser("~") + '/.pick'
+DEFAULT_SAFE_FILE = 'pick.safe'
+DEFAULT_SAFE_TEMPLATE = {
+        'created_on': None, 
+        'modified_on': None, 
+        'created_by': getpass.getuser(), 
+        'data':{}
+    }
+
+class Pick():
+  def __init__(self, token, safe, config):
+    self.token = token
+    self.safe = safe
+    self.config = config
+    self.platform = self.get_platform()
+
+  def write_safe(self, json_data):
+    ''' Writes the given data to an ecrypted file using gpg '''
+
+    with open('/dev/null', 'w') as null:
+      # First echo the data to encrypt into a pipe
+      cmd1 = 'echo %s' % json.dumps(json_data)
+      ps = subprocess.Popen(cmd1.split(), stdout=subprocess.PIPE)
+
+      # Then encrypt the data from stdin
+      cmd2 = 'gpg --symmetric --armor --batch --yes --passphrase %s --output %s' % (self.token, self.safe)
+      ps2 = subprocess.check_output(cmd2.split(), stdin=ps.stdout, stderr=null)
+
+  def read_safe(self):
+    ''' Decrypts the safe and returns the parsed JSON '''
+    with open('/dev/null', 'w') as null:
+      cmd= 'gpg --decrypt --batch --armor --passphrase %s %s' % (self.token, self.safe)
+      p1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=null)
+      secrets, err = p1.communicate()
+  
+      if err:
+        print err
+        exit(102)
+  
+    try:
+      return json.loads(secrets)
+    except ValueError:
+      print 'Unable to read safe at %s' % self.safe
+      exit(101)
+
+  def write_password(self):
+    ''' Writes a password to the safe '''
+    alias = raw_input('Enter an Alias\n> ')
+    username = raw_input('Enter the account name (username/email/etc)\n> ')
+    gen_password = raw_input('Generate password? (y/n, default: y)')
+
+    if gen_password.strip() in ['n', 'N']:
+      password = getpass.getpass('Enter the password\n> ')
+    else:
+      password = self.generate_password()
+
+    safe = self.read_safe()
+
+    now = int(time.time())
+    safe['data'][alias] = {
+            'alias': alias,
+            'username': username,
+            'password': password,
+            'created_on': now,
+            'modified_on': now
+            }
+
+    self.write_safe(safe)
+    self.clip(password)
+    print 'Password saved and copied to clipboard!'
+
+  def read_password(self, id):
+    ''' Reads a password by id. e.g. "github" '''
+    safe = self.read_safe()
+
+    if id == 'all':
+      return self.pretty_print(safe['data'])
+    if id not in safe['data']:
+      print 'Password for %s not found' % id
+
+    obj = safe['data'][id]
+    pwd = obj['password']
+
+    self.clip(pwd)
+
+    if self.config['silent']:
+      return
+
+    if self.config['verbose']:
+      return self.pretty_print(obj)
+
+    print pwd
+
+  def initialize_safe(self):
+    ''' Creates a new safe with default values '''
+    if not exists(DEFAULT_SAFE_DIR):
+      print 'Creating safe at %s' % DEFAULT_SAFE_DIR
+      makedirs(DEFAULT_SAFE_DIR)
+
+    safe = DEFAULT_SAFE_TEMPLATE
+
+    now = int(time.time())
+    safe['created_on'] = now
+    safe['modified_on'] = now
+    self.write_safe(safe)
+    print 'Safe created!'
+
+  def generate_password(self, length=50):
+    ''' Generates a random password of length '''
+    chars = string.printable
+    return ''.join(chars[ord(urandom(1)) % len(chars)] for _ in range(length))
+    
+  def get_platform(self):
+    ''' Get the plaform we're running on '''
+    if platform in ['linux', 'linux2']:
+      return 'linux'
+    elif platform == "darwin":
+      return 'osx'
+    else: 
+      print 'Unsupported platform %s' % platform
+      exit(100)
+
+  def pretty_print(self, json_data):
+    ''' Pretty prints JSON '''
+    print json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ': '))
+
+  def clip(self, text):
+    ''' Copy the given text to the clipboard '''
+    if self.platform == 'linux':
+      process = subprocess.Popen(['xclip', '-sel', 'clip'], stdin=subprocess.PIPE)
+    else:
+      # Assumes OS X
+      process = subprocess.Popen('pbcopy', stdin=subprocess.PIPE)
+
+    process.communicate(text.encode('utf-8'))
+
+def try_get_token():
+  ''' Loads the token (password) from the environment or prompts the user for it '''
+  token = getenv('PICK_TOKEN', None)
+  if token:
+    return token
+
+  return getpass.getpass('Enter password\n> ')
+
+def get_safe_path():
+  ''' Loads the safe path from the environment or uses the default location '''
+  return getenv('PICK_SAFE', '%s/%s' % (DEFAULT_SAFE_DIR, DEFAULT_SAFE_FILE))
+
+def get_config():
+  ''' Loads the configuration from the environment or uses defaults '''
+  conf = getenv('PICK_CONFIG', '{}')
+  try:
+    config = json.loads(conf)
+
+    if 'silent' not in config:
+      config['silent'] = False
+    if 'verbose' not in config:
+      config['verbose'] = False
+
+    return config
+  except ValueError:
+    print 'Unable to read PICK_CONFIG'
+    exit(101)
+
+
+if __name__=='__main__':
+  args = parser.parse_args()
+
+  token = try_get_token()
+  safe = get_safe_path()
+  config = get_config()
+
+  pick = Pick(token, safe, config)
+
+  if args.alias or args.read:
+    pick.read_password(args.alias)
+    exit()
+
+  if args.init:
+    pick.initialize_safe()
+    exit()
+  
+  if args.write:
+    pick.write_password()
+    exit()
+  
