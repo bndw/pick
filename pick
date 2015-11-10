@@ -94,7 +94,8 @@ class Pick():
     if id == 'all':
       return self.pretty_print(safe['data'])
     if id not in safe['data']:
-      print 'Password for %s not found' % id
+      print 'Password not found'
+      exit()
 
     obj = safe['data'][id]
     pwd = obj['password']
