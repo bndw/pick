@@ -191,8 +191,12 @@ if __name__=='__main__':
 
   pick = Pick(token, safe, config)
 
-  if args.alias or args.read:
+  if args.alias:
     pick.read_password(args.alias)
+    exit()
+
+  if args.read:
+    pick.read_password(args.read)
     exit()
 
   if args.init:
