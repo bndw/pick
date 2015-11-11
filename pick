@@ -65,7 +65,7 @@ class Pick():
     ''' Writes a password to the safe '''
     alias = raw_input('Enter an Alias\n> ')
     username = raw_input('Enter the account name (username/email/etc)\n> ')
-    gen_password = raw_input('Generate password? (y/n, default: y)')
+    gen_password = raw_input('Generate password? (y/n, default: y)\n> ')
 
     if gen_password.strip() in ['n', 'N']:
       password = getpass.getpass('Enter the password\n> ')
@@ -126,7 +126,7 @@ class Pick():
 
   def generate_password(self, length=50):
     ''' Generates a random password of length '''
-    chars = string.printable
+    chars = string.uppercase + string.lowercase + string.punctuation + string.letters
     return ''.join(chars[ord(urandom(1)) % len(chars)] for _ in range(length))
     
   def get_platform(self):
