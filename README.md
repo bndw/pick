@@ -2,6 +2,8 @@ pick
 ====
 A tiny password manager for OS X and Linux.
 
+![demo](https://github.com/bndw/pick/raw/master/demo.gif)
+
 Features
 --------
 * JSON formatted data
