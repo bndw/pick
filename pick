@@ -15,6 +15,7 @@ parser.add_argument('alias', nargs='?', help='Alias of the password to read')
 parser.add_argument('-i', '--init', action='store_true')
 parser.add_argument('-r','--read', help='Password to fetch')
 parser.add_argument('-w','--write', action='store_true', help='Write a new password to the safe')
+parser.add_argument('-d', '--delete', action='store_true', help='Delete a password from the safe')
 
 DEFAULT_SAFE_DIR = expanduser("~") + '/.pick'
 DEFAULT_SAFE_FILE = 'pick.safe'
@@ -50,16 +51,25 @@ class Pick():
       cmd= 'gpg --decrypt --batch --armor --passphrase %s %s' % (self.token, self.safe)
       p1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=null)
       secrets, err = p1.communicate()
-  
+
       if err:
         print err
         exit(102)
-  
+
     try:
       return json.loads(secrets)
     except ValueError:
       print 'Unable to read safe at %s' % self.safe
       exit(101)
+
+  def delete_password(self, alias):
+    ''' Deletes a password from the safe '''
+    alias = raw_input('Enter an Alias\n> ')
+    safe = self.read_safe()
+
+    del safe['data'][alias]
+    self.write_safe(safe);
+    print 'Password deleted'
 
   def write_password(self):
     ''' Writes a password to the safe '''
@@ -206,4 +216,7 @@ if __name__=='__main__':
   if args.write:
     pick.write_password()
     exit()
-  
+
+  if args.delete:
+    pick.delete_password()
+    exit()
