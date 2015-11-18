@@ -15,7 +15,7 @@ parser.add_argument('alias', nargs='?', help='Alias of the password to read')
 parser.add_argument('-i', '--init', action='store_true')
 parser.add_argument('-r','--read', help='Password to fetch')
 parser.add_argument('-w','--write', action='store_true', help='Write a new password to the safe')
-parser.add_argument('-d', '--delete', nargs='?', help='Delete a password from the safe')
+parser.add_argument('-d', '--delete', help='Delete a password from the safe')
 
 DEFAULT_SAFE_DIR = expanduser("~") + '/.pick'
 DEFAULT_SAFE_FILE = 'pick.safe'
