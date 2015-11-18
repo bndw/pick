@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser(description='A tiny password manager.')
 parser.add_argument('alias', nargs='?', help='Alias of the password to read')
 parser.add_argument('-i', '--init', action='store_true')
 parser.add_argument('-r','--read', help='Password to fetch')
+parser.add_argument('-u','--username', help='Fetch the username for an alias')
 parser.add_argument('-w','--write', action='store_true', help='Write a new password to the safe')
 
 DEFAULT_SAFE_DIR = expanduser("~") + '/.pick'
@@ -110,6 +111,16 @@ class Pick():
 
     print pwd
 
+  def read_username(self, alias):
+    """ Reads the username for an alias """
+    safe = self.read_safe()
+
+    if not alias in safe['data']:
+      print 'Alias does not exist'
+      exit()
+
+    print safe['data'][alias]['username']
+
   def initialize_safe(self):
     ''' Creates a new safe with default values '''
     if not exists(DEFAULT_SAFE_DIR):
@@ -197,6 +208,10 @@ if __name__=='__main__':
 
   if args.read:
     pick.read_password(args.read)
+    exit()
+
+  if args.username:
+    pick.read_username(args.username)
     exit()
 
   if args.init:
