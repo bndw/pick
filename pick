@@ -2,7 +2,8 @@
 
 import argparse
 import json
-import getpass
+from getpass import getpass, getuser
+import re
 from os import getenv, makedirs, urandom
 from os.path import expanduser, exists
 import string
@@ -10,129 +11,33 @@ import subprocess
 from sys import exit, platform
 import time
 
-parser = argparse.ArgumentParser(description='A tiny password manager.')
+parser = argparse.ArgumentParser(description="A minimal password manager")
 parser.add_argument('alias', nargs='?', help='Alias of the password to read')
-parser.add_argument('-i', '--init', action='store_true')
-parser.add_argument('-r','--read', help='Password to fetch')
-parser.add_argument('-u','--username', help='Fetch the username for an alias')
-parser.add_argument('-w','--write', action='store_true', help='Write a new password to the safe')
+parser.add_argument('-a','--account', nargs='+', help='Write a new account to the safe. pick -a [alias] [value]')
 parser.add_argument('-d', '--delete', help='Delete a password from the safe')
+parser.add_argument('-i', '--init', action='store_true')
+parser.add_argument('-l','--list', help='List the contents of the safe')
+parser.add_argument('-o','--output',nargs='+',  help='Define which values are output. e.g. password, username')
+parser.add_argument('-r','--read', help='Read a password from the safe')
+parser.add_argument('-w','--write', nargs='+', help='Write a new login to the safe')
 
 DEFAULT_SAFE_DIR = expanduser("~") + '/.pick'
 DEFAULT_SAFE_FILE = 'pick.safe'
 DEFAULT_SAFE_TEMPLATE = {
         'created_on': None, 
         'modified_on': None, 
-        'created_by': getpass.getuser(), 
-        'data':{}
+        'created_by': getuser(), 
+        'accounts': {},
+        'credentials': {}
     }
 
 class Pick():
-  def __init__(self, token, safe, config):
+  def __init__(self, token, safe_path, config):
     self.token = token
-    self.safe = safe
+    self.safe_path = safe_path
     self.config = config
     self.platform = self.get_platform()
-
-  def write_safe(self, json_data):
-    ''' Writes the given data to an ecrypted file using gpg '''
-
-    with open('/dev/null', 'w') as null:
-      # First echo the data to encrypt into a pipe
-      cmd1 = 'echo %s' % json.dumps(json_data)
-      ps = subprocess.Popen(cmd1.split(), stdout=subprocess.PIPE)
-
-      # Then encrypt the data from stdin
-      cmd2 = 'gpg --symmetric --armor --batch --yes --passphrase %s --output %s' % (self.token, self.safe)
-      ps2 = subprocess.check_output(cmd2.split(), stdin=ps.stdout, stderr=null)
-
-  def read_safe(self):
-    ''' Decrypts the safe and returns the parsed JSON '''
-    with open('/dev/null', 'w') as null:
-      cmd= 'gpg --decrypt --batch --armor --passphrase %s %s' % (self.token, self.safe)
-      p1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=null)
-      secrets, err = p1.communicate()
-
-      if err:
-        print err
-        exit(102)
-
-    try:
-      return json.loads(secrets)
-    except ValueError:
-      print 'Unable to read safe at %s' % self.safe
-      exit(101)
-
-  def delete_password(self, alias):
-    """ Deletes a password from the safe """
-    safe = self.read_safe()
-
-    if not alias in safe['data']:
-      print 'Alias does not exist'
-      exit()
-
-    del safe['data'][alias]
-    self.write_safe(safe)
-    print 'Password deleted'
-
-  def write_password(self):
-    ''' Writes a password to the safe '''
-    alias = raw_input('Enter an Alias\n> ')
-    username = raw_input('Enter the account name (username/email/etc)\n> ')
-    gen_password = raw_input('Generate password? (y/n, default: y)\n> ')
-
-    if gen_password.strip() in ['n', 'N']:
-      password = getpass.getpass('Enter the password\n> ')
-    else:
-      password = self.generate_password()
-
-    safe = self.read_safe()
-
-    now = int(time.time())
-    safe['data'][alias] = {
-            'alias': alias,
-            'username': username,
-            'password': password,
-            'created_on': now,
-            'modified_on': now
-            }
-
-    self.write_safe(safe)
-    self.clip(password)
-    print 'Password saved and copied to clipboard!'
-
-  def read_password(self, id):
-    ''' Reads a password by id. e.g. "github" '''
-    safe = self.read_safe()
-
-    if id == 'all':
-      return self.pretty_print(safe['data'])
-    if id not in safe['data']:
-      print 'Password not found'
-      exit()
-
-    obj = safe['data'][id]
-    pwd = obj['password']
-
-    self.clip(pwd)
-
-    if self.config['silent']:
-      return
-
-    if self.config['verbose']:
-      return self.pretty_print(obj)
-
-    print pwd
-
-  def read_username(self, alias):
-    """ Reads the username for an alias """
-    safe = self.read_safe()
-
-    if not alias in safe['data']:
-      print 'Alias does not exist'
-      exit()
-
-    print safe['data'][alias]['username']
+    self.safe = None
 
   def initialize_safe(self):
     ''' Creates a new safe with default values '''
@@ -146,7 +51,195 @@ class Pick():
     safe['created_on'] = now
     safe['modified_on'] = now
     self.write_safe(safe)
+
     print 'Safe created!'
+
+  def write_safe(self, json_data):
+    ''' Writes the given data to an ecrypted file using gpg '''
+    with open('/dev/null', 'w') as null:
+      # First echo the data to encrypt into a pipe
+      cmd1 = 'echo %s' % json.dumps(json_data)
+      ps = subprocess.Popen(cmd1.split(), stdout=subprocess.PIPE)
+
+      # Then encrypt the data from stdin
+      cmd2 = 'gpg --symmetric --armor --batch --yes --passphrase %s --output %s' % (self.token, self.safe_path)
+      ps2 = subprocess.check_output(cmd2.split(), stdin=ps.stdout, stderr=null)
+
+  def read_safe(self):
+    ''' Decrypts the safe and returns the parsed JSON '''
+    if self.safe:
+      return self.safe
+
+    with open('/dev/null', 'w') as null:
+      cmd= 'gpg --decrypt --batch --armor --passphrase %s %s' % (self.token, self.safe_path)
+      p1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=null)
+      secrets, err = p1.communicate()
+
+      if err:
+        print err
+        exit(102)
+
+    try:
+      self.safe = json.loads(secrets)
+      return self.safe
+    except ValueError:
+      print 'Unable to read safe at %s' % self.safe_path
+      exit(101)
+
+  def delete_credential(self, alias):
+    """ Deletes a credential from the safe """
+    safe = self.read_safe()
+
+    if not alias in safe['credentials']:
+      print 'Alias does not exist'
+      exit()
+
+    del safe['credentials'][alias]
+    self.write_safe(safe)
+    print 'Password deleted'
+
+  def write_credential(self, alias=None, username=None, password=None, account=None):
+    ''' Writes a new credential to the safe '''
+    if username and account:
+      # This is likely an error state, since an existing account was provided,
+      # but for some reason there was also a username provided.
+      print 'An account and username were both provided. You must choose only one'
+      exit(100)
+
+    if not alias:
+      alias = get_input('Enter an Alias')
+
+    if not username and self.account_exists(account):
+      if account: 
+        account = account
+        # TODO(): Filling the credential with the *current* value/username for the account
+        # may be an issue as there is a potenial the account's value/username may change.
+        # We should probably check this at read time and update the value as necessary.
+        username = self.read_account(account)
+      else:
+        account = None
+        username = get_input('Enter the account name (username/email/etc)')
+
+    if not password:
+      gen_password = get_input('Generate password? (y/n, default: y)')
+
+      if gen_password.strip() in ['n', 'N']:
+        password = get_input('Enter the password', hidden=True)
+      else:
+        password = self.generate_password()
+
+    safe = self.read_safe()
+
+    now = int(time.time())
+    safe['credentials'][alias] = {
+            'alias': alias,
+            'username': username,
+            'account': account,
+            'password': password,
+            'created_on': now,
+            'modified_on': now
+            }
+
+    self.write_safe(safe)
+    self.clip(password)
+    print 'Password saved and copied to clipboard!'
+
+  def read_credential(self, alias, output=[]):
+    ''' Reads a password by alias '''
+    safe = self.read_safe()
+
+    if alias == 'all':
+      credentials = [v for k,v in safe['credentials'].iteritems()]
+      return self.pretty_print(credentials)
+    if alias not in safe['credentials']:
+      print 'Password not found'
+      exit()
+
+    obj = safe['credentials'][alias]
+    pwd = obj['password']
+
+    self.clip(pwd)
+
+    if self.config['silent']:
+      return
+
+    if self.config['verbose']:
+      return self.pretty_print(obj)
+
+    if not output:
+      print pwd
+    else:
+      res = {}
+      for prop in output:
+        if prop in obj: res[prop] = obj[prop]
+      print res
+
+  def write_account(self, alias=None, value=None):
+    ''' Writes a new account to the safe '''
+
+    def get_account_type(val):
+      if '@' and '.' in val:
+        return 'email'
+
+      total_numbers = len(re.sub('[^0-9]', '', val))
+      if total_numbers >= 7 and total_numbers <= 15:
+        return 'phone'
+
+      return 'username'
+
+    if not alias:
+      alias = get_input('Enter an Alias')
+
+    if not value:
+      value= get_input('Enter the value (username/email/etc)')
+
+    account_type = get_account_type(value)
+
+    safe = self.read_safe()
+
+    now = int(time.time())
+    safe['accounts'][alias] = {
+            'alias': alias,
+            'value': value,
+            'type': account_type,
+            'created_on': now,
+            'modified_on': now
+            }
+
+    self.write_safe(safe)
+    print 'Account saved!'
+
+  def account_exists(self, alias):
+    ''' Ensures an account exists '''
+    safe = self.read_safe()
+
+    return alias in safe['accounts']
+
+  def read_account(self, alias):
+    ''' Reads a account by alias '''
+    safe = self.read_safe()
+
+    if not self.account_exists(alias):
+      print 'Account not found'
+      exit()
+
+    return safe['accounts'][alias]['value']
+
+  def list_collection(self, collection, output_props=[]):
+    safe = self.read_safe()
+
+    if not collection in safe:
+      print 'Invalid collection'
+      exit()
+
+    # The requested collection with all object properties
+    coll = [v for k,v in safe[collection].iteritems()]
+
+    if output_props:
+      # The requested collection with only the specified output properties
+      coll = [{prop: obj[prop] for prop in output_props if prop in obj} for obj in coll]
+
+    return self.pretty_print(coll)
 
   def generate_password(self, length=50):
     ''' Generates a random password of length '''
@@ -177,13 +270,25 @@ class Pick():
 
     process.communicate(text.encode('utf-8'))
 
+
+def get_input(prompt, hidden=False):
+  ''' Gets input from user. If hidden, the user's typing will be hidden '''
+  if not prompt.endswith('\n> '):
+    # Standardize input prompts
+    prompt = prompt + '\n> '
+
+  if hidden:
+    return getpass(prompt)
+
+  return raw_input(prompt)
+
 def try_get_token():
   ''' Loads the token (password) from the environment or prompts the user for it '''
   token = getenv('PICK_TOKEN', None)
   if token:
     return token
 
-  return getpass.getpass('Enter password\n> ')
+  return get_input('Enter password', hidden=True)
 
 def get_safe_path():
   ''' Loads the safe path from the environment or uses the default location '''
@@ -210,31 +315,47 @@ if __name__=='__main__':
   args = parser.parse_args()
 
   token = try_get_token()
-  safe = get_safe_path()
+  safe_path = get_safe_path()
   config = get_config()
 
-  pick = Pick(token, safe, config)
-
-  if args.alias:
-    pick.read_password(args.alias)
-    exit()
-
-  if args.read:
-    pick.read_password(args.read)
-    exit()
-
-  if args.username:
-    pick.read_username(args.username)
-    exit()
+  pick = Pick(token, safe_path, config)
 
   if args.init:
     pick.initialize_safe()
     exit()
-  
-  if args.write:
-    pick.write_password()
+
+  if args.alias:
+    pick.read_credential(args.alias, args.output)
+    exit()
+
+  if args.read:
+    pick.read_credential(args.read, args.output)
+    exit()
+
+  if args.write and not args.account:
+    pick.write_credential(*args.write)
+    exit
+
+  if args.write and args.account:
+    if len(args.write) == 1:
+      # Only alias
+      pick.write_credential(alias=args.write[0], account=args.account[0])
+    elif len(args.write) == 2:
+      alias, password = args.write
+      pick.write_credential(alias=alias, password=password, account=args.account[0])
+    else:
+      print 'Invalid write command!'
     exit()
 
   if args.delete:
-    pick.delete_password(args.delete)
+    pick.delete_credential(args.delete)
     exit()
+
+  if args.account:
+    pick.write_account(*args.account)
+    exit()
+
+  if args.list:
+    pick.list_collection(args.list, args.output)
+    exit()
+
