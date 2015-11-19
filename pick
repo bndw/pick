@@ -109,16 +109,15 @@ class Pick():
     if not alias:
       alias = get_input('Enter an Alias')
 
-    if not username and self.account_exists(account):
-      if account: 
-        account = account
-        # TODO(): Filling the credential with the *current* value/username for the account
-        # may be an issue as there is a potenial the account's value/username may change.
-        # We should probably check this at read time and update the value as necessary.
-        username = self.read_account(account)
-      else:
-        account = None
-        username = get_input('Enter the account name (username/email/etc)')
+    if not username and account is not None and self.account_exists(account):
+      account = account
+      # TODO(): Filling the credential with the *current* value/username for the account
+      # may be an issue as there is a potenial the account's value/username may change.
+      # We should probably check this at read time and update the value as necessary.
+      username = self.read_account(account)
+    else:
+      account = None
+      username = get_input('Enter the account name (username/email/etc)')
 
     if not password:
       gen_password = get_input('Generate password? (y/n, default: y)')
