@@ -150,8 +150,18 @@ class Pick():
 
   def generate_password(self, length=50):
     ''' Generates a random password of length '''
+    rand_max = 256
+    rand_excess = (rand_max + 1) % length
+    rand_limit = rand_max - rand_excess
     chars = string.uppercase + string.lowercase + string.punctuation + string.letters
-    return ''.join(chars[ord(urandom(1)) % len(chars)] for _ in range(length))
+
+    def next_index():
+      while True:
+        x = ord(urandom(1))
+        if x <= rand_limit:
+          return x % length
+
+    return ''.join(chars[next_index()] for _ in range(length))
     
   def get_platform(self):
     ''' Get the plaform we're running on '''
