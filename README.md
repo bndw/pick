@@ -1,14 +1,14 @@
 pick
 ====
-A tiny password manager for OS X and Linux.
+A minimal password manager for OS X and Linux.
 
 ![demo](https://github.com/bndw/pick/raw/master/demo.gif)
 
 Features
 --------
+* GPG for encryption
 * JSON formatted data
 * Environment Variable configuration
-* GPG for encryption
 
 Dependencies
 ------------
@@ -75,9 +75,4 @@ Advanced
 * Don't ever want your passwords printed to stdout?
     ```sh
     export PICK_CONFIG='{"silent":true}'
-    ```
-
-* Want to print additonal metadata along with passwords?
-    ```sh
-    export PICK_CONFIG='{"verbose":true}'
     ```
