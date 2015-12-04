@@ -77,7 +77,14 @@ class Pick():
 
   def write_password(self):
     ''' Writes a password to the safe '''
+    safe = self.read_safe()
+
     alias = raw_input('Enter an Alias\n> ')
+    if alias in safe['data']:
+      cont = raw_input('%s already exists, do you want to overwrite? (y/n)\n> ' % alias)
+      if cont.strip() in ['n', 'N']:
+        exit()
+
     username = raw_input('Enter the account name (username/email/etc)\n> ')
     gen_password = raw_input('Generate password? (y/n, default: y)\n> ')
 
@@ -86,7 +93,6 @@ class Pick():
     else:
       password = self.generate_password()
 
-    safe = self.read_safe()
 
     now = int(time.time())
     safe['data'][alias] = {
