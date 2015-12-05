@@ -43,23 +43,20 @@ class Pick():
       p1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=null)
       secrets, err = p1.communicate()
 
-      if err:
-        print err
-        exit(102)
+      if err: 
+        die(err, 102)
 
     try:
       return json.loads(secrets)
     except ValueError:
-      print 'Unable to read safe at %s' % self.safe
-      exit(101)
+      die('Unable to read safe at %s' % self.safe, 101)
 
   def delete_password(self, alias):
     """ Deletes a password from the safe """
     safe = self.read_safe()
 
     if not alias in safe['data']:
-      print 'Alias does not exist'
-      exit()
+      die('Alias not found')
 
     del safe['data'][alias]
     self.write_safe(safe)
@@ -69,14 +66,13 @@ class Pick():
     ''' Writes a password to the safe '''
     safe = self.read_safe()
 
-    alias = raw_input('Enter an Alias\n> ')
+    alias = get_input('Enter an Alias')
     if (
             alias in safe['data'] and 
             not get_answer('%s already exists, do you want to overwrite' % alias)
-        ):
-        exit()
+        ): die()
 
-    username = raw_input('Enter the account name (username/email/etc)\n> ')
+    username = get_input('Enter the account name (username/email/etc)')
 
     if get_answer('Generate password'):
       password = self.generate_password()
@@ -103,8 +99,7 @@ class Pick():
     if alias == 'all':
       return self.pretty_print(safe['data'])
     if alias not in safe['data']:
-      print 'Password not found'
-      exit()
+      die('Password not found')
 
     password = safe['data'][alias]['password']
     self.clip(password)
@@ -117,8 +112,7 @@ class Pick():
     safe = self.read_safe()
 
     if not alias in safe['data']:
-      print 'Alias not found'
-      exit()
+      die('Alias not found')
 
     print safe['data'][alias]['username']
 
@@ -154,8 +148,7 @@ class Pick():
     elif platform == "darwin":
       return 'osx'
     else: 
-      print 'Unsupported platform %s' % platform
-      exit(100)
+      die('Unsupported platform %s' % platform)
 
   def pretty_print(self, json_data):
     ''' Pretty prints JSON '''
@@ -170,6 +163,13 @@ class Pick():
       process = subprocess.Popen('pbcopy', stdin=subprocess.PIPE)
 
     process.communicate(text.encode('utf-8'))
+
+def die(message='', code=100):
+  print message
+  exit(code)
+
+def get_input(prompt):
+  return raw_input('%s\n> ' % prompt)
 
 def get_answer(prompt, default='y'):
   ''' Gets a y/n answer for the prompt '''
@@ -199,8 +199,7 @@ def get_config():
 
     return config
   except ValueError:
-    print 'Unable to read PICK_CONFIG'
-    exit(101)
+    die('Unable to read PICK_CONFIG', 101)
 
 
 if __name__=='__main__':
