@@ -125,9 +125,6 @@ class Pick():
     if self.config['silent']:
       return
 
-    if self.config['verbose']:
-      return self.pretty_print(obj)
-
     print pwd
 
   def read_username(self, alias):
@@ -213,8 +210,6 @@ def get_config():
 
     if 'silent' not in config:
       config['silent'] = False
-    if 'verbose' not in config:
-      config['verbose'] = False
 
     return config
   except ValueError:
