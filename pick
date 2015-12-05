@@ -27,9 +27,8 @@ class Pick():
 
   def write_safe(self, json_data):
     ''' Writes the given data to an ecrypted file using gpg '''
-
     with open('/dev/null', 'w') as null:
-      # First echo the data to encrypt into a pipe
+      # Send the data to encrypt into a pipe
       cmd1 = 'echo %s' % json.dumps(json_data)
       ps = subprocess.Popen(cmd1.split(), stdout=subprocess.PIPE)
 
@@ -71,19 +70,18 @@ class Pick():
     safe = self.read_safe()
 
     alias = raw_input('Enter an Alias\n> ')
-    if alias in safe['data']:
-      cont = raw_input('%s already exists, do you want to overwrite? (y/n)\n> ' % alias)
-      if cont.strip() in ['n', 'N']:
+    if (
+            alias in safe['data'] and 
+            not get_answer('%s already exists, do you want to overwrite' % alias)
+        ):
         exit()
 
     username = raw_input('Enter the account name (username/email/etc)\n> ')
-    gen_password = raw_input('Generate password? (y/n, default: y)\n> ')
 
-    if gen_password.strip() in ['n', 'N']:
-      password = getpass('Enter the password\n> ')
-    else:
+    if get_answer('Generate password'):
       password = self.generate_password()
-
+    else:
+      password = getpass('Enter the password\n> ')
 
     now = int(time.time())
     safe['data'][alias] = {
@@ -98,32 +96,28 @@ class Pick():
     self.clip(password)
     print 'Password saved and copied to clipboard!'
 
-  def read_password(self, id):
-    ''' Reads a password by id. e.g. "github" '''
+  def read_password(self, alias):
+    ''' Reads a password by alias '''
     safe = self.read_safe()
 
-    if id == 'all':
+    if alias == 'all':
       return self.pretty_print(safe['data'])
-    if id not in safe['data']:
+    if alias not in safe['data']:
       print 'Password not found'
       exit()
 
-    obj = safe['data'][id]
-    pwd = obj['password']
+    password = safe['data'][alias]['password']
+    self.clip(password)
 
-    self.clip(pwd)
-
-    if self.config['silent']:
-      return
-
-    print pwd
+    if not self.config['silent']:
+      print password
 
   def read_username(self, alias):
-    """ Reads the username for an alias """
+    """ Reads a username for an alias """
     safe = self.read_safe()
 
     if not alias in safe['data']:
-      print 'Alias does not exist'
+      print 'Alias not found'
       exit()
 
     print safe['data'][alias]['username']
@@ -135,6 +129,7 @@ class Pick():
         'created_by': getuser(), 
         'data':{}
     })
+
     print 'Safe created!'
 
   def generate_password(self, length=50):
@@ -176,6 +171,14 @@ class Pick():
 
     process.communicate(text.encode('utf-8'))
 
+def get_answer(prompt, default='y'):
+  ''' Gets a y/n answer for the prompt '''
+  answer = raw_input('%s? (y/n)\n> ' % prompt)
+  if not answer: 
+    answer = default
+
+  return answer.lower().strip() == 'y'
+
 def get_master_password():
   ''' Loads the password from the environment or prompts the user for it '''
   password = getenv('PICK_TOKEN', None)
@@ -188,9 +191,8 @@ def get_safe_path():
 
 def get_config():
   ''' Loads the configuration from the environment or uses defaults '''
-  conf = getenv('PICK_CONFIG', '{}')
   try:
-    config = json.loads(conf)
+    config = json.loads(getenv('PICK_CONFIG', '{}'))
 
     if 'silent' not in config:
       config['silent'] = False
@@ -212,24 +214,18 @@ if __name__=='__main__':
 
   if args.alias:
     pick.read_password(args.alias)
-    exit()
 
-  if args.read:
+  elif args.read:
     pick.read_password(args.read)
-    exit()
 
-  if args.username:
+  elif args.username:
     pick.read_username(args.username)
-    exit()
 
-  if args.init:
+  elif args.init:
     pick.initialize_safe()
-    exit()
   
-  if args.write:
+  elif args.write:
     pick.write_password()
-    exit()
 
-  if args.delete:
+  elif args.delete:
     pick.delete_password(args.delete)
-    exit()
