@@ -2,9 +2,9 @@
 
 import argparse
 import json
-import getpass
-from os import getenv, makedirs, urandom
-from os.path import expanduser, exists
+from getpass import getpass, getuser
+from os import getenv, urandom
+from os.path import expanduser, join
 import string
 import subprocess
 from sys import exit, platform
@@ -18,18 +18,9 @@ parser.add_argument('-u','--username', help='Fetch the username for an alias')
 parser.add_argument('-w','--write', action='store_true', help='Write a new password to the safe')
 parser.add_argument('-d', '--delete', help='Delete a password from the safe')
 
-DEFAULT_SAFE_DIR = expanduser("~") + '/.pick'
-DEFAULT_SAFE_FILE = 'pick.safe'
-DEFAULT_SAFE_TEMPLATE = {
-        'created_on': None, 
-        'modified_on': None, 
-        'created_by': getpass.getuser(), 
-        'data':{}
-    }
-
 class Pick():
-  def __init__(self, token, safe, config):
-    self.token = token
+  def __init__(self, password, safe, config):
+    self.password = password
     self.safe = safe
     self.config = config
     self.platform = self.get_platform()
@@ -43,13 +34,13 @@ class Pick():
       ps = subprocess.Popen(cmd1.split(), stdout=subprocess.PIPE)
 
       # Then encrypt the data from stdin
-      cmd2 = 'gpg --symmetric --armor --batch --yes --passphrase %s --output %s' % (self.token, self.safe)
+      cmd2 = 'gpg --symmetric --armor --batch --yes --passphrase %s --output %s' % (self.password, self.safe)
       ps2 = subprocess.check_output(cmd2.split(), stdin=ps.stdout, stderr=null)
 
   def read_safe(self):
     ''' Decrypts the safe and returns the parsed JSON '''
     with open('/dev/null', 'w') as null:
-      cmd= 'gpg --decrypt --batch --armor --passphrase %s %s' % (self.token, self.safe)
+      cmd= 'gpg --decrypt --batch --armor --passphrase %s %s' % (self.password, self.safe)
       p1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=null)
       secrets, err = p1.communicate()
 
@@ -89,7 +80,7 @@ class Pick():
     gen_password = raw_input('Generate password? (y/n, default: y)\n> ')
 
     if gen_password.strip() in ['n', 'N']:
-      password = getpass.getpass('Enter the password\n> ')
+      password = getpass('Enter the password\n> ')
     else:
       password = self.generate_password()
 
@@ -139,16 +130,11 @@ class Pick():
 
   def initialize_safe(self):
     ''' Creates a new safe with default values '''
-    if not exists(DEFAULT_SAFE_DIR):
-      print 'Creating safe at %s' % DEFAULT_SAFE_DIR
-      makedirs(DEFAULT_SAFE_DIR)
-
-    safe = DEFAULT_SAFE_TEMPLATE
-
-    now = int(time.time())
-    safe['created_on'] = now
-    safe['modified_on'] = now
-    self.write_safe(safe)
+    self.write_safe({
+        'created_on': int(time.time()), 
+        'created_by': getuser(), 
+        'data':{}
+    })
     print 'Safe created!'
 
   def generate_password(self, length=50):
@@ -190,17 +176,15 @@ class Pick():
 
     process.communicate(text.encode('utf-8'))
 
-def try_get_token():
-  ''' Loads the token (password) from the environment or prompts the user for it '''
-  token = getenv('PICK_TOKEN', None)
-  if token:
-    return token
-
-  return getpass.getpass('Enter password\n> ')
+def get_master_password():
+  ''' Loads the password from the environment or prompts the user for it '''
+  password = getenv('PICK_TOKEN', None)
+  return password if password else getpass('Enter password\n> ')
 
 def get_safe_path():
   ''' Loads the safe path from the environment or uses the default location '''
-  return getenv('PICK_SAFE', '%s/%s' % (DEFAULT_SAFE_DIR, DEFAULT_SAFE_FILE))
+  default_safe_file = join(expanduser('~'), '.pick.safe')
+  return getenv('PICK_SAFE', default_safe_file)
 
 def get_config():
   ''' Loads the configuration from the environment or uses defaults '''
@@ -220,11 +204,11 @@ def get_config():
 if __name__=='__main__':
   args = parser.parse_args()
 
-  token = try_get_token()
-  safe = get_safe_path()
-  config = get_config()
-
-  pick = Pick(token, safe, config)
+  pick = Pick(
+          password = get_master_password(),
+          safe = get_safe_path(),
+          config = get_config()
+          )
 
   if args.alias:
     pick.read_password(args.alias)
