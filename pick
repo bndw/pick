@@ -4,26 +4,48 @@ import argparse
 import json
 from getpass import getpass, getuser
 from os import getenv, urandom
-from os.path import expanduser, join
+from os.path import expanduser, isfile, join
 import string
 import subprocess
 from sys import exit, platform
 import time
 
-parser = argparse.ArgumentParser(description='A tiny password manager.')
-parser.add_argument('alias', nargs='?', help='Alias of the password to read')
-parser.add_argument('-i', '--init', action='store_true')
-parser.add_argument('-r','--read', help='Password to fetch')
-parser.add_argument('-u','--username', help='Fetch the username for an alias')
-parser.add_argument('-w','--write', action='store_true', help='Write a new password to the safe')
-parser.add_argument('-d', '--delete', help='Delete a password from the safe')
+VERSION = '0.1.0'
+USAGE = '''pick - minimal password manager
+
+Options:
+    -h, --help
+    -v, --version
+
+Usage:
+    pick -c, --copy   <alias>
+    pick -d, --delete <alias>
+    pick -l, --list
+    pick -r, --read   <alias>
+    pick -w, --write  [<alias>] [<username>] [<password>]
+
+The most commonly used pick commands are:
+    copy        Copy a credential password to the clipboard
+    write       Write a new credential to the safe
+    read        Read a credential from the safe
+    list        List all credentials in the safe
+    delete      Delete a credential from the sfae
+'''
+
+parser = argparse.ArgumentParser(description='minimal password manager.', usage=USAGE)
+parser.add_argument('alias', nargs='?', help='Copy a credential password to the clipboard')
+parser.add_argument('-c', '--copy', help='Copy a credential password to the clipboard')
+parser.add_argument('-w', '--write', nargs='*', help='Write a new credential to the safe')
+parser.add_argument('-r', '--read', help='Read a credential from the safe')
+parser.add_argument('-l', '--list', action='store_true', help='List all credentials in the safe')
+parser.add_argument('-d', '--delete', help='Delete a credential from the safe')
+parser.add_argument('-v', '--version', action='version', version='pick version %s' % VERSION)
 
 class Pick():
   def __init__(self, password, safe, config):
     self.password = password
     self.safe = safe
     self.config = config
-    self.platform = self.get_platform()
 
   def write_safe(self, json_data):
     ''' Writes the given data to an ecrypted file using gpg '''
@@ -38,6 +60,12 @@ class Pick():
 
   def read_safe(self):
     ''' Decrypts the safe and returns the parsed JSON '''
+    if not isfile(self.safe):
+      if not get_answer('No safe found at %s, create one?' % self.safe):
+        die('You must create a safe', 100)
+      else:
+        print self.initialize_safe()
+
     with open('/dev/null', 'w') as null:
       cmd= 'gpg --decrypt --batch --armor --passphrase %s %s' % (self.password, self.safe)
       p1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=null)
@@ -51,8 +79,63 @@ class Pick():
     except ValueError:
       die('Unable to read safe at %s' % self.safe, 101)
 
-  def delete_password(self, alias):
-    """ Deletes a password from the safe """
+  def read_credential(self, alias):
+    ''' Reads a credential by alias '''
+    safe = self.read_safe()
+
+    if alias not in safe['data']:
+      die('Credential not found')
+
+    return safe['data'][alias]
+
+  def write_credential(self, alias=None, username=None, password=None):
+    ''' Writes a credential by alias '''
+    safe = self.read_safe()
+
+    # 1. Make sure there's an alias
+    if not alias:
+      alias = get_input('Enter an Alias')
+
+    # 1a. Confirm before overwriting an existing credential
+    alias_exists = alias in safe['data']
+    if (
+            alias_exists and 
+            not get_answer('%s already exists, do you want to overwrite' % alias)
+        ): die()
+
+    # 2. Make sure there's a username
+    if not username:
+      username = get_input('Enter the account username (username/email/etc)')
+
+    # 3. Make sure there's a password
+    if not password:
+      if get_answer('Generate password'):
+        password = self.generate_password()
+      else:
+        password = getpass('Enter the password\n> ')
+
+    now = int(time.time())
+
+    # 4. Create the credential
+    if alias_exists:
+      safe['data'][alias]['username'] = username
+      safe['data'][alias]['password'] = password 
+      safe['data'][alias]['modified_on'] = now
+    else:
+      safe['data'][alias] = {
+              'alias': alias,
+              'username': username,
+              'password': password,
+              'created_on': now,
+              'modified_on': now
+              }
+
+    # 5. Save it
+    self.write_safe(safe)
+    return 'Credential saved'
+
+  def delete_credential(self, alias):
+    """ Deletes a credential from the safe """
     safe = self.read_safe()
 
     if not alias in safe['data']:
@@ -60,61 +143,7 @@ class Pick():
 
     del safe['data'][alias]
     self.write_safe(safe)
-    print 'Password deleted'
-
-  def write_password(self):
-    ''' Writes a password to the safe '''
-    safe = self.read_safe()
-
-    alias = get_input('Enter an Alias')
-    if (
-            alias in safe['data'] and 
-            not get_answer('%s already exists, do you want to overwrite' % alias)
-        ): die()
-
-    username = get_input('Enter the account name (username/email/etc)')
-
-    if get_answer('Generate password'):
-      password = self.generate_password()
-    else:
-      password = getpass('Enter the password\n> ')
-
-    now = int(time.time())
-    safe['data'][alias] = {
-            'alias': alias,
-            'username': username,
-            'password': password,
-            'created_on': now,
-            'modified_on': now
-            }
-
-    self.write_safe(safe)
-    self.clip(password)
-    print 'Password saved and copied to clipboard!'
-
-  def read_password(self, alias):
-    ''' Reads a password by alias '''
-    safe = self.read_safe()
-
-    if alias == 'all':
-      return self.pretty_print(safe['data'])
-    if alias not in safe['data']:
-      die('Password not found')
-
-    password = safe['data'][alias]['password']
-    self.clip(password)
-
-    if not self.config['silent']:
-      print password
-
-  def read_username(self, alias):
-    """ Reads a username for an alias """
-    safe = self.read_safe()
-
-    if not alias in safe['data']:
-      die('Alias not found')
-
-    print safe['data'][alias]['username']
+    return 'Credential deleted'
 
   def initialize_safe(self):
     ''' Creates a new safe with default values '''
@@ -124,7 +153,7 @@ class Pick():
         'data':{}
     })
 
-    print 'Safe created!'
+    return 'Safe created!'
 
   def generate_password(self, length=50):
     ''' Generates a random password of length '''
@@ -141,28 +170,29 @@ class Pick():
 
     return ''.join(chars[next_index()] for _ in range(length))
     
-  def get_platform(self):
-    ''' Get the plaform we're running on '''
-    if platform in ['linux', 'linux2']:
-      return 'linux'
-    elif platform == "darwin":
-      return 'osx'
-    else: 
-      die('Unsupported platform %s' % platform)
 
-  def pretty_print(self, json_data):
-    ''' Pretty prints JSON '''
-    print json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ': '))
+def pretty_print(json_data):
+  ''' Pretty prints JSON '''
+  print json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ': '))
 
-  def clip(self, text):
-    ''' Copy the given text to the clipboard '''
-    if self.platform == 'linux':
-      process = subprocess.Popen(['xclip', '-sel', 'clip'], stdin=subprocess.PIPE)
-    else:
-      # Assumes OS X
-      process = subprocess.Popen('pbcopy', stdin=subprocess.PIPE)
+def get_platform():
+  ''' Get the plaform we're running on '''
+  if platform in ['linux', 'linux2']:
+    return 'linux'
+  elif platform == "darwin":
+    return 'osx'
+  else: 
+    die('Unsupported platform %s' % platform)
 
-    process.communicate(text.encode('utf-8'))
+def copy_to_clipboard(text):
+  ''' Copy the given text to the clipboard '''
+  if get_platform() == 'linux':
+    process = subprocess.Popen(['xclip', '-sel', 'clip'], stdin=subprocess.PIPE)
+  else:
+    # Assumes OS X
+    process = subprocess.Popen('pbcopy', stdin=subprocess.PIPE)
+
+  process.communicate(text.encode('utf-8'))
 
 def die(message='', code=100):
   print message
@@ -211,20 +241,34 @@ if __name__=='__main__':
           config = get_config()
           )
 
-  if args.alias:
-    pick.read_password(args.alias)
+  if args.copy is not None:
+    alias = args.copy
+    credential = pick.read_credential(alias)
+    copy_to_clipboard(credential['password'])
 
-  elif args.read:
-    pick.read_password(args.read)
+  elif args.write is not None:
+    if len(args.write) == 3:
+        alias, username, password = args.write
+    elif len(args.write) == 2:
+        alias, username = args.write; password = None
+    elif len(args.write) == 1:
+        alias = args.write[0]; password = None; username = None
+    else:
+        alias, username, password = [None, None, None]
 
-  elif args.username:
-    pick.read_username(args.username)
-
-  elif args.init:
-    pick.initialize_safe()
+    print pick.write_credential(alias, username, password)
   
-  elif args.write:
-    pick.write_password()
+  elif args.read is not None:
+    alias = args.read
+    pretty_print(pick.read_credential(alias))
 
-  elif args.delete:
-    pick.delete_password(args.delete)
+  elif args.list is not False:
+    safe = pick.read_safe()
+    credentials = safe['data']
+    pretty_print(credentials)
+
+  elif args.delete is not None:
+    alias = args.delete
+    print pick.delete_credential(alias)
+  else:
+    print USAGE
