@@ -1,29 +1,21 @@
 #!/usr/bin/env python
 
-import argparse
 import json
 from getpass import getpass, getuser
 from os import getenv, urandom
-from os.path import expanduser, join
+from os.path import expanduser, isfile, join
 import string
 import subprocess
-from sys import exit, platform
+from sys import argv, exit, platform
 import time
 
-parser = argparse.ArgumentParser(description='A tiny password manager.')
-parser.add_argument('alias', nargs='?', help='Alias of the password to read')
-parser.add_argument('-i', '--init', action='store_true')
-parser.add_argument('-r','--read', help='Password to fetch')
-parser.add_argument('-u','--username', help='Fetch the username for an alias')
-parser.add_argument('-w','--write', action='store_true', help='Write a new password to the safe')
-parser.add_argument('-d', '--delete', help='Delete a password from the safe')
+class Safe():
+  def __init__(self, utils):
+    self.utils = utils
 
-class Pick():
-  def __init__(self, password, safe, config):
-    self.password = password
-    self.safe = safe
-    self.config = config
-    self.platform = self.get_platform()
+    self.password = self.get_master_password()
+    self.safe = self.get_safe_path()
+    self.config = self.get_config()
 
   def write_safe(self, json_data):
     ''' Writes the given data to an ecrypted file using gpg '''
@@ -38,83 +30,90 @@ class Pick():
 
   def read_safe(self):
     ''' Decrypts the safe and returns the parsed JSON '''
+    if not isfile(self.safe):
+      if not self.utils.get_answer('No safe found at %s, create one' % self.safe):
+        self.utils.die('You must create a safe', 100)
+      else:
+        print self.initialize_safe()
+
     with open('/dev/null', 'w') as null:
       cmd= 'gpg --decrypt --batch --armor --passphrase %s %s' % (self.password, self.safe)
       p1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=null)
       secrets, err = p1.communicate()
 
       if err: 
-        die(err, 102)
+        self.utils.die(err, 102)
 
     try:
       return json.loads(secrets)
     except ValueError:
-      die('Unable to read safe at %s' % self.safe, 101)
+      self.utils.die('Unable to read safe at %s' % self.safe, 101)
 
-  def delete_password(self, alias):
-    """ Deletes a password from the safe """
+  def read_credential(self, alias):
+    ''' Reads a credential by alias '''
+    safe = self.read_safe()
+
+    if alias not in safe['data']:
+      self.utils.die('Credential not found')
+
+    return safe['data'][alias]
+
+  def write_credential(self, alias=None, username=None, password=None):
+    ''' Writes a credential by alias '''
+    safe = self.read_safe()
+
+    # 1. Make sure there's an alias
+    if not alias:
+      alias = self.utils.get_input('Enter an Alias')
+
+    # 1a. Confirm before overwriting an existing credential
+    alias_exists = alias in safe['data']
+    if (
+            alias_exists and 
+            not self.utils.get_answer('%s already exists, do you want to overwrite' % alias)
+        ): self.utils.die()
+
+    # 2. Make sure there's a username
+    if not username:
+      username = self.utils.get_input('Enter the account username (username/email/etc)')
+
+    # 3. Make sure there's a password
+    if not password:
+      if self.utils.get_answer('Generate password'):
+        password = self.utils.generate_password()
+      else:
+        password = getpass('Enter the password\n> ')
+
+    now = int(time.time())
+
+    # 4. Create the credential
+    if alias_exists:
+      safe['data'][alias]['username'] = username
+      safe['data'][alias]['password'] = password 
+      safe['data'][alias]['modified_on'] = now
+    else:
+      safe['data'][alias] = {
+              'alias': alias,
+              'username': username,
+              'password': password,
+              'created_on': now,
+              'modified_on': now
+              }
+
+    # 5. Save it
+    self.write_safe(safe)
+    return 'Credential saved'
+
+  def delete_credential(self, alias):
+    """ Deletes a credential from the safe """
     safe = self.read_safe()
 
     if not alias in safe['data']:
-      die('Alias not found')
+      self.utils.die('Alias not found')
 
     del safe['data'][alias]
     self.write_safe(safe)
-    print 'Password deleted'
-
-  def write_password(self):
-    ''' Writes a password to the safe '''
-    safe = self.read_safe()
-
-    alias = get_input('Enter an Alias')
-    if (
-            alias in safe['data'] and 
-            not get_answer('%s already exists, do you want to overwrite' % alias)
-        ): die()
-
-    username = get_input('Enter the account name (username/email/etc)')
-
-    if get_answer('Generate password'):
-      password = self.generate_password()
-    else:
-      password = getpass('Enter the password\n> ')
-
-    now = int(time.time())
-    safe['data'][alias] = {
-            'alias': alias,
-            'username': username,
-            'password': password,
-            'created_on': now,
-            'modified_on': now
-            }
-
-    self.write_safe(safe)
-    self.clip(password)
-    print 'Password saved and copied to clipboard!'
-
-  def read_password(self, alias):
-    ''' Reads a password by alias '''
-    safe = self.read_safe()
-
-    if alias == 'all':
-      return self.pretty_print(safe['data'])
-    if alias not in safe['data']:
-      die('Password not found')
-
-    password = safe['data'][alias]['password']
-    self.clip(password)
-
-    if not self.config['silent']:
-      print password
-
-  def read_username(self, alias):
-    """ Reads a username for an alias """
-    safe = self.read_safe()
-
-    if not alias in safe['data']:
-      die('Alias not found')
-
-    print safe['data'][alias]['username']
+    return 'Credential removed'
 
   def initialize_safe(self):
     ''' Creates a new safe with default values '''
@@ -124,8 +123,32 @@ class Pick():
         'data':{}
     })
 
-    print 'Safe created!'
+    return 'Safe created'
 
+  def get_master_password(self):
+    ''' Loads the password from the environment or prompts the user for it '''
+    password = getenv('PICK_TOKEN', None)
+    return password if password else getpass('Enter password\n> ')
+  
+  def get_safe_path(self):
+    ''' Loads the safe path from the environment or uses the default location '''
+    default_safe_file = join(expanduser('~'), '.pick.safe')
+    return getenv('PICK_SAFE', default_safe_file)
+  
+  def get_config(self):
+    ''' Loads the configuration from the environment or uses defaults '''
+    try:
+      config = json.loads(getenv('PICK_CONFIG', '{}'))
+  
+      if 'silent' not in config:
+        config['silent'] = False
+  
+      return config
+    except ValueError:
+      self.utils.die('Unable to read PICK_CONFIG', 101)
+    
+
+class Util():
   def generate_password(self, length=50):
     ''' Generates a random password of length '''
     rand_max = 256
@@ -140,7 +163,11 @@ class Pick():
           return x % length
 
     return ''.join(chars[next_index()] for _ in range(length))
-    
+
+  def pretty_print(self, json_data):
+    ''' Pretty prints JSON '''
+    print json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ': '))
+  
   def get_platform(self):
     ''' Get the plaform we're running on '''
     if platform in ['linux', 'linux2']:
@@ -148,83 +175,152 @@ class Pick():
     elif platform == "darwin":
       return 'osx'
     else: 
-      die('Unsupported platform %s' % platform)
-
-  def pretty_print(self, json_data):
-    ''' Pretty prints JSON '''
-    print json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ': '))
-
-  def clip(self, text):
+      self.die('Unsupported platform %s' % platform)
+  
+  def copy_to_clipboard(self, text):
     ''' Copy the given text to the clipboard '''
-    if self.platform == 'linux':
+    if self.get_platform() == 'linux':
       process = subprocess.Popen(['xclip', '-sel', 'clip'], stdin=subprocess.PIPE)
     else:
       # Assumes OS X
       process = subprocess.Popen('pbcopy', stdin=subprocess.PIPE)
-
+  
     process.communicate(text.encode('utf-8'))
+  
+  def die(self, message=None, code=0):
+    ''' Exit the program with a message and code '''
+    if message: print message
+    exit(code)
+  
+  def get_input(self, prompt):
+    ''' Get user input with some default formatting '''
+    return raw_input('%s\n> ' % prompt)
+  
+  def get_answer(self, prompt, default='y'):
+    ''' Gets a y/n answer for the prompt '''
+    answer = raw_input('%s? (y/n)\n> ' % prompt)
+    if not answer: 
+      answer = default
+  
+    return answer.lower().strip() == 'y'
 
-def die(message='', code=100):
-  print message
-  exit(code)
 
-def get_input(prompt):
-  return raw_input('%s\n> ' % prompt)
+class Cli():
+  def __init__(self, usage, version):
+    self.usage = usage
+    self.version = version
 
-def get_answer(prompt, default='y'):
-  ''' Gets a y/n answer for the prompt '''
-  answer = raw_input('%s? (y/n)\n> ' % prompt)
-  if not answer: 
-    answer = default
+  def parse_args(self):
+    ''' Parses the command line arguments '''
+    if len(argv) <= 1:
+      print self.usage; exit()
+  
+    self.prog = argv[0].strip()
+    self.cmd = argv[1].strip()
+  
+    if self.cmd == '-h' or self.cmd == '--help':
+      print self.usage; exit()
+  
+    if self.cmd == '--version':
+      print self.version; exit()
+  
+    self.cmd_args = argv[2:]
+  
+    if '-h' in self.cmd_args or '--help' in self.cmd_args:
+      print self.command_help(self.cmd); exit()
+  
+  def command_help(self, cmd):
+    ''' Returns a help string for a command '''
+    if cmd == 'add':
+      return 'Usage: %s add [ALIAS] [USERNAME] [PASSWORD]' % self.prog
+    elif cmd == 'cat':
+      return 'Usage: %s cat ALIAS' % self.prog
+    elif cmd == 'cp':
+      return 'Usage: %s cp ALIAS' % self.prog
+    elif cmd == 'ls':
+      return 'Usage: %s ls' % self.prog
+    elif cmd == 'rm':
+      return 'Usage: %s rm ALIAS' % self.prog
+    else:
+      return None
 
-  return answer.lower().strip() == 'y'
+  def do_add(self):
+    ''' Executes the add command '''
+    if len(self.cmd_args) == 3:
+        alias, username, password = self.cmd_args
+    elif len(self.cmd_args) == 2:
+        alias, username = self.cmd_args; password = None
+    elif len(self.cmd_args) == 1:
+        alias = self.cmd_args[0]; password = None; username = None
+    else:
+        alias, username, password = [None, None, None]
 
-def get_master_password():
-  ''' Loads the password from the environment or prompts the user for it '''
-  password = getenv('PICK_TOKEN', None)
-  return password if password else getpass('Enter password\n> ')
+    print self.safe.write_credential(alias, username, password)
 
-def get_safe_path():
-  ''' Loads the safe path from the environment or uses the default location '''
-  default_safe_file = join(expanduser('~'), '.pick.safe')
-  return getenv('PICK_SAFE', default_safe_file)
+  def do_cat(self):
+    ''' Executes the cat command '''
+    if len(self.cmd_args) < 1:
+      self.utils.die(self.command_help(self.cmd))
 
-def get_config():
-  ''' Loads the configuration from the environment or uses defaults '''
-  try:
-    config = json.loads(getenv('PICK_CONFIG', '{}'))
+    for alias in self.cmd_args:
+      self.utils.pretty_print(self.safe.read_credential(alias))
 
-    if 'silent' not in config:
-      config['silent'] = False
+  def do_copy(self):
+    ''' Executes the copy command '''
+    if len(self.cmd_args) != 1:
+      self.utils.die(self.command_help(self.cmd))
 
-    return config
-  except ValueError:
-    die('Unable to read PICK_CONFIG', 101)
+    alias = self.cmd_args[0]
+    credential = self.safe.read_credential(alias)
+    self.utils.copy_to_clipboard(credential['password'])
 
+  def do_ls(self):
+    ''' Executes the ls command '''
+    safe = self.safe.read_safe()
+    for credential in safe['data'].keys(): print credential
+
+  def do_rm(self):
+    ''' Executes the rm command '''
+    if len(self.cmd_args) < 1:
+      self.utils.die(self.command_help(self.cmd))
+
+    for alias in self.cmd_args:
+      print self.safe.delete_credential(alias)
+
+  def run(self):
+    ''' Runs a command '''
+    self.parse_args()
+
+    self.utils = Util()
+    self.safe = Safe(self.utils)
+
+    if self.cmd == 'add':
+      self.do_add()
+    elif self.cmd == 'cat':
+      self.do_cat()
+    elif self.cmd == 'cp':
+      self.do_copy()
+    elif self.cmd == 'ls':
+      self.do_ls()
+    elif self.cmd == 'rm':
+      self.do_rm()
+    else:
+      self.utils.die(self.usage)
 
 if __name__=='__main__':
-  args = parser.parse_args()
-
-  pick = Pick(
-          password = get_master_password(),
-          safe = get_safe_path(),
-          config = get_config()
-          )
-
-  if args.alias:
-    pick.read_password(args.alias)
-
-  elif args.read:
-    pick.read_password(args.read)
-
-  elif args.username:
-    pick.read_username(args.username)
-
-  elif args.init:
-    pick.initialize_safe()
+  VERSION = '0.1.0'
+  USAGE = '''pick - minimal password manager
   
-  elif args.write:
-    pick.write_password()
+Options:
+    -h, --help      Print usage
+    --version       Print version information and quit
 
-  elif args.delete:
-    pick.delete_password(args.delete)
+Commands:
+    add     Save a credential to the safe
+    cat     Print a credential to STDOUT
+    cp      Copy a credential password to the clipboard
+    ls      List credentials
+    rm      Remove a credential
+  '''
+
+  Cli(USAGE, VERSION).run()

@@ -8,25 +8,17 @@ Features
 --------
 * GPG for encryption
 * JSON formatted data
+* Password generation
 * Environment Variable configuration
 
 Dependencies
 ------------
-* GPG
-   ```sh
-   # OS X
-   brew install gpg
-   ```
-   ```sh
-   # Linux
-   sudo apt-get install gnupg
-   ```
+#### GPG
+* **OS X**: `brew install gpg` 
+* **Linux**: `sudo apt-get install gnupg`
 
-* xclip (Linux only)
-   ```sh
-   # Linux
-   sudo apt-get install xclip
-   ```
+#### xclip (Linux only)
+* **Linux**: `sudo apt-get install xclip`
 
 Installation
 ------------
@@ -40,39 +32,20 @@ Installation
     cp pick /usr/local/bin
     ```
 
-3. Initialize pick
-    ```sh
-    pick --init
-    ```
-
-Usage
------
-* Write a password (interactive)
-    ```sh
-    pick -w
-    ```
-
-* Read a password by alias
-    ```sh
-    pick github
-    ```
-
-* Read all passwords
-    ```sh
-    pick all
-    ```
-
-Advanced
+Commands
 --------
+```
+add [ALIAS] [USERNAME] [PASSWORD]     Add a credential to the safe
+cat ALIAS                             Print a credential to STDOUT
+cp  ALIAS                             Copy a credential's password to the clipboard
+ls                                    List credentials
+rm  ALIAS                             Remove a credential
+```
 
-### Environment Variables
+Config
+------
 
-* Don't want to type in the password everytime?
+* Don't want to type in the password everytime?    
     ```sh
     export PICK_TOKEN=<PASSWORD HERE>
-    ```
-
-* Don't ever want your passwords printed to stdout?
-    ```sh
-    export PICK_CONFIG='{"silent":true}'
     ```
