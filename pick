@@ -18,7 +18,7 @@ class Safe():
     self.config = self.get_config()
 
   def write_safe(self, json_data):
-    ''' Writes the given data to an ecrypted file using gpg '''
+    ''' Writes the given data to an encrypted file using gpg '''
     with open('/dev/null', 'w') as null:
       # Send the data to encrypt into a pipe
       cmd1 = 'echo %s' % json.dumps(json_data)
