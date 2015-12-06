@@ -154,7 +154,7 @@ class Util():
     rand_max = 256
     rand_excess = (rand_max + 1) % length
     rand_limit = rand_max - rand_excess
-    chars = string.uppercase + string.lowercase + string.punctuation + string.letters
+    chars = string.digits + string.letters + string.punctuation
 
     def next_index():
       while True:
