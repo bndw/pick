@@ -13,16 +13,12 @@ Features
 
 Dependencies
 ------------
-##### GPG
-Used to encrypt all data
+#### GPG
+* **OS X**: `brew install gpg` 
+* **Linux**: `sudo apt-get install gnupg`
 
-* OS X: `brew install gpg` 
-* Linux: `sudo apt-get install gnupg`
-
-##### xclip (Linux only)
-Used to copy passwords to the clipboard on Linux systems
-
-* Linux: `sudo apt-get install xclip`
+#### xclip (Linux only)
+* **Linux**: `sudo apt-get install xclip`
 
 Installation
 ------------
@@ -48,7 +44,8 @@ rm  ALIAS                             Remove a credential
 
 Config
 ------
-* Don't want to type in the password everytime?
+
+* Don't want to type in the password everytime?    
     ```sh
     export PICK_TOKEN=<PASSWORD HERE>
     ```
