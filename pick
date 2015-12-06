@@ -151,16 +151,12 @@ class Safe():
 class Util():
   def generate_password(self, length=50):
     ''' Generates a random password of length '''
-    rand_max = 256
-    rand_excess = (rand_max + 1) % length
-    rand_limit = rand_max - rand_excess
-    chars = string.digits + string.letters + string.punctuation
+    # Use no more than 256 chars in this string, rest will not be used
+    chars = string.digits + string.punctuation + string.letters
+    num_chars = len(chars)
 
     def next_index():
-      while True:
-        x = ord(urandom(1))
-        if x <= rand_limit:
-          return x % length
+      return ord(urandom(1)) % num_chars
 
     return ''.join(chars[next_index()] for _ in range(length))
 
