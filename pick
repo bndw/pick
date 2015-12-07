@@ -41,7 +41,7 @@ class Safe():
       p1 = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=null)
       secrets, err = p1.communicate()
 
-      if err: 
+      if err:
         self.utils.die(err, 102)
 
     try:
@@ -69,7 +69,7 @@ class Safe():
     # 1a. Confirm before overwriting an existing credential
     alias_exists = alias in safe['data']
     if (
-            alias_exists and 
+            alias_exists and
             not self.utils.get_answer('%s already exists, do you want to overwrite' % alias)
         ): self.utils.die()
 
@@ -89,7 +89,7 @@ class Safe():
     # 4. Create the credential
     if alias_exists:
       safe['data'][alias]['username'] = username
-      safe['data'][alias]['password'] = password 
+      safe['data'][alias]['password'] = password
       safe['data'][alias]['modified_on'] = now
     else:
       safe['data'][alias] = {
@@ -118,8 +118,8 @@ class Safe():
   def initialize_safe(self):
     ''' Creates a new safe with default values '''
     self.write_safe({
-        'created_on': int(time.time()), 
-        'created_by': getuser(), 
+        'created_on': int(time.time()),
+        'created_by': getuser(),
         'data':{}
     })
 
@@ -129,24 +129,24 @@ class Safe():
     ''' Loads the password from the environment or prompts the user for it '''
     password = getenv('PICK_TOKEN', None)
     return password if password else getpass('Enter password\n> ')
-  
+
   def get_safe_path(self):
     ''' Loads the safe path from the environment or uses the default location '''
     default_safe_file = join(expanduser('~'), '.pick.safe')
     return getenv('PICK_SAFE', default_safe_file)
-  
+
   def get_config(self):
     ''' Loads the configuration from the environment or uses defaults '''
     try:
       config = json.loads(getenv('PICK_CONFIG', '{}'))
-  
+
       if 'silent' not in config:
         config['silent'] = False
-  
+
       return config
     except ValueError:
       self.utils.die('Unable to read PICK_CONFIG', 101)
-    
+
 
 class Util():
   def generate_password(self, length=50):
@@ -167,16 +167,16 @@ class Util():
   def pretty_print(self, json_data):
     ''' Pretty prints JSON '''
     print json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ': '))
-  
+
   def get_platform(self):
     ''' Get the plaform we're running on '''
     if platform in ['linux', 'linux2']:
       return 'linux'
     elif platform == "darwin":
       return 'osx'
-    else: 
+    else:
       self.die('Unsupported platform %s' % platform)
-  
+
   def copy_to_clipboard(self, text):
     ''' Copy the given text to the clipboard '''
     if self.get_platform() == 'linux':
@@ -184,24 +184,24 @@ class Util():
     else:
       # Assumes OS X
       process = subprocess.Popen('pbcopy', stdin=subprocess.PIPE)
-  
+
     process.communicate(text.encode('utf-8'))
-  
+
   def die(self, message=None, code=0):
     ''' Exit the program with a message and code '''
     if message: print message
     exit(code)
-  
+
   def get_input(self, prompt):
     ''' Get user input with some default formatting '''
     return raw_input('%s\n> ' % prompt)
-  
+
   def get_answer(self, prompt, default='y'):
     ''' Gets a y/n answer for the prompt '''
     answer = raw_input('%s? (y/n)\n> ' % prompt)
-    if not answer: 
+    if not answer:
       answer = default
-  
+
     return answer.lower().strip() == 'y'
 
 
@@ -214,21 +214,21 @@ class Cli():
     ''' Parses the command line arguments '''
     if len(argv) <= 1:
       print self.usage; exit()
-  
+
     self.prog = argv[0].strip()
     self.cmd = argv[1].strip()
-  
+
     if self.cmd == '-h' or self.cmd == '--help':
       print self.usage; exit()
-  
+
     if self.cmd == '--version':
       print self.version; exit()
-  
+
     self.cmd_args = argv[2:]
-  
+
     if '-h' in self.cmd_args or '--help' in self.cmd_args:
       print self.command_help(self.cmd); exit()
-  
+
   def command_help(self, cmd):
     ''' Returns a help string for a command '''
     if cmd == 'add':
@@ -310,7 +310,7 @@ class Cli():
 if __name__=='__main__':
   VERSION = '0.1.0'
   USAGE = '''pick - minimal password manager
-  
+
 Options:
     -h, --help      Print usage
     --version       Print version information and quit
