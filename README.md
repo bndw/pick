@@ -45,7 +45,7 @@ rm  ALIAS                             Remove a credential
 Config
 ------
 
-* Don't want to type in the password everytime?    
+* Override the safe location (default: ~/.pick.safe)
     ```sh
-    export PICK_TOKEN=<PASSWORD HERE>
+    export PICK_SAFE=/path/to/pick.safe
     ```

@@ -12,10 +12,8 @@ import time
 class Safe():
   def __init__(self, utils):
     self.utils = utils
-
-    self.password = self.get_master_password()
     self.safe = self.get_safe_path()
-    self.config = self.get_config()
+    self.password = getpass('Enter password\n> ')
 
   def write_safe(self, json_data):
     ''' Writes the given data to an encrypted file using gpg '''
@@ -125,27 +123,10 @@ class Safe():
 
     return 'Safe created'
 
-  def get_master_password(self):
-    ''' Loads the password from the environment or prompts the user for it '''
-    password = getenv('PICK_TOKEN', None)
-    return password if password else getpass('Enter password\n> ')
-
   def get_safe_path(self):
     ''' Loads the safe path from the environment or uses the default location '''
     default_safe_file = join(expanduser('~'), '.pick.safe')
     return getenv('PICK_SAFE', default_safe_file)
-
-  def get_config(self):
-    ''' Loads the configuration from the environment or uses defaults '''
-    try:
-      config = json.loads(getenv('PICK_CONFIG', '{}'))
-
-      if 'silent' not in config:
-        config['silent'] = False
-
-      return config
-    except ValueError:
-      self.utils.die('Unable to read PICK_CONFIG', 101)
 
 
 class Util():
