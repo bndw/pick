@@ -12,7 +12,7 @@ func (s *Safe) save() error {
 		return err
 	}
 
-	ciphertext, err := utils.Encrypt(plaintext, _password)
+	ciphertext, err := utils.Encrypt(plaintext, s.password)
 	if err != nil {
 		return err
 	}

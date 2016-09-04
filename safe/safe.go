@@ -6,7 +6,6 @@ import (
 
 type Safe struct {
 	backend  backends.Backend   `json:"-"`
+	password []byte             `json:"-"`
 	Accounts map[string]Account `json:"accounts"`
 }
-
-var _password []byte

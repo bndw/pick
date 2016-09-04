@@ -13,9 +13,7 @@ func Load(password []byte, backend backends.Backend) (*Safe, error) {
 		// TODO: Check the config for a disk location
 		backend = backends.NewDiskBackend(nil)
 	}
-
-	_password = password
-	s := Safe{backend: backend}
+	s := Safe{backend: backend, password: password}
 
 	ciphertext, err := s.backend.Load()
 
