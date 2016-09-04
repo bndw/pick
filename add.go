@@ -42,7 +42,7 @@ func addCommand(args ...string) int {
 }
 
 func overwrite(name string) bool {
-	prompt := fmt.Sprintf("%s already exists, overwrite (y/n) ?\n", name)
+	prompt := fmt.Sprintf("%s already exists, overwrite (y/n)?", name)
 	return utils.GetAnswer(prompt)
 }
 
