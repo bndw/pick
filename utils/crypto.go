@@ -12,10 +12,6 @@ import (
 	"golang.org/x/crypto/openpgp/armor"
 )
 
-func init() {
-	pseudoRand.Seed(time.Now().UTC().UnixNano())
-}
-
 // decrypt uses PGP to decrypt symmetrically encrypted and armored text
 // with the provided password.
 func Decrypt(text []byte, password []byte) (decryptedText []byte, err error) {
