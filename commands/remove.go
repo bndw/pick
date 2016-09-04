@@ -1,8 +1,8 @@
-package main
+package commands
 
 import "fmt"
 
-func removeCommand(args ...string) int {
+func RemoveCommand(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
 		return handleError(err)

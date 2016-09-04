@@ -1,11 +1,11 @@
-package main
+package commands
 
 import (
 	"fmt"
 	"sort"
 )
 
-func listCommand(args ...string) int {
+func ListCommand(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
 		return handleError(err)

@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/bndw/pick/utils"
 )
 
-func exportCommand(args ...string) int {
+func ExportCommand(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
 		return handleError(err)

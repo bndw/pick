@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ const (
 	passwordLength = 25
 )
 
-func addCommand(args ...string) int {
+func AddCommand(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
 		return handleError(err)

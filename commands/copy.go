@@ -1,6 +1,6 @@
-package main
+package commands
 
-func copyCommand(args ...string) int {
+func CopyCommand(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
 		return handleError(err)
