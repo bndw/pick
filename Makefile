@@ -1,7 +1,7 @@
 PWD := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 GOPKG = github.com/bndw/pick
-GOPATH = "$(CURDIR):$(CURDIR)/vendor"
+GOPATH = "$(CURDIR)/vendor:$(CURDIR)"
 
 BIN_DIR = /usr/local/bin
 INSTALL = install
