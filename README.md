@@ -4,48 +4,30 @@ A minimal password manager for OS X and Linux.
 
 ![demo](https://github.com/bndw/pick/raw/master/demo.gif)
 
-Features
---------
-* GPG for encryption
-* JSON formatted data
-* Password generation
-* Environment Variable configuration
-
-Dependencies
-------------
-#### GPG
-* **OS X**: `brew install gpg` 
-* **Linux**: `sudo apt-get install gnupg`
-
-#### xclip (Linux only)
-* **Linux**: `sudo apt-get install xclip`
-
-Installation
-------------
-1. Clone the repository
-    ```sh
-    git clone https://github.com/bndw/pick.git && cd pick
-    ```
-
-2. Copy the `pick` executable into your PATH
-    ```sh
-    cp pick /usr/local/bin
-    ```
-
-Commands
---------
-```
-add [ALIAS] [USERNAME] [PASSWORD]     Add a credential to the safe
-cat ALIAS                             Print a credential to STDOUT
-cp  ALIAS                             Copy a credential's password to the clipboard
-ls                                    List credentials
-rm  ALIAS                             Remove a credential
+## Install
+```sh
+$ go get github.com/bndw/pick
 ```
 
-Config
-------
+## Usage
+```
+Usage:
+  pick [command]
 
-* Override the safe location (default: ~/.pick.safe)
-    ```sh
-    export PICK_SAFE=/path/to/pick.safe
-    ```
+Available Commands:
+  add         Add a credential
+  cat         Cat a credential
+  cp          Copy a credential to the clipboard
+  export      Export decrypted credentials in JSON format
+  ls          List all credentials
+  rm          Remove a credential
+
+Flags:
+  -h, --help   help for pick
+
+Use "pick [command] --help" for more information about a command.
+```
+
+## Similar software
+* [pwd.sh: Unix shell, GPG-based password manager](https://github.com/drduh/pwd.sh)
+* [Pass: the standard unix password manager](http://www.passwordstore.org/)

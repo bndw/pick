@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+BIN_DIR=${BIN_DIR:-/usr/local/bin}
+INSTALL=install
+
+echo "Installing pick to $BIN_DIR/pick..."
+$INSTALL -c bin/pick $BIN_DIR/pick
