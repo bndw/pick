@@ -6,6 +6,14 @@ A minimal password manager for OS X and Linux.
 $ go get github.com/bndw/pick
 ```
 
+or
+
+```sh
+$ git clone https://github.com/bndw/pick && cd pick
+$ make
+$ make install
+```
+
 ![demo](https://github.com/bndw/pick/raw/master/demo.gif)
 
 ## Usage
