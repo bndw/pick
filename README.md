@@ -9,15 +9,6 @@ A minimal password manager for OS X and Linux.
 $ go get github.com/bndw/pick
 ```
 
-or
-
-```sh
-$ git clone https://github.com/bndw/pick && cd pick
-$ ./build
-$ ./install
-```
-
-
 ## Usage
 ```
 Usage:
