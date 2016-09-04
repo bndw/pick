@@ -12,21 +12,12 @@ func exportCommand(args ...string) int {
 		return handleError(err)
 	}
 
-	accounts, err := safe.List()
-	if err != nil {
-		return handleError(err)
-	}
-
+	accounts := safe.List()
 	if len(accounts) < 1 {
 		fmt.Println("No accounts to export")
 		return 1
 	}
 
-	var accountSlice []interface{}
-	for _, account := range accounts {
-		accountSlice = append(accountSlice, account)
-	}
-
-	utils.PrettyPrint(accountSlice)
+	utils.PrettyPrint(accounts)
 	return 0
 }

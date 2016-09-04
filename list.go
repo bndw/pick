@@ -11,13 +11,8 @@ func listCommand(args ...string) int {
 		return handleError(err)
 	}
 
-	accounts, err := safe.List()
-	if err != nil {
-		return handleError(err)
-	}
-
 	var accountNames []string
-	for _, account := range accounts {
+	for _, account := range safe.List() {
 		accountNames = append(accountNames, account.Name)
 	}
 
