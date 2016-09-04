@@ -10,9 +10,10 @@ import (
 )
 
 const (
+	safeFileName = "pick.safe"
+	safeFileMode = 0600
+	safeDirName  = ".pick"
 	safeDirMode  = 0700
-	safeMode     = 0600
-	safeFilename = "pick.safe"
 )
 
 type DiskBackend struct {
@@ -26,7 +27,7 @@ func defaultSafePath() *string {
 		panic(err)
 	}
 
-	safeDir := fmt.Sprintf("%s/.pick", usr.HomeDir)
+	safeDir := fmt.Sprintf("%s/%s", usr.HomeDir, safeDirName)
 
 	if _, err := os.Stat(safeDir); os.IsNotExist(err) {
 		if mkerr := os.Mkdir(safeDir, safeDirMode); mkerr != nil {
@@ -34,7 +35,7 @@ func defaultSafePath() *string {
 		}
 	}
 
-	safePath := fmt.Sprintf("%s/%s", safeDir, safeFilename)
+	safePath := fmt.Sprintf("%s/%s", safeDir, safeFileName)
 
 	return &safePath
 }
@@ -56,5 +57,5 @@ func (db *DiskBackend) Load() ([]byte, error) {
 }
 
 func (db *DiskBackend) Save(data []byte) error {
-	return ioutil.WriteFile(db.path, data, safeMode)
+	return ioutil.WriteFile(db.path, data, safeFileMode)
 }
