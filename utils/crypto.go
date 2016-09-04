@@ -6,7 +6,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"math/big"
-	"time"
 
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/armor"
