@@ -38,6 +38,11 @@ func addCommand(args ...string) int {
 	}
 
 	fmt.Println("Credential added")
+	if utils.GetAnswer("Copy password to clipboard (Y/n)?", true) {
+		if err := safe.Copy(name); err != nil {
+			handleError(err)
+		}
+	}
 	return 0
 }
 
