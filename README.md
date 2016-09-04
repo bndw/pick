@@ -3,7 +3,7 @@ pick
 A minimal password manager for OS X and Linux.
 
 ```sh
-$ go get github.com/bndw/pick
+$ go get -u github.com/bndw/pick
 ```
 
 ![demo](https://github.com/bndw/pick/raw/master/demo.gif)
