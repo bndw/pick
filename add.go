@@ -23,16 +23,13 @@ func addCommand(args ...string) int {
 	}
 
 	err = safe.Add(name, username, password)
-	if _, conflict := err.(*errors.AccountExists); conflict {
-		if overwrite(name) {
-			// Remove the existing credential
-			rerr := safe.Remove(name)
-			if rerr != nil {
-				return handleError(rerr)
-			}
-
-			addCommand([]string{name, username, password}...)
+	if _, conflict := err.(*errors.AccountExists); conflict && overwrite(name) {
+		rerr := safe.Remove(name)
+		if rerr != nil {
+			return handleError(rerr)
 		}
+
+		addCommand([]string{name, username, password}...)
 	} else if err != nil {
 		return handleError(err)
 	}
@@ -54,12 +51,11 @@ func parseAddArgs(args []string) (name, username, password string, errCode int) 
 
 	switch len(args) {
 	case 3:
-		name = args[0]
-		username = args[1]
 		password = args[2]
+		fallthrough
 	case 2:
-		name = args[0]
 		username = args[1]
+		fallthrough
 	case 1:
 		name = args[0]
 	}
