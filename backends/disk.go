@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/user"
 
 	"github.com/bndw/pick/errors"
+	"github.com/mitchellh/go-homedir"
 )
 
 const (
@@ -21,13 +21,12 @@ type DiskBackend struct {
 }
 
 func defaultSafePath() *string {
-	// TODO(): This will not work on Windows.
-	usr, err := user.Current()
+	home, err := homedir.Dir()
 	if err != nil {
 		panic(err)
 	}
 
-	safeDir := fmt.Sprintf("%s/%s", usr.HomeDir, safeDirName)
+	safeDir := fmt.Sprintf("%s/%s", home, safeDirName)
 
 	if _, err := os.Stat(safeDir); os.IsNotExist(err) {
 		if mkerr := os.Mkdir(safeDir, safeDirMode); mkerr != nil {
