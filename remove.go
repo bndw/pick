@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func removeCommand(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
@@ -10,5 +12,6 @@ func removeCommand(args ...string) int {
 		return handleError(err)
 	}
 
+	fmt.Println("Credential removed")
 	return 0
 }
