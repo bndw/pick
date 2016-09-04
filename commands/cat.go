@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/bndw/pick/utils"
 )
 
-func catCommand(args ...string) int {
+func CatCommand(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
 		return handleError(err)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bndw/pick/commands"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +14,7 @@ var cmdAdd = &cobra.Command{
 	Long: `The add command is used to add a new credential.
             `,
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(addCommand(args...))
+		os.Exit(commands.AddCommand(args...))
 	},
 }
 
@@ -28,7 +29,7 @@ var cmdCat = &cobra.Command{
 			os.Exit(1)
 		}
 
-		os.Exit(catCommand(args...))
+		os.Exit(commands.CatCommand(args...))
 	},
 }
 
@@ -44,7 +45,7 @@ to the clipboard.
 			os.Exit(1)
 		}
 
-		os.Exit(copyCommand(args...))
+		os.Exit(commands.CopyCommand(args...))
 	},
 }
 
@@ -55,7 +56,7 @@ var cmdExport = &cobra.Command{
 format.
             `,
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(exportCommand(args...))
+		os.Exit(commands.ExportCommand(args...))
 	},
 }
 
@@ -65,7 +66,7 @@ var cmdList = &cobra.Command{
 	Long: `The list command is used to list the saved credentials.
             `,
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(listCommand(args...))
+		os.Exit(commands.ListCommand(args...))
 	},
 }
 
@@ -75,7 +76,7 @@ var cmdRemove = &cobra.Command{
 	Long: `The remove command is used to remove a saved credential.
             `,
 	Run: func(cmd *cobra.Command, args []string) {
-		os.Exit(removeCommand(args...))
+		os.Exit(commands.RemoveCommand(args...))
 	},
 }
 
