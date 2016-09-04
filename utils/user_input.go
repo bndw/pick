@@ -9,13 +9,16 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func GetAnswer(prompt string) bool {
+func GetAnswer(prompt string, defaultYes bool) bool {
 	text, err := GetInput(prompt)
 	if err != nil {
 		return false
 	}
 
 	text = strings.ToLower(text)
+	if text == "" && defaultYes {
+		return true
+	}
 	if strings.HasPrefix(text, "y") {
 		return true
 	}
