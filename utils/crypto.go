@@ -4,12 +4,18 @@ import (
 	"bytes"
 	"crypto/rand"
 	"errors"
-	"io"
 	"io/ioutil"
+	"math/big"
+	pseudoRand "math/rand"
+	"time"
 
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/armor"
 )
+
+func init() {
+	pseudoRand.Seed(time.Now().UTC().UnixNano())
+}
 
 // decrypt uses PGP to decrypt symmetrically encrypted and armored text
 // with the provided password.
@@ -77,34 +83,24 @@ func Encrypt(text []byte, password []byte) (encryptedText []byte, err error) {
 }
 
 // GeneratePassword generates a password.
-func GeneratePassword(length int) (password string, err error) {
-	chars := []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+,.?/:;{}[]`~")
+func GeneratePassword(length int) string {
+	const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-	passwordBuf := make([]byte, length)
-	randomData := make([]byte, length+(length/4)) // storage for random bytes.
-	charLen := byte(len(chars))
-	maxrb := byte(256 - (256 % len(chars)))
-	i := 0
+	buffer := make([]byte, length)
+	max := big.NewInt(int64(len(chars)))
 
-	for {
-		if _, err := io.ReadFull(rand.Reader, randomData); err != nil {
-			return "", err
-		}
-		for _, c := range randomData {
-			if c >= maxrb {
-				continue
-			}
-
-			passwordBuf[i] = chars[c%charLen]
-			i++
-
-			if i == length {
-				// We're done
-				return string(passwordBuf), nil
-			}
-		}
+	for i := 0; i < length; i++ {
+		buffer[i] = chars[randomInt(max)]
 	}
 
-	// noop
-	return "", errors.New("Unable to generate password")
+	return string(buffer)
+}
+
+func randomInt(max *big.Int) int {
+	if rand, err := rand.Int(rand.Reader, max); err != nil {
+		// Fallback to pseudo-random
+		return pseudoRand.Intn(int(max.Int64()))
+	} else {
+		return int(rand.Int64())
+	}
 }
