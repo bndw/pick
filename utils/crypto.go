@@ -6,7 +6,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"math/big"
-	pseudoRand "math/rand"
 	"time"
 
 	"golang.org/x/crypto/openpgp"
@@ -83,24 +82,31 @@ func Encrypt(text []byte, password []byte) (encryptedText []byte, err error) {
 }
 
 // GeneratePassword generates a password.
-func GeneratePassword(length int) string {
+func GeneratePassword(length int) (string, error) {
 	const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 	buffer := make([]byte, length)
 	max := big.NewInt(int64(len(chars)))
 
+	var index int
+	var err error
 	for i := 0; i < length; i++ {
-		buffer[i] = chars[randomInt(max)]
+		index, err = randomInt(max)
+		if err != nil {
+			return "", err
+		}
+
+		buffer[i] = chars[index]
 	}
 
-	return string(buffer)
+	return string(buffer), nil
 }
 
-func randomInt(max *big.Int) int {
-	if rand, err := rand.Int(rand.Reader, max); err != nil {
-		// Fallback to pseudo-random
-		return pseudoRand.Intn(int(max.Int64()))
-	} else {
-		return int(rand.Int64())
+func randomInt(max *big.Int) (int, error) {
+	rand, err := rand.Int(rand.Reader, max)
+	if err != nil {
+		return 0, err
 	}
+
+	return int(rand.Int64()), nil
 }

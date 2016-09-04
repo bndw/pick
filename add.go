@@ -83,7 +83,11 @@ func parseAddArgs(args []string) (name, username, password string, errCode int) 
 
 	if password == "" {
 		if utils.GetAnswer("Generate password (y/n)?") {
-			password = utils.GeneratePassword(passwordLength)
+			password, err = utils.GeneratePassword(passwordLength)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 		} else {
 			var _password []byte
 			if _password, err = utils.GetPasswordInput(fmt.Sprintf("Enter a password for %s", name)); err != nil {
