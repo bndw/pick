@@ -42,8 +42,8 @@ func addCommand(args ...string) int {
 }
 
 func overwrite(name string) bool {
-	prompt := fmt.Sprintf("%s already exists, overwrite (y/n)?", name)
-	return utils.GetAnswer(prompt)
+	prompt := fmt.Sprintf("%s already exists, overwrite (y/N)?", name)
+	return utils.GetAnswer(prompt, false)
 }
 
 func parseAddArgs(args []string) (name, username, password string, errCode int) {
@@ -81,7 +81,7 @@ func parseAddArgs(args []string) (name, username, password string, errCode int) 
 	}
 
 	if password == "" {
-		if utils.GetAnswer("Generate password (y/n)?") {
+		if utils.GetAnswer("Generate password (Y/n)?", true) {
 			password, err = utils.GeneratePassword(passwordLength)
 			if err != nil {
 				fmt.Println(err)
