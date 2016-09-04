@@ -23,7 +23,7 @@ func addCommand(args ...string) int {
 	}
 
 	err = safe.Add(name, username, password)
-	if _, confict := err.(*errors.AccountExists); confict {
+	if _, conflict := err.(*errors.AccountExists); conflict {
 		if overwrite(name) {
 			// Remove the existing credential
 			rerr := safe.Remove(name)
