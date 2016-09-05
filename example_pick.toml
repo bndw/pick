@@ -1,0 +1,16 @@
+# An example of an optional config file for pick.
+# If no config file is available, sensible defaults will be used.
+# If you wish to use a config file, it must be located at ~/.pick/pick.toml
+
+# The encryption section controls the configuration of the safe encryption.
+[encryption]
+type = "aes"
+[encryption.settings]
+  hash = "sha256"
+
+# The storage section controls the configuration of the backend.
+[storage]
+type = "file"
+[storage.settings]
+  path = "/etc/pick/pick.safe"
+
