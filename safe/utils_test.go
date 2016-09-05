@@ -2,18 +2,13 @@ package safe
 
 import (
 	"io/ioutil"
-	"math/rand"
 	"os"
-	"time"
 
 	"github.com/bndw/pick/backends"
 	"github.com/bndw/pick/crypto"
 )
 
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
 func init() {
-	rand.Seed(time.Now().UnixNano())
 	removeTestSafe()
 }
 
@@ -68,12 +63,4 @@ func createTestSafe() (*Safe, error) {
 func removeTestSafe() {
 	_ = os.Remove(testSafeName)
 	return
-}
-
-func randomString(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-	return string(b)
 }
