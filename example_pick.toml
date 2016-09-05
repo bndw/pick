@@ -13,4 +13,3 @@ type = "aes-openpgp"
 type = "file"
   [storage.settings]
   path = "$HOME/.pick/pick.safe"
-
