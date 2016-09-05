@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"strings"
 
@@ -15,23 +14,23 @@ import (
 	"golang.org/x/crypto/openpgp/packet"
 )
 
-type AESClient struct {
+type AESOpenPGPClient struct {
 	packetConfig *packet.Config
 }
 
-func NewAESClient(config Config) (*AESClient, error) {
+func NewAESOpenPGPClient(config Config) (*AESOpenPGPClient, error) {
 
 	// TODO(): Construct a packet from the config
 	// pc := &packet.Config{
 	// 	 DefaultHash: getHashFromConfig(config),
 	// }
 
-	return &AESClient{}, nil
+	return &AESOpenPGPClient{}, nil
 }
 
 // decrypt uses PGP to decrypt symmetrically encrypted and armored text
 // with the provided password.
-func (*AESClient) Decrypt(ciphertext []byte, password []byte) (plaintext []byte, err error) {
+func (*AESOpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext []byte, err error) {
 	decbuf := bytes.NewBuffer(ciphertext)
 
 	armorBlock, err := armor.Decode(decbuf)
@@ -70,7 +69,7 @@ func (*AESClient) Decrypt(ciphertext []byte, password []byte) (plaintext []byte,
 
 // encrypt uses PGP to symmetrically encrypt and armor text with the
 // provided password.
-func (*AESClient) Encrypt(plaintext []byte, password []byte) (ciphertext []byte, err error) {
+func (*AESOpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext []byte, err error) {
 	encbuf := bytes.NewBuffer(nil)
 
 	w, err := armor.Encode(encbuf, "PGP SIGNATURE", nil)
@@ -97,8 +96,6 @@ func getHashFromConfig(config Config) crypto.Hash {
 	if !ok {
 		// No hash set, let the default case pick it up
 	}
-
-	fmt.Printf("crypto.aes - Using hash %s\n", hash)
 
 	switch strings.ToLower(hash) {
 	default:

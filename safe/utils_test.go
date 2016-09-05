@@ -46,7 +46,7 @@ func createTestSafe() (*Safe, error) {
 	}
 
 	cryptoClient, err := crypto.New(crypto.Config{
-		Type:     "aes",
+		Type:     "aes-openpgp",
 		Settings: map[string]interface{}{},
 	})
 	if err != nil {

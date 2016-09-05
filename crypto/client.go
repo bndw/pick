@@ -13,10 +13,10 @@ func New(config Config) (Client, error) {
 	switch config.Type {
 	default:
 		if config.Type != "" {
-			fmt.Println("Invalid encryption type, using default\n")
+			fmt.Println("Invalid encryption type, using default")
 		}
-		return NewAESClient(config)
-	case "aes":
-		return NewAESClient(config)
+		return NewAESOpenPGPClient(config)
+	case "aes-openpgp":
+		return NewAESOpenPGPClient(config)
 	}
 }

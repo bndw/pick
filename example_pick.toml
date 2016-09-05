@@ -4,7 +4,7 @@
 
 # The encryption section controls the configuration of the safe encryption.
 [encryption]
-type = "aes"
+type = "aes-openpgp"
   [encryption.settings]
   hash = "sha256"
 
