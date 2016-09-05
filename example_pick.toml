@@ -12,5 +12,5 @@ type = "aes"
 [storage]
 type = "file"
   [storage.settings]
-  path = "/Users/you/.pick/pick.safe"
+  path = "$HOME/.pick/pick.safe"
 

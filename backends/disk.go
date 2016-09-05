@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/bndw/pick/errors"
 	"github.com/mitchellh/go-homedir"
@@ -18,6 +19,7 @@ const (
 
 var (
 	safePath string
+	homeDir  string
 )
 
 type DiskBackend struct {
@@ -25,11 +27,17 @@ type DiskBackend struct {
 }
 
 func NewDiskBackend(config Config) (*DiskBackend, error) {
+	var err error
+	if homeDir, err = homedir.Dir(); err != nil {
+		return nil, err
+	}
+
 	safePath, ok := config.Settings["path"].(string)
-	if !ok {
-		// Use default path when not specified
-		var err error
-		if safePath, err = defaultSafePath(); err != nil {
+	if ok && strings.HasPrefix(safePath, "$HOME") {
+		safePath = formatHomeDir(safePath, homeDir)
+	} else {
+		safePath, err = defaultSafePath()
+		if err != nil {
 			return nil, err
 		}
 	}
@@ -50,12 +58,7 @@ func (db *DiskBackend) Save(data []byte) error {
 }
 
 func defaultSafePath() (string, error) {
-	home, err := homedir.Dir()
-	if err != nil {
-		return "", err
-	}
-
-	safeDir := fmt.Sprintf("%s/%s", home, defaultSafeDirName)
+	safeDir := fmt.Sprintf("%s/%s", homeDir, defaultSafeDirName)
 
 	if _, err := os.Stat(safeDir); os.IsNotExist(err) {
 		if mkerr := os.Mkdir(safeDir, defaultSafeDirMode); mkerr != nil {
@@ -66,4 +69,8 @@ func defaultSafePath() (string, error) {
 	safePath := fmt.Sprintf("%s/%s", safeDir, defaultSafeFileName)
 
 	return safePath, nil
+}
+
+func formatHomeDir(str, home string) string {
+	return strings.Replace(str, "$HOME", home, 1)
 }
