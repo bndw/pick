@@ -2,14 +2,15 @@ package safe
 
 import (
 	"io/ioutil"
+	"math/rand"
 	"os"
-
-	"github.com/bndw/pick/backends"
-	"github.com/bndw/pick/crypto"
+	"time"
 )
 
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 func init() {
-	removeTestSafe()
+	rand.Seed(time.Now().UnixNano())
 }
 
 const (
@@ -29,38 +30,24 @@ var (
 	testSafePassword = []byte("seabreezes\n")
 )
 
-func createTestSafe() (*Safe, error) {
+func createTestSafe() string {
 	err := ioutil.WriteFile(testSafeName, []byte(testSafeContent), 0600)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	backendClient, err := backends.New(backends.Config{
-		Type: "file",
-		Settings: map[string]interface{}{
-			"path": testSafeName,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	cryptoClient, err := crypto.New(crypto.Config{
-		Type:     "aes-openpgp",
-		Settings: map[string]interface{}{},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return Load(
-		testSafePassword,
-		backendClient,
-		cryptoClient,
-	)
+	return testSafeName
 }
 
-func removeTestSafe() {
-	_ = os.Remove(testSafeName)
+func removeTestSafe(testSafe string) {
+	_ = os.Remove(testSafe)
 	return
+}
+
+func randomString(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }

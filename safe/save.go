@@ -2,6 +2,8 @@ package safe
 
 import (
 	"encoding/json"
+
+	"github.com/bndw/pick/utils"
 )
 
 func (s *Safe) save() error {
@@ -10,7 +12,7 @@ func (s *Safe) save() error {
 		return err
 	}
 
-	ciphertext, err := s.crypto.Encrypt(plaintext, s.password)
+	ciphertext, err := utils.Encrypt(plaintext, s.password)
 	if err != nil {
 		return err
 	}

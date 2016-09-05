@@ -1,37 +1,20 @@
-package crypto
+package utils
 
 import (
 	"bytes"
-	"crypto"
+	"crypto/rand"
 	"errors"
 	"io/ioutil"
-	"strings"
-
-	_ "crypto/sha256"
+	"math/big"
 
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/armor"
-	"golang.org/x/crypto/openpgp/packet"
 )
-
-type AESOpenPGPClient struct {
-	packetConfig *packet.Config
-}
-
-func NewAESOpenPGPClient(config Config) (*AESOpenPGPClient, error) {
-
-	// TODO(): Construct a packet from the config
-	// pc := &packet.Config{
-	// 	 DefaultHash: getHashFromConfig(config),
-	// }
-
-	return &AESOpenPGPClient{}, nil
-}
 
 // decrypt uses PGP to decrypt symmetrically encrypted and armored text
 // with the provided password.
-func (*AESOpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext []byte, err error) {
-	decbuf := bytes.NewBuffer(ciphertext)
+func Decrypt(text []byte, password []byte) (decryptedText []byte, err error) {
+	decbuf := bytes.NewBuffer(text)
 
 	armorBlock, err := armor.Decode(decbuf)
 	if err != nil {
@@ -63,13 +46,14 @@ func (*AESOpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext 
 		return
 	}
 
-	plaintext = decryptedBuf
+	decryptedText = decryptedBuf
+
 	return
 }
 
 // encrypt uses PGP to symmetrically encrypt and armor text with the
 // provided password.
-func (*AESOpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext []byte, err error) {
+func Encrypt(text []byte, password []byte) (encryptedText []byte, err error) {
 	encbuf := bytes.NewBuffer(nil)
 
 	w, err := armor.Encode(encbuf, "PGP SIGNATURE", nil)
@@ -77,30 +61,47 @@ func (*AESOpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext 
 		return
 	}
 
-	pt, err := openpgp.SymmetricallyEncrypt(w, password, nil, nil)
+	plaintext, err := openpgp.SymmetricallyEncrypt(w, password, nil, nil)
 	if err != nil {
 		return
 	}
 
-	_, err = pt.Write(plaintext)
+	_, err = plaintext.Write(text)
 
-	pt.Close()
+	plaintext.Close()
 	w.Close()
 
-	ciphertext = encbuf.Bytes()
+	encryptedText = encbuf.Bytes()
+
 	return
 }
 
-func getHashFromConfig(config Config) crypto.Hash {
-	hash, ok := config.Settings["hash"].(string)
-	if !ok {
-		// No hash set, let the default case pick it up
+// GeneratePassword generates a password.
+func GeneratePassword(length int) (string, error) {
+	const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+	buffer := make([]byte, length)
+	max := big.NewInt(int64(len(chars)))
+
+	var index int
+	var err error
+	for i := 0; i < length; i++ {
+		index, err = randomInt(max)
+		if err != nil {
+			return "", err
+		}
+
+		buffer[i] = chars[index]
 	}
 
-	switch strings.ToLower(hash) {
-	default:
-		return crypto.SHA256
-	case "sha256":
-		return crypto.SHA256
+	return string(buffer), nil
+}
+
+func randomInt(max *big.Int) (int, error) {
+	rand, err := rand.Int(rand.Reader, max)
+	if err != nil {
+		return 0, err
 	}
+
+	return int(rand.Int64()), nil
 }
