@@ -5,12 +5,12 @@
 # The encryption section controls the configuration of the safe encryption.
 [encryption]
 type = "aes"
-[encryption.settings]
+  [encryption.settings]
   hash = "sha256"
 
 # The storage section controls the configuration of the backend.
 [storage]
 type = "file"
-[storage.settings]
-  path = "/etc/pick/pick.safe"
+  [storage.settings]
+  path = "/Users/you/.pick/pick.safe"
 
