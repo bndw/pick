@@ -34,9 +34,7 @@ func NewDiskBackend(config Config) (*DiskBackend, error) {
 
 	safePath, ok := config.Settings["path"].(string)
 	if ok {
-		if strings.HasPrefix(safePath, "$HOME") {
-			safePath = formatHomeDir(safePath, homeDir)
-		}
+		safePath = formatHomeDir(safePath, homeDir)
 	} else {
 		safePath, err = defaultSafePath()
 	}
