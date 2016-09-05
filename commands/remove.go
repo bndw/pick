@@ -1,8 +1,25 @@
 package commands
 
-import "fmt"
+import (
+	"fmt"
+	"os"
 
-func RemoveCommand(args ...string) int {
+	"github.com/spf13/cobra"
+)
+
+func init() {
+	RootCmd.AddCommand(&cobra.Command{
+		Use:   "rm [name]",
+		Short: "Remove a credential",
+		Long: `The remove command is used to remove a saved credential.
+            `,
+		Run: func(cmd *cobra.Command, args []string) {
+			os.Exit(Remove(args...))
+		},
+	})
+}
+
+func Remove(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
 		return handleError(err)

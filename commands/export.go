@@ -2,11 +2,27 @@ package commands
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/bndw/pick/utils"
+	"github.com/spf13/cobra"
 )
 
-func ExportCommand(args ...string) int {
+func init() {
+	RootCmd.AddCommand(&cobra.Command{
+		Use:   "export",
+		Short: "Export decrypted credentials in JSON format",
+		Long: `The export command is used to export decrypted credentials in JSON
+format.
+            `,
+		Run: func(cmd *cobra.Command, args []string) {
+			os.Exit(Export(args...))
+		},
+	})
+
+}
+
+func Export(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
 		return handleError(err)

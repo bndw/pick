@@ -2,16 +2,31 @@ package commands
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/bndw/pick/errors"
 	"github.com/bndw/pick/utils"
+	"github.com/spf13/cobra"
 )
 
 const (
+	// TODO: Pull this from config
 	passwordLength = 25
 )
 
-func AddCommand(args ...string) int {
+func init() {
+	RootCmd.AddCommand(&cobra.Command{
+		Use:   "add [name] [username] [password]",
+		Short: "Add a credential",
+		Long: `The add command is used to add a new credential.
+            `,
+		Run: func(cmd *cobra.Command, args []string) {
+			os.Exit(Add(args...))
+		},
+	})
+}
+
+func Add(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
 		return handleError(err)
