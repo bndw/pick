@@ -10,41 +10,31 @@ import (
 )
 
 const (
-	safeFileName = "pick.safe"
-	safeFileMode = 0600
-	safeDirName  = ".pick"
-	safeDirMode  = 0700
+	defaultSafeFileMode = 0600
+	defaultSafeFileName = "pick.safe"
+	defaultSafeDirMode  = 0700
+	defaultSafeDirName  = ".pick"
+)
+
+var (
+	safePath string
 )
 
 type DiskBackend struct {
 	path string
 }
 
-func defaultSafePath() *string {
-	home, err := homedir.Dir()
-	if err != nil {
-		panic(err)
-	}
-
-	safeDir := fmt.Sprintf("%s/%s", home, safeDirName)
-
-	if _, err := os.Stat(safeDir); os.IsNotExist(err) {
-		if mkerr := os.Mkdir(safeDir, safeDirMode); mkerr != nil {
-			panic(mkerr)
+func NewDiskBackend(config Config) (*DiskBackend, error) {
+	safePath, ok := config.Settings["path"].(string)
+	if !ok {
+		// Use default path when not specified
+		var err error
+		if safePath, err = defaultSafePath(); err != nil {
+			return nil, err
 		}
 	}
 
-	safePath := fmt.Sprintf("%s/%s", safeDir, safeFileName)
-
-	return &safePath
-}
-
-func NewDiskBackend(path *string) *DiskBackend {
-	if path == nil {
-		path = defaultSafePath()
-	}
-
-	return &DiskBackend{*path}
+	return &DiskBackend{safePath}, nil
 }
 
 func (db *DiskBackend) Load() ([]byte, error) {
@@ -56,5 +46,24 @@ func (db *DiskBackend) Load() ([]byte, error) {
 }
 
 func (db *DiskBackend) Save(data []byte) error {
-	return ioutil.WriteFile(db.path, data, safeFileMode)
+	return ioutil.WriteFile(db.path, data, defaultSafeFileMode)
+}
+
+func defaultSafePath() (string, error) {
+	home, err := homedir.Dir()
+	if err != nil {
+		return "", err
+	}
+
+	safeDir := fmt.Sprintf("%s/%s", home, defaultSafeDirName)
+
+	if _, err := os.Stat(safeDir); os.IsNotExist(err) {
+		if mkerr := os.Mkdir(safeDir, defaultSafeDirMode); mkerr != nil {
+			return "", mkerr
+		}
+	}
+
+	safePath := fmt.Sprintf("%s/%s", safeDir, defaultSafeFileName)
+
+	return safePath, nil
 }
