@@ -10,5 +10,4 @@ func New(config Config) (Client, error) {
 	default:
 		return NewDiskBackend(config)
 	}
-	return nil, nil
 }
