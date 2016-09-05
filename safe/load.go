@@ -4,16 +4,16 @@ import (
 	"encoding/json"
 
 	"github.com/bndw/pick/backends"
+	"github.com/bndw/pick/crypto"
 	"github.com/bndw/pick/errors"
-	"github.com/bndw/pick/utils"
 )
 
-func Load(password []byte, backend backends.Backend) (*Safe, error) {
-	if backend == nil {
-		// TODO: Check the config for a disk location
-		backend = backends.NewDiskBackend(nil)
+func Load(password []byte, backend backends.Client, encryptionClient crypto.Client) (*Safe, error) {
+	s := Safe{
+		backend:  backend,
+		crypto:   encryptionClient,
+		password: password,
 	}
-	s := Safe{backend: backend, password: password}
 
 	ciphertext, err := s.backend.Load()
 
@@ -25,7 +25,7 @@ func Load(password []byte, backend backends.Backend) (*Safe, error) {
 		return nil, err
 	}
 
-	plaintext, err := utils.Decrypt(ciphertext, password)
+	plaintext, err := s.crypto.Decrypt(ciphertext, password)
 	if err != nil {
 		return nil, err
 	}

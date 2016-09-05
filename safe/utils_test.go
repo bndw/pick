@@ -5,12 +5,16 @@ import (
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/bndw/pick/backends"
+	"github.com/bndw/pick/crypto"
 )
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+	removeTestSafe()
 }
 
 const (
@@ -30,17 +34,39 @@ var (
 	testSafePassword = []byte("seabreezes\n")
 )
 
-func createTestSafe() string {
+func createTestSafe() (*Safe, error) {
 	err := ioutil.WriteFile(testSafeName, []byte(testSafeContent), 0600)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return testSafeName
+	backendClient, err := backends.New(backends.Config{
+		Type: "file",
+		Settings: map[string]interface{}{
+			"path": testSafeName,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	cryptoClient, err := crypto.New(crypto.Config{
+		Type:     "aes",
+		Settings: map[string]interface{}{},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return Load(
+		testSafePassword,
+		backendClient,
+		cryptoClient,
+	)
 }
 
-func removeTestSafe(testSafe string) {
-	_ = os.Remove(testSafe)
+func removeTestSafe() {
+	_ = os.Remove(testSafeName)
 	return
 }
 
