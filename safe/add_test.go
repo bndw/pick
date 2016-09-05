@@ -2,16 +2,10 @@ package safe
 
 import (
 	"testing"
-
-	"github.com/bndw/pick/backends"
 )
 
 func TestAdd(t *testing.T) {
-	testSafe := createTestSafe()
-	defer removeTestSafe(testSafeName)
-
-	backend := backends.NewDiskBackend(&testSafe)
-	safe, err := Load(testSafePassword, backend)
+	safe, err := createTestSafe()
 	if err != nil {
 		t.Error(err)
 	}

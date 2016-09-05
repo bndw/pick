@@ -4,47 +4,44 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/bndw/pick/errors"
 	"github.com/mitchellh/go-homedir"
 )
 
 const (
-	safeFileName = "pick.safe"
-	safeFileMode = 0600
-	safeDirName  = ".pick"
-	safeDirMode  = 0700
+	defaultSafeFileMode = 0600
+	defaultSafeFileName = "pick.safe"
+	defaultSafeDirMode  = 0700
+	defaultSafeDirName  = ".pick"
+)
+
+var (
+	safePath string
+	homeDir  string
 )
 
 type DiskBackend struct {
 	path string
 }
 
-func defaultSafePath() *string {
-	home, err := homedir.Dir()
-	if err != nil {
-		panic(err)
+func NewDiskBackend(config Config) (*DiskBackend, error) {
+	var err error
+	if homeDir, err = homedir.Dir(); err != nil {
+		return nil, err
 	}
 
-	safeDir := fmt.Sprintf("%s/%s", home, safeDirName)
-
-	if _, err := os.Stat(safeDir); os.IsNotExist(err) {
-		if mkerr := os.Mkdir(safeDir, safeDirMode); mkerr != nil {
-			panic(mkerr)
+	safePath, ok := config.Settings["path"].(string)
+	if ok {
+		if strings.HasPrefix(safePath, "$HOME") {
+			safePath = formatHomeDir(safePath, homeDir)
 		}
+	} else {
+		safePath, err = defaultSafePath()
 	}
 
-	safePath := fmt.Sprintf("%s/%s", safeDir, safeFileName)
-
-	return &safePath
-}
-
-func NewDiskBackend(path *string) *DiskBackend {
-	if path == nil {
-		path = defaultSafePath()
-	}
-
-	return &DiskBackend{*path}
+	return &DiskBackend{safePath}, nil
 }
 
 func (db *DiskBackend) Load() ([]byte, error) {
@@ -56,5 +53,23 @@ func (db *DiskBackend) Load() ([]byte, error) {
 }
 
 func (db *DiskBackend) Save(data []byte) error {
-	return ioutil.WriteFile(db.path, data, safeFileMode)
+	return ioutil.WriteFile(db.path, data, defaultSafeFileMode)
+}
+
+func defaultSafePath() (string, error) {
+	safeDir := fmt.Sprintf("%s/%s", homeDir, defaultSafeDirName)
+
+	if _, err := os.Stat(safeDir); os.IsNotExist(err) {
+		if mkerr := os.Mkdir(safeDir, defaultSafeDirMode); mkerr != nil {
+			return "", mkerr
+		}
+	}
+
+	safePath := fmt.Sprintf("%s/%s", safeDir, defaultSafeFileName)
+
+	return safePath, nil
+}
+
+func formatHomeDir(str, home string) string {
+	return strings.Replace(str, "$HOME", home, 1)
 }
