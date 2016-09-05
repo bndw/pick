@@ -2,10 +2,25 @@ package commands
 
 import (
 	"fmt"
+	"os"
 	"sort"
+
+	"github.com/spf13/cobra"
 )
 
-func ListCommand(args ...string) int {
+func init() {
+	RootCmd.AddCommand(&cobra.Command{
+		Use:   "ls",
+		Short: "List all credentials",
+		Long: `The list command is used to list the saved credentials.
+            `,
+		Run: func(cmd *cobra.Command, args []string) {
+			os.Exit(List(args...))
+		},
+	})
+}
+
+func List(args ...string) int {
 	safe, err := loadSafe()
 	if err != nil {
 		return handleError(err)
