@@ -9,6 +9,7 @@ func TestAdd(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	defer removeTestSafe()
 
 	if err = safe.Add("github", "bndw", "fooBarBaz"); err != nil {
 		t.Error(err)

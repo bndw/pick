@@ -9,6 +9,7 @@ func TestCopy(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	defer removeTestSafe()
 
 	if err = safe.Copy("foo"); err != nil {
 		t.Error(err)

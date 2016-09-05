@@ -9,6 +9,7 @@ func TestRemove(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	defer removeTestSafe()
 
 	if err = safe.Remove("foo"); err != nil {
 		t.Error(err)

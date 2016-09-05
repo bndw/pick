@@ -9,6 +9,7 @@ func TestCat(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	defer removeTestSafe()
 
 	if _, err = safe.Cat("foo"); err != nil {
 		t.Error(err)

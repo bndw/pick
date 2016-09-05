@@ -9,6 +9,7 @@ func TestList(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	defer removeTestSafe()
 
 	accounts := safe.List()
 	if len(accounts) < 1 {
