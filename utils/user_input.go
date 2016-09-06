@@ -9,8 +9,15 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func GetAnswer(prompt string, defaultYes bool) bool {
-	text, err := GetInput(prompt)
+func Confirm(prompt string, defaultYes bool) bool {
+	var yn string
+	if defaultYes {
+		yn = "Y/n"
+	} else {
+		yn = "y/N"
+	}
+	question := fmt.Sprintf("%s (%s)?", prompt, yn)
+	text, err := GetInput(question)
 	if err != nil {
 		return false
 	}
