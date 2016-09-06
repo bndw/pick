@@ -9,6 +9,7 @@ func TestReplace(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	defer removeTestSafe()
 
 	if err = safe.Replace("foo", "Bubbles", "kitt3ns"); err != nil {
 		t.Error(err)
