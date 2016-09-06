@@ -9,7 +9,7 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-func GetAnswer(prompt string, defaultYes bool) bool {
+func Confirm(prompt string, defaultYes bool) bool {
 	text, err := GetInput(prompt)
 	if err != nil {
 		return false

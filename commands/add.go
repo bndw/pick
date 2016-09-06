@@ -53,7 +53,7 @@ func Add(args ...string) int {
 	}
 
 	fmt.Println("Credential added")
-	if utils.GetAnswer("Copy password to clipboard (Y/n)?", true) {
+	if utils.Confirm("Copy password to clipboard (Y/n)?", true) {
 		if err := safe.Copy(name); err != nil {
 			handleError(err)
 		}
@@ -63,7 +63,7 @@ func Add(args ...string) int {
 
 func overwrite(name string) bool {
 	prompt := fmt.Sprintf("%s already exists, overwrite (y/N)?", name)
-	return utils.GetAnswer(prompt, false)
+	return utils.Confirm(prompt, false)
 }
 
 func parseAddArgs(args []string) (name, username, password string, errCode int) {
@@ -101,7 +101,7 @@ func parseAddArgs(args []string) (name, username, password string, errCode int) 
 	}
 
 	if password == "" {
-		if utils.GetAnswer("Generate password (Y/n)?", true) {
+		if utils.Confirm("Generate password (Y/n)?", true) {
 			password, err = utils.GeneratePassword(passwordLength)
 			if err != nil {
 				fmt.Println(err)
