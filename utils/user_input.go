@@ -10,7 +10,14 @@ import (
 )
 
 func Confirm(prompt string, defaultYes bool) bool {
-	text, err := GetInput(prompt)
+	var yn string
+	if defaultYes {
+		yn = "Y/n"
+	} else {
+		yn = "y/N"
+	}
+	question := fmt.Sprintf("%s (%s)?", prompt, yn)
+	text, err := GetInput(question)
 	if err != nil {
 		return false
 	}
