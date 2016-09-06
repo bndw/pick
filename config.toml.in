@@ -1,6 +1,6 @@
 # An example of an optional config file for pick.
 # If no config file is available, sensible defaults will be used.
-# If you wish to use a config file, it must be located at ~/.pick/pick.toml
+# If you wish to use a config file, it must be located at ~/.pick/config.toml
 # Variables:
 # $HOME gets replaced with the path to your home directory, e.g. $HOME/.pick -> /home/john/.pick
 

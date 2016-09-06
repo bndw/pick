@@ -12,7 +12,7 @@ import (
 
 var (
 	config                Config // holds the global pick config.
-	defaultConfigFileTmpl = "%s/.pick/pick.toml"
+	defaultConfigFileTmpl = "%s/.pick/config.toml"
 )
 
 func Execute() error {

@@ -3,6 +3,7 @@ PWD := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 GOPKG = github.com/bndw/pick
 GOPATH = "$(CURDIR)/vendor:$(CURDIR)"
 
+PICK_DIR = $(HOME)/.pick
 BIN_DIR = /usr/local/bin
 INSTALL = install
 
@@ -30,8 +31,13 @@ install:
 uninstall:
 	rm -f $(BIN_DIR)/pick
 
+config:
+	@if [ ! -f "$(PICK_DIR)/config.toml" ]; then \
+		$(INSTALL) -c -m 0600 config.toml.in $(PICK_DIR)/config.toml ; \
+	fi
+
 clean:
 	rm -rf vendor/
 	rm -rf bin/
 
-.PHONY: all goget build test install uninstall clean
+.PHONY: all goget build test install uninstall config clean
