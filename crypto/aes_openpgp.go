@@ -72,7 +72,7 @@ func (*AESOpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext 
 func (*AESOpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext []byte, err error) {
 	encbuf := bytes.NewBuffer(nil)
 
-	w, err := armor.Encode(encbuf, "PGP SIGNATURE", nil)
+	w, err := armor.Encode(encbuf, "PGP MESSAGE", nil)
 	if err != nil {
 		return
 	}
