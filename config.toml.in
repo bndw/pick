@@ -4,12 +4,6 @@
 # Variables:
 # $HOME gets replaced with the path to your home directory, e.g. $HOME/.pick -> /home/john/.pick
 
-# The encryption section controls the configuration of the safe encryption.
-[encryption]
-type = "aes-openpgp"
-  [encryption.settings]
-  hash = "sha256"
-
 # The storage section controls the configuration of the backend.
 [storage]
 type = "file"
