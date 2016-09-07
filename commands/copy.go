@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bndw/pick/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -31,8 +32,13 @@ func Copy(args ...string) int {
 		return handleError(err)
 	}
 
-	if err := safe.Copy(args[0]); err != nil {
+	account, err := safe.Get(args[0])
+	if err != nil {
 		return handleError(err)
+	}
+
+	if err := utils.CopyToClipboard(account.Password); err != nil {
+		handleError(err)
 	}
 
 	return 0
