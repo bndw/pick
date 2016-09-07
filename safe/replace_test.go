@@ -15,7 +15,7 @@ func TestReplace(t *testing.T) {
 		t.Error(err)
 	}
 
-	account, err := safe.Cat("foo")
+	account, err := safe.Get("foo")
 	if err != nil {
 		t.Error(err)
 	}

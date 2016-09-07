@@ -31,7 +31,7 @@ func Cat(args ...string) int {
 		return handleError(err)
 	}
 
-	account, err := safe.Cat(args[0])
+	account, err := safe.Get(args[0])
 	if err != nil {
 		return handleError(err)
 	}
