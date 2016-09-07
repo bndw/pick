@@ -4,14 +4,14 @@ import (
 	"testing"
 )
 
-func TestCat(t *testing.T) {
+func TestGet(t *testing.T) {
 	safe, err := createTestSafe()
 	if err != nil {
 		t.Error(err)
 	}
 	defer removeTestSafe()
 
-	if _, err = safe.Cat("foo"); err != nil {
+	if _, err = safe.Get("foo"); err != nil {
 		t.Error(err)
 	}
 }
