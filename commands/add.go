@@ -37,7 +37,7 @@ func Add(args ...string) int {
 		return errCode
 	}
 
-	err = safe.Add(name, username, password)
+	account, err := safe.Add(name, username, password)
 	if _, conflict := err.(*errors.AccountExists); conflict && overwrite(name) {
 		if rerr := safe.Replace(name, username, password); rerr != nil {
 			return handleError(rerr)
@@ -48,7 +48,7 @@ func Add(args ...string) int {
 
 	fmt.Println("Credential added")
 	if utils.Confirm("Copy password to clipboard", true) {
-		if err := safe.Copy(name); err != nil {
+		if err := utils.CopyToClipboard(account.Password); err != nil {
 			handleError(err)
 		}
 	}
