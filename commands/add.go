@@ -49,7 +49,7 @@ func Add(args ...string) int {
 	fmt.Println("Credential added")
 	if utils.Confirm("Copy password to clipboard", true) {
 		if err := utils.CopyToClipboard(account.Password); err != nil {
-			handleError(err)
+			return handleError(err)
 		}
 	}
 	return 0
