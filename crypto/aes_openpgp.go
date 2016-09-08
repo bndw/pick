@@ -82,7 +82,9 @@ func (*AESOpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext 
 		return
 	}
 
-	_, err = pt.Write(plaintext)
+	if _, err := pt.Write(plaintext); err != nil {
+		return nil, err
+	}
 
 	pt.Close()
 	w.Close()
