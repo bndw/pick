@@ -37,6 +37,9 @@ func NewDiskBackend(config Config) (*DiskBackend, error) {
 		safePath = formatHomeDir(safePath, homeDir)
 	} else {
 		safePath, err = defaultSafePath()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &DiskBackend{safePath}, nil
