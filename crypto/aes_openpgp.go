@@ -76,18 +76,17 @@ func (*AESOpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext 
 	if err != nil {
 		return
 	}
+	defer w.Close()
 
 	pt, err := openpgp.SymmetricallyEncrypt(w, password, nil, nil)
 	if err != nil {
 		return
 	}
+	defer pt.Close()
 
 	if _, err := pt.Write(plaintext); err != nil {
 		return nil, err
 	}
-
-	pt.Close()
-	w.Close()
 
 	ciphertext = encbuf.Bytes()
 	return
