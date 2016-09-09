@@ -38,7 +38,7 @@ func Copy(args ...string) int {
 	}
 
 	if err := utils.CopyToClipboard(account.Password); err != nil {
-		handleError(err)
+		return handleError(err)
 	}
 
 	return 0
