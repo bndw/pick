@@ -33,7 +33,11 @@ uninstall:
 
 config:
 	@if [ ! -f "$(PICK_DIR)/config.toml" ]; then \
+		OLD_UMASK=$(shell echo `umask`) ; \
+		umask 077 ; \
+		mkdir -p $(PICK_DIR) ; \
 		$(INSTALL) -c -m 0600 config.toml.in $(PICK_DIR)/config.toml ; \
+		umask $(OLD_UMASK) ; \
 	fi
 
 clean:
