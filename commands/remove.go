@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	RootCmd.AddCommand(&cobra.Command{
+	rootCmd.AddCommand(&cobra.Command{
 		Use:   "rm [name]",
 		Short: "Remove a credential",
 		Long: `The remove command is used to remove a saved credential.

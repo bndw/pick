@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	RootCmd.AddCommand(&cobra.Command{
+	rootCmd.AddCommand(&cobra.Command{
 		Use:   "version",
 		Short: "Print the version number of pick",
 		Long:  `The version command prints the version of pick`,

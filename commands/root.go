@@ -8,7 +8,7 @@ import (
 // Global pick config
 var Config *config.Config
 
-var RootCmd = &cobra.Command{
+var rootCmd = &cobra.Command{
 	Use:   "pick",
 	Short: "pick is a minimal password manager",
 	Long:  "pick is a minimal password manager",
@@ -17,5 +17,5 @@ var RootCmd = &cobra.Command{
 func Execute(cfg *config.Config) error {
 	Config = cfg
 
-	return RootCmd.Execute()
+	return rootCmd.Execute()
 }

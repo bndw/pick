@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	RootCmd.AddCommand(&cobra.Command{
+	rootCmd.AddCommand(&cobra.Command{
 		Use:   "export",
 		Short: "Export decrypted credentials in JSON format",
 		Long: `The export command is used to export decrypted credentials in JSON

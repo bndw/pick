@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	RootCmd.AddCommand(&cobra.Command{
+	rootCmd.AddCommand(&cobra.Command{
 		Use:   "backup",
 		Short: "Backup the safe",
 		Long: `The backup command is used to backup your current safe.

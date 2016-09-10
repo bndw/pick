@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	RootCmd.AddCommand(&cobra.Command{
+	rootCmd.AddCommand(&cobra.Command{
 		Use:   "cp [name]",
 		Short: "Copy a credential to the clipboard",
 		Long: `The copy command is used to copy a credential's password

@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	RootCmd.AddCommand(&cobra.Command{
+	rootCmd.AddCommand(&cobra.Command{
 		Use:   "ls",
 		Short: "List all credentials",
 		Long: `The list command is used to list the saved credentials.

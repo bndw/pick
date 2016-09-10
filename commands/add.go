@@ -15,7 +15,7 @@ const (
 )
 
 func init() {
-	RootCmd.AddCommand(&cobra.Command{
+	rootCmd.AddCommand(&cobra.Command{
 		Use:   "add [name] [username] [password]",
 		Short: "Add a credential",
 		Long: `The add command is used to add a new credential.
