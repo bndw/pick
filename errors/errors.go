@@ -14,6 +14,13 @@ func (e *SafeCorrupt) Error() string {
 	return "Safe currupt"
 }
 
+type BackupFileExists struct {
+}
+
+func (e *BackupFileExists) Error() string {
+	return "Backup file already exists"
+}
+
 type AccountExists struct {
 }
 

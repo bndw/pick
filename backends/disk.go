@@ -5,16 +5,20 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/bndw/pick/errors"
 	"github.com/mitchellh/go-homedir"
 )
 
 const (
-	defaultSafeFileMode = 0600
-	defaultSafeFileName = "pick.safe"
-	defaultSafeDirMode  = 0700
-	defaultSafeDirName  = ".pick"
+	defaultSafeFileMode     = 0600
+	defaultSafeFileName     = "pick.safe"
+	defaultSafeDirMode      = 0700
+	defaultSafeDirName      = ".pick"
+	defaultBackupDir        = "%s/%s/backups"
+	defaultBackupFileName   = "pick_%s.safe"
+	defaultBackupTimeFormat = "2006-01-02_15-04-05"
 )
 
 var (
@@ -64,6 +68,33 @@ func (db *DiskBackend) Save(data []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (db *DiskBackend) Backup() error {
+	backupDir := fmt.Sprintf(defaultBackupDir, homeDir, defaultSafeDirName)
+	timeFormat := time.Now().Format(defaultBackupTimeFormat)
+	backupFileName := fmt.Sprintf(defaultBackupFileName, timeFormat)
+	backupPath := backupDir + "/" + backupFileName
+
+	if _, err := os.Stat(backupDir); err != nil {
+		if os.IsNotExist(err) {
+			if mkerr := os.Mkdir(backupDir, defaultSafeDirMode); mkerr != nil {
+				return mkerr
+			}
+		} else {
+			return err
+		}
+	}
+
+	if _, err := os.Stat(backupPath); err == nil {
+		return &errors.BackupFileExists{}
+	}
+
+	data, err := db.Load()
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(backupPath, data, defaultSafeFileMode)
 }
 
 func defaultSafePath() (string, error) {

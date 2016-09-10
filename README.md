@@ -23,6 +23,7 @@ Usage:
 
 Available Commands:
   add         Add a credential
+  backup      Backup safe
   cat         Cat a credential
   cp          Copy a credential to the clipboard
   export      Export decrypted credentials in JSON format

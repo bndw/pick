@@ -15,12 +15,12 @@ func loadSafe() (*safe.Safe, error) {
 		return nil, err
 	}
 
-	backendClient, err := backends.New(config.Storage)
+	backendClient, err := newBackendClient()
 	if err != nil {
 		return nil, err
 	}
 
-	cryptoClient, err := crypto.New(config.Encryption)
+	cryptoClient, err := newCryptoClient()
 	if err != nil {
 		return nil, err
 	}
@@ -30,6 +30,14 @@ func loadSafe() (*safe.Safe, error) {
 		backendClient,
 		cryptoClient,
 	)
+}
+
+func newBackendClient() (backends.Client, error) {
+	return backends.New(config.Storage)
+}
+
+func newCryptoClient() (crypto.Client, error) {
+	return crypto.New(config.Encryption)
 }
 
 func handleError(err error) int {
