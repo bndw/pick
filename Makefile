@@ -11,6 +11,19 @@ FOLDERS = $(shell find ./src -mindepth 1 -maxdepth 1 -type d)
 
 all: build
 
+install_hooks:
+	@if test -d .git; then \
+		for HOOK in githooks/???*; do \
+			case $$HOOK in \
+				*.sample|*~|*.swp) continue;; \
+			esac; \
+			if test -x $$HOOK; then \
+				test ! -x .git/hooks/$${HOOK##*/} && echo "Installing git hook $${HOOK##*/}.."; \
+				$(INSTALL) -c $$HOOK .git/hooks; \
+			fi \
+		done \
+	fi
+
 goget:
 	GOPATH=$(GOPATH) go get github.com/rogpeppe/godeps
 	GOPATH=$(GOPATH) $(CURDIR)/vendor/bin/godeps -u dependencies.tsv
@@ -18,7 +31,7 @@ goget:
 	rm -f $(CURDIR)/vendor/src/$(GOPKG)
 	ln -sf $(PWD)/src $(CURDIR)/vendor/src/$(GOPKG)
 
-build: goget
+build: install_hooks goget
 	GOPATH=$(GOPATH) go build -o bin/pick $(GOPKG)
 
 test: goget
@@ -44,4 +57,4 @@ clean:
 	rm -rf vendor/
 	rm -rf bin/
 
-.PHONY: all goget build test install uninstall config clean
+.PHONY: all install_hooks goget build test install uninstall config clean
