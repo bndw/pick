@@ -13,9 +13,12 @@ import (
 var (
 	config                Config // holds the global pick config.
 	defaultConfigFileTmpl = "%s/.pick/config.toml"
+	Version               string
 )
 
-func Execute() error {
+func Execute(version string) error {
+	Version = version
+
 	home, err := homedir.Dir()
 	if err != nil {
 		return err
