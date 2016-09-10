@@ -46,8 +46,12 @@ func NewDiskBackend(config Config) (*DiskBackend, error) {
 }
 
 func (db *DiskBackend) Load() ([]byte, error) {
-	if _, err := os.Stat(db.path); os.IsNotExist(err) {
-		return nil, &errors.SafeNotFound{}
+	if _, err := os.Stat(db.path); err != nil {
+		if os.IsNotExist(err) {
+			return nil, &errors.SafeNotFound{}
+		} else {
+			return nil, err
+		}
 	}
 
 	return ioutil.ReadFile(db.path)
@@ -60,9 +64,13 @@ func (db *DiskBackend) Save(data []byte) error {
 func defaultSafePath() (string, error) {
 	safeDir := fmt.Sprintf("%s/%s", homeDir, defaultSafeDirName)
 
-	if _, err := os.Stat(safeDir); os.IsNotExist(err) {
-		if mkerr := os.Mkdir(safeDir, defaultSafeDirMode); mkerr != nil {
-			return "", mkerr
+	if _, err := os.Stat(safeDir); err != nil {
+		if os.IsNotExist(err) {
+			if mkerr := os.Mkdir(safeDir, defaultSafeDirMode); mkerr != nil {
+				return "", mkerr
+			}
+		} else {
+			return "", err
 		}
 	}
 

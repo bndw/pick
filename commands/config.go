@@ -35,8 +35,12 @@ type Config struct {
 }
 
 func initConfig(configFile string) error {
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		// TODO(): No config found, should we create one?
+	if _, err := os.Stat(configFile); err != nil {
+		if os.IsNotExist(err) {
+			// TODO(): No config found, should we create one?
+		} else {
+			return err
+		}
 	} else {
 		if _, err := toml.DecodeFile(configFile, &config); err != nil {
 			return err
