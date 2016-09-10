@@ -54,7 +54,16 @@ func (db *DiskBackend) Load() ([]byte, error) {
 }
 
 func (db *DiskBackend) Save(data []byte) error {
-	return ioutil.WriteFile(db.path, data, defaultSafeFileMode)
+	tmpFile := db.path + ".tmp"
+	if err := ioutil.WriteFile(tmpFile, data, defaultSafeFileMode); err != nil {
+		os.Remove(tmpFile)
+		return err
+	}
+	if err := os.Rename(tmpFile, db.path); err != nil {
+		os.Remove(tmpFile)
+		return err
+	}
+	return nil
 }
 
 func defaultSafePath() (string, error) {
