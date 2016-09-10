@@ -14,7 +14,7 @@ func main() {
 	cfg, err := config.Load(Version)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		os.Exit(-1)
 	}
 
 	if err := commands.Execute(cfg); err != nil {
