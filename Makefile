@@ -44,6 +44,11 @@ install:
 uninstall:
 	rm -f $(BIN_DIR)/pick
 
+fmt: gofmt
+
+gofmt:
+	GOPATH=$(GOPATH) go fmt $(FOLDERS)
+
 config:
 	@if [ ! -f "$(PICK_DIR)/config.toml" ]; then \
 		OLD_UMASK=$(shell echo `umask`) ; \
@@ -57,4 +62,4 @@ clean:
 	rm -rf vendor/
 	rm -rf bin/
 
-.PHONY: all install_hooks goget build test install uninstall config clean
+.PHONY: all install_hooks goget build test install uninstall fmt gofmt config clean
