@@ -7,7 +7,7 @@ PICK_DIR = $(HOME)/.pick
 BIN_DIR = /usr/local/bin
 INSTALL = install
 
-FOLDERS = $(shell find . -mindepth 1 -maxdepth 1 -type d -not -path "*.git" -not -path "*vendor" -not -path "*bin")
+FOLDERS = $(shell find ./src -mindepth 1 -maxdepth 1 -type d)
 
 all: build
 
@@ -16,10 +16,10 @@ goget:
 	GOPATH=$(GOPATH) $(CURDIR)/vendor/bin/godeps -u dependencies.tsv
 	mkdir -p $(shell dirname "$(CURDIR)/vendor/src/$(GOPKG)")
 	rm -f $(CURDIR)/vendor/src/$(GOPKG)
-	ln -sf $(PWD) $(CURDIR)/vendor/src/$(GOPKG)
+	ln -sf $(PWD)/src $(CURDIR)/vendor/src/$(GOPKG)
 
 build: goget
-	GOPATH=$(GOPATH) go build -o bin/pick .
+	GOPATH=$(GOPATH) go build -o bin/pick $(GOPKG)
 
 test: goget
 	GOPATH=$(GOPATH) go test -v $(FOLDERS)
