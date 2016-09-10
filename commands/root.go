@@ -1,12 +1,12 @@
 package commands
 
 import (
-	"github.com/bndw/pick/config"
+	c "github.com/bndw/pick/config"
 	"github.com/spf13/cobra"
 )
 
 // Global pick config
-var Config *config.Config
+var config *c.Config
 
 var rootCmd = &cobra.Command{
 	Use:   "pick",
@@ -14,8 +14,8 @@ var rootCmd = &cobra.Command{
 	Long:  "pick is a minimal password manager",
 }
 
-func Execute(cfg *config.Config) error {
-	Config = cfg
+func Execute(cfg *c.Config) error {
+	config = cfg
 
 	return rootCmd.Execute()
 }

@@ -33,11 +33,11 @@ func loadSafe() (*safe.Safe, error) {
 }
 
 func newBackendClient() (backends.Client, error) {
-	return backends.New(Config.Storage)
+	return backends.New(config.Storage)
 }
 
 func newCryptoClient() (crypto.Client, error) {
-	return crypto.New(Config.Encryption)
+	return crypto.New(config.Encryption)
 }
 
 func handleError(err error) int {
