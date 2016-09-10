@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	RootCmd.AddCommand(&cobra.Command{
+	rootCmd.AddCommand(&cobra.Command{
 		Use:   "cat [name]",
 		Short: "Cat a credential",
 		Long: `The cat command is used to print a credential to stdout.
