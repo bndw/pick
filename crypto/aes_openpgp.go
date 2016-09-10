@@ -88,6 +88,14 @@ func (*AESOpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext 
 		return nil, err
 	}
 
+	// Force-close writer to flush their cache
+	if err = pt.Close(); err != nil {
+		return
+	}
+	if err = w.Close(); err != nil {
+		return
+	}
+
 	ciphertext = encbuf.Bytes()
 	return
 }
