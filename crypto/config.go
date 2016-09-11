@@ -11,6 +11,7 @@ const (
 	ConfigTypeAESGCM  = "aes_gcm"
 	cipherAES256      = "aes256"
 	cipherAES128      = "aes128"
+	hashSHA256        = "sha256"
 	hashSHA512        = "sha512"
 )
 

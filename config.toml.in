@@ -38,7 +38,7 @@ type = "file"
   # Currently supported values: 32, 24, 16 for 256bit, 192bit, 128bit respectively.
   #keylen = 32
   # The hash function to use for PBKDF2.
-  # Currently supported values: "sha512".
+  # Currently supported values: "sha512", "sha256".
   #pbkdf2hash = "sha512"
   # The number of iterations used to derive the key from your password.
   #pbkdf2iterations = 100000

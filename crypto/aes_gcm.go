@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/json"
 	"fmt"
@@ -77,6 +78,8 @@ func (c *AESGCMClient) pbkdf2HashFunc() func() hash.Hash {
 		fallthrough
 	case hashSHA512:
 		return sha512.New
+	case hashSHA256:
+		return sha256.New
 	}
 }
 
