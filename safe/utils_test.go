@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/bndw/pick/backends"
+	"github.com/bndw/pick/config"
 	"github.com/bndw/pick/crypto"
 )
 
@@ -35,25 +36,34 @@ func createTestSafe() (*Safe, error) {
 		return nil, err
 	}
 
-	backendClient, err := backends.New(backends.Config{
+	backendConfig := backends.Config{
 		Type: "file",
 		Settings: map[string]interface{}{
 			"path": testSafeName,
 		},
-	})
+	}
+	backendClient, err := backends.New(&backendConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	cryptoClient, err := crypto.New(crypto.NewDefaultConfig())
+	cryptoConfig := crypto.NewDefaultConfig()
+	cryptoClient, err := crypto.New(&cryptoConfig)
 	if err != nil {
 		return nil, err
+	}
+
+	config := &config.Config{
+		Encryption: cryptoConfig,
+		Storage:    backendConfig,
+		Version:    "1.2.3 test",
 	}
 
 	return Load(
 		testSafePassword,
 		backendClient,
 		cryptoClient,
+		config,
 	)
 }
 
