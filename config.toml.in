@@ -17,8 +17,9 @@ type = "file"
 # The encryption section controls the configuration of the safe encryption.
 #[encryption]
 # type let's you specify the encryption method to use.
-# Currently supported values: "openpgp".
+# Currently supported values: "openpgp", "aes_gcm".
 #type = "openpgp"
+#type = "aes_gcm"
   # Settings for the "openpgp" type
   #[encryption.openpgp]
   # The cipher to use, currently supported: "aes256", "aes128".
@@ -31,3 +32,15 @@ type = "file"
   # Not all values in the 1024-65011712 range are legal and if an illegal value is selected,
   # the value is automatically rounded up to the nearest legal value.
   #s2kcount = 65011712
+  # Settings for the "aes_gcm" type
+  #[encryption.aes_gcm]
+  # Specifies the key length (in bytes) to use for AES.
+  # Currently supported values: 32, 24, 16 for 256bit, 192bit, 128bit respectively.
+  #keylen = 32
+  # The hash function to use for PBKDF2.
+  # Currently supported values: "sha512".
+  #pbkdf2hash = "sha512"
+  # The number of iterations used to derive the key from your password.
+  #pbkdf2iterations = 100000
+  # Specifies the salt length (in bytes) for the PBKDF2.
+  #pbkdf2saltlen = 16

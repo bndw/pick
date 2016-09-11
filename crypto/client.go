@@ -17,6 +17,14 @@ func New(config *Config) (Client, error) {
 		}
 		fallthrough
 	case ConfigTypeOpenPGP:
+		// Remove other settings
+		// TODO(leon): This is shitty.
+		config.AESGCMSettings = nil
 		return NewOpenPGPClient(*config.OpenPGPSettings)
+	case ConfigTypeAESGCM:
+		// Remove other settings
+		// TODO(leon): This is shitty.
+		config.OpenPGPSettings = nil
+		return NewAESGCMClient(*config.AESGCMSettings)
 	}
 }
