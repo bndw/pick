@@ -14,19 +14,19 @@ func init() {
 
 const (
 	// testSafeContent has one account in it, "foo".
-	testSafeContent = `-----BEGIN PGP SIGNATURE-----
+	testSafeContent = `-----BEGIN PGP MESSAGE-----
 
-wx4EBwMIEp9YTGqqetBgwXj5+80vLdBMeIvLS49/GPDS4AHkVDeGlKy/bXalpl9M
-q7YwLOEBo+DO4CTh9ujgVeKriVie4HjmoykOiH3REZLAJO7U3ejMIP4onlD0u6SJ
-vD4U2ipsQIWhWaWfASmpl6T0Qq39tDqE8XZjFcTt/Btujfb5zoPpbeA84s53sEXg
-suDC4K7k5IYOU66CG3XbOaafkrrfmeKCjJGG4aZyAA==
-=Wzqv
------END PGP SIGNATURE-----`
+wx4EBwMI/EyvqWA12cNgJBnoGRxYO1D0/F/w5Ro5uafS4AHkLjgl3wFVjIRB1vbo
+GSX6FeE9q+Ap4JzhoTTgcOLB6iyW4HDmGZFzcVq+JgYYg0+7Q+4jlC/bBxyhtb1h
+UHBuCvFGG4ENExdLliCsixI1bP8KB2TlLH459U859KWkg1aEJJ+1FeDR5E1GwV5y
+Jn766KqjJFAUxwvguuNHI0fMMcIyfeA+4uNDsmXg+uRsGhwVdCP509FRtqes0EPh
+4mqkkV7hFAgA=geI2
+-----END PGP MESSAGE-----`
 	testSafeName = "test.safe"
 )
 
 var (
-	testSafePassword = []byte("seabreezes\n")
+	testSafePassword = []byte("seabreezes")
 )
 
 func createTestSafe() (*Safe, error) {
@@ -45,10 +45,7 @@ func createTestSafe() (*Safe, error) {
 		return nil, err
 	}
 
-	cryptoClient, err := crypto.New(crypto.Config{
-		Type:     "aes-openpgp",
-		Settings: map[string]interface{}{},
-	})
+	cryptoClient, err := crypto.New(crypto.NewDefaultConfig())
 	if err != nil {
 		return nil, err
 	}

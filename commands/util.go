@@ -29,15 +29,16 @@ func loadSafe() (*safe.Safe, error) {
 		password,
 		backendClient,
 		cryptoClient,
+		config,
 	)
 }
 
 func newBackendClient() (backends.Client, error) {
-	return backends.New(config.Storage)
+	return backends.New(&config.Storage)
 }
 
 func newCryptoClient() (crypto.Client, error) {
-	return crypto.New(config.Encryption)
+	return crypto.New(&config.Encryption)
 }
 
 func handleError(err error) int {

@@ -2,35 +2,69 @@ package crypto
 
 import (
 	"bytes"
-	"crypto"
-	"errors"
+	"fmt"
 	"io/ioutil"
-	"strings"
 
-	_ "crypto/sha256"
-
+	"github.com/bndw/pick/errors"
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/armor"
 	"golang.org/x/crypto/openpgp/packet"
 )
 
-type AESOpenPGPClient struct {
+type OpenPGPClient struct {
+	settings     OpenPGPSettings
 	packetConfig *packet.Config
 }
 
-func NewAESOpenPGPClient(config Config) (*AESOpenPGPClient, error) {
+type OpenPGPSettings struct {
+	Cipher   string `json:"cipher,omitempty" toml:"cipher"`
+	S2KCount int    `json:"s2kcount,omitempty" toml:"s2kcount"`
+}
 
-	// TODO(): Construct a packet from the config
-	// pc := &packet.Config{
-	// 	 DefaultHash: getHashFromConfig(config),
-	// }
+const (
+	openpgpDefaultCipher   = cipherAES256
+	openpgpDefaultS2KCount = 65011712
+)
 
-	return &AESOpenPGPClient{}, nil
+func DefaultOpenPGPSettings() *OpenPGPSettings {
+	return &OpenPGPSettings{
+		Cipher:   openpgpDefaultCipher,
+		S2KCount: openpgpDefaultS2KCount,
+	}
+}
+
+func NewOpenPGPClient(settings OpenPGPSettings) (*OpenPGPClient, error) {
+	c := &OpenPGPClient{
+		settings: settings,
+	}
+	c.packetConfig = &packet.Config{
+		DefaultCipher: c.cipherFunc(),
+		S2KCount:      c.s2kCount(),
+	}
+	return c, nil
+}
+
+func (c *OpenPGPClient) cipherFunc() packet.CipherFunction {
+	switch c.settings.Cipher {
+	default:
+		if c.settings.Cipher != "" {
+			fmt.Println("Invalid cipher, using default")
+		}
+		fallthrough
+	case cipherAES256:
+		return packet.CipherAES256
+	case cipherAES128:
+		return packet.CipherAES128
+	}
+}
+
+func (c *OpenPGPClient) s2kCount() int {
+	return c.settings.S2KCount
 }
 
 // decrypt uses PGP to decrypt symmetrically encrypted and armored text
 // with the provided password.
-func (*AESOpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext []byte, err error) {
+func (c *OpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext []byte, err error) {
 	decbuf := bytes.NewBuffer(ciphertext)
 
 	armorBlock, err := armor.Decode(decbuf)
@@ -44,7 +78,7 @@ func (*AESOpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext 
 		// This method will fail fast.
 		// Ref: https://godoc.org/golang.org/x/crypto/openpgp#PromptFunction
 		if failed {
-			return nil, errors.New("Unable to unlock safe with provided password")
+			return nil, &errors.SafeDecryptionFailed{}
 		}
 
 		failed = true
@@ -52,7 +86,7 @@ func (*AESOpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext 
 		return password, nil
 	}
 
-	md, err := openpgp.ReadMessage(armorBlock.Body, nil, prompt, nil)
+	md, err := openpgp.ReadMessage(armorBlock.Body, nil, prompt, c.packetConfig)
 
 	if err != nil {
 		return
@@ -69,7 +103,7 @@ func (*AESOpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext 
 
 // encrypt uses PGP to symmetrically encrypt and armor text with the
 // provided password.
-func (*AESOpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext []byte, err error) {
+func (c *OpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext []byte, err error) {
 	encbuf := bytes.NewBuffer(nil)
 
 	w, err := armor.Encode(encbuf, "PGP MESSAGE", nil)
@@ -78,7 +112,7 @@ func (*AESOpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext 
 	}
 	defer w.Close()
 
-	pt, err := openpgp.SymmetricallyEncrypt(w, password, nil, nil)
+	pt, err := openpgp.SymmetricallyEncrypt(w, password, nil, c.packetConfig)
 	if err != nil {
 		return
 	}
@@ -98,18 +132,4 @@ func (*AESOpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext 
 
 	ciphertext = encbuf.Bytes()
 	return
-}
-
-func getHashFromConfig(config Config) crypto.Hash {
-	hash, ok := config.Settings["hash"].(string)
-	if !ok {
-		// No hash set, let the default case pick it up
-	}
-
-	switch strings.ToLower(hash) {
-	default:
-		return crypto.SHA256
-	case "sha256":
-		return crypto.SHA256
-	}
 }

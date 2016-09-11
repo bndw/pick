@@ -14,6 +14,13 @@ func (e *SafeCorrupt) Error() string {
 	return "Safe currupt"
 }
 
+type SafeDecryptionFailed struct {
+}
+
+func (e *SafeDecryptionFailed) Error() string {
+	return "Unable to unlock safe with provided password"
+}
+
 type BackupFileExists struct {
 }
 

@@ -15,5 +15,15 @@ func (s *Safe) save() error {
 		return err
 	}
 
-	return s.backend.Save(ciphertext)
+	safeDTO := safeDTO{
+		Config:     &s.Config.Encryption,
+		Ciphertext: ciphertext,
+	}
+
+	data, err := json.Marshal(safeDTO)
+	if err != nil {
+		return err
+	}
+
+	return s.backend.Save(data)
 }
