@@ -9,6 +9,10 @@ type Client interface {
 func New(config *Config) (Client, error) {
 	switch config.Type {
 	default:
+		fallthrough
+	case "file":
 		return NewDiskBackend(*config)
+	case "mock":
+		return NewMockBackend(), nil
 	}
 }
