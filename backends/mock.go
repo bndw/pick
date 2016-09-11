@@ -2,7 +2,7 @@ package backends
 
 // mockBackend is used for tests
 type mockBackend struct {
-	data []byte
+	Data []byte
 }
 
 func NewMockBackend() *mockBackend {
@@ -14,7 +14,7 @@ Jn766KqjJFAUxwvguuNHI0fMMcIyfeA+4uNDsmXg+uRsGhwVdCP509FRtqes0EPh
 4mqkkV7hFAgA=geI2
 -----END PGP MESSAGE-----`)
 
-	return &mockBackend{data: safeData}
+	return &mockBackend{Data: safeData}
 }
 
 func (b *mockBackend) Backup() error {
@@ -22,10 +22,10 @@ func (b *mockBackend) Backup() error {
 }
 
 func (b *mockBackend) Load() ([]byte, error) {
-	return b.data, nil
+	return b.Data, nil
 }
 
 func (b *mockBackend) Save(ciphertext []byte) error {
-	b.data = ciphertext
+	b.Data = ciphertext
 	return nil
 }
