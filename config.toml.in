@@ -21,6 +21,7 @@ type = "file"
   [storage.settings]
   path = "$HOME/.pick/pick.safe"
 
+
 ## Encryption
 #
 #    Danger Area!
@@ -64,7 +65,7 @@ type = "file"
 #     saltlen = 16
 #     # Settings for the "scrypt" key-derivation type
 #     [encryption.aes_gcm.scrypt]
-#     n = 16384
+#     n = 131072
 #     r = 8
 #     p = 1
 #     # Specifies the salt length (in bytes) for Scrypt.

@@ -15,7 +15,7 @@ type Scrypt struct {
 
 const (
 	defaultSaltLen = 16
-	defaultN       = 16384
+	defaultN       = 131072 // 2^17
 	defaultR       = 8
 	defaultP       = 1
 )
