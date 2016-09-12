@@ -50,6 +50,9 @@ type = "file"
 #   # Specifies the key length (in bytes) to use for AES.
 #   # Currently supported values: 32, 24, 16 for 256bit, 192bit, 128bit respectively.
 #   keylen = 32
+#   # Specifies the key derivation function to use.
+#   # Currently supported values: "pbkdf2", "scrypt".
+#   keyderivation = "pbkdf2"
 #     # Settings for the "pbkdf2" Key-Derivation type
 #     [encryption.aes_gcm.pbkdf2]
 #     # The hash function to use for PBKDF2.
@@ -58,4 +61,11 @@ type = "file"
 #     # The number of iterations used to derive the key from your password.
 #     iterations = 100000
 #     # Specifies the salt length (in bytes) for the PBKDF2.
+#     saltlen = 16
+#     # Settings for the "scrypt" key-derivation type
+#     [encryption.aes_gcm.scrypt]
+#     n = 16384
+#     r = 8
+#     p = 1
+#     # Specifies the salt length (in bytes) for Scrypt.
 #     saltlen = 16

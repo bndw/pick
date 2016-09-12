@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/bndw/pick/crypto/pbkdf2"
+	"github.com/bndw/pick/crypto/scrypt"
 	"github.com/bndw/pick/errors"
 )
 
@@ -20,6 +21,7 @@ type AESGCMSettings struct {
 	KeyLen        int            `json:"keylen,omitempty" toml:"keylen"`
 	KeyDerivation string         `json:"keyderivation,omitempty" toml:"keyderivation"`
 	PBKDF2        *pbkdf2.PBKDF2 `json:"pbkdf2,omitempty" toml:"pbkdf2"`
+	Scrypt        *scrypt.Scrypt `json:"scrypt,omitempty" toml:"scrypt"`
 	// These three Pbkdf2 configs are required for backwards-compatiblity :(
 	Pbkdf2Hash       string `json:"pbkdf2hash,omitempty" toml:"pbkdf2hash"`
 	Pbkdf2Iterations int    `json:"pbkdf2iterations,omitempty" toml:"pbkdf2iterations"`
@@ -33,8 +35,8 @@ type AESGCMStore struct {
 }
 
 const (
-	aesGCMDefaultKeyLen        = 32
-	aesGCMDefaultKeyDerivation = "pbkdf2"
+	aesGCMDefaultKeyLen        = cipherLenAES256
+	aesGCMDefaultKeyDerivation = keyDerivationTypePBKDF2
 )
 
 func DefaultAESGCMSettings() *AESGCMSettings {
@@ -42,6 +44,7 @@ func DefaultAESGCMSettings() *AESGCMSettings {
 		KeyLen:        aesGCMDefaultKeyLen,
 		KeyDerivation: aesGCMDefaultKeyDerivation,
 		PBKDF2:        pbkdf2.New(),
+		Scrypt:        scrypt.New(),
 	}
 }
 
@@ -60,8 +63,16 @@ func NewAESGCMClient(settings *AESGCMSettings) (*AESGCMClient, error) {
 			fmt.Println("Invalid keyDerivation, using default")
 		}
 		fallthrough
-	case "pbkdf2":
+	case keyDerivationTypePBKDF2:
+		// Remove other settings
+		// TODO(leon): This is shitty.
+		settings.Scrypt = nil
 		kdf = settings.PBKDF2
+	case keyDerivationTypeScrypt:
+		// Remove other settings
+		// TODO(leon): This is shitty.
+		settings.PBKDF2 = nil
+		kdf = settings.Scrypt
 	}
 	return &AESGCMClient{
 		settings:      *settings,
@@ -77,9 +88,9 @@ func (c *AESGCMClient) keyLen() int {
 			fmt.Println("Invalid keyLen, using default")
 		}
 		return aesGCMDefaultKeyLen
-	case 16:
-	case 24:
-	case 32:
+	case cipherLenAES128:
+	case cipherLenAES192:
+	case cipherLenAES256:
 	}
 	return keyLen
 }
