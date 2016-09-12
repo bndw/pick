@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/bndw/pick/safe"
 	"github.com/spf13/cobra"
 )
 
@@ -25,7 +26,7 @@ func Backup(args ...string) int {
 		return handleError(err)
 	}
 
-	if err := backendClient.Backup(); err != nil {
+	if err := safe.Backup(backendClient); err != nil {
 		return handleError(err)
 	}
 

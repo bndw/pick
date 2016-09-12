@@ -18,6 +18,7 @@
 # The storage section controls where the safe is stored and which storage type to use.
 [storage]
 type = "file"
+auto_backup = true
   [storage.settings]
   path = "$HOME/.pick/pick.safe"
 
