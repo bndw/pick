@@ -47,7 +47,14 @@ func createTestSafe() (*Safe, error) {
 		return nil, err
 	}
 
-	cryptoConfig := crypto.NewDefaultConfig()
+	cryptoConfig := crypto.Config{
+		Type: crypto.ConfigTypeOpenPGP,
+		OpenPGPSettings: &crypto.OpenPGPSettings{
+			Cipher:   "aes128",
+			S2KCount: 1024,
+		},
+	}
+
 	cryptoClient, err := crypto.New(&cryptoConfig)
 	if err != nil {
 		return nil, err
