@@ -21,7 +21,6 @@ type = "file"
   [storage.settings]
   path = "$HOME/.pick/pick.safe"
 
-
 ## Encryption
 #
 #    Danger Area!
@@ -51,10 +50,12 @@ type = "file"
 #   # Specifies the key length (in bytes) to use for AES.
 #   # Currently supported values: 32, 24, 16 for 256bit, 192bit, 128bit respectively.
 #   keylen = 32
-#   # The hash function to use for PBKDF2.
-#   # Currently supported values: "sha512", "sha256".
-#   pbkdf2hash = "sha512"
-#   # The number of iterations used to derive the key from your password.
-#   pbkdf2iterations = 100000
-#   # Specifies the salt length (in bytes) for the PBKDF2.
-#   pbkdf2saltlen = 16
+#     # Settings for the "pbkdf2" Key-Derivation type
+#     [encryption.aes_gcm.pbkdf2]
+#     # The hash function to use for PBKDF2.
+#     # Currently supported values: "sha512", "sha256".
+#     hash = "sha512"
+#     # The number of iterations used to derive the key from your password.
+#     iterations = 100000
+#     # Specifies the salt length (in bytes) for the PBKDF2.
+#     saltlen = 16

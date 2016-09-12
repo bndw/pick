@@ -4,22 +4,23 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
-	"crypto/sha256"
-	"crypto/sha512"
 	"encoding/json"
 	"fmt"
-	"hash"
 
+	"github.com/bndw/pick/crypto/pbkdf2"
 	"github.com/bndw/pick/errors"
-	"golang.org/x/crypto/pbkdf2"
 )
 
 type AESGCMClient struct {
-	settings AESGCMSettings
+	settings      AESGCMSettings
+	keyDerivation KeyDerivation
 }
 
 type AESGCMSettings struct {
-	KeyLen           int    `json:"keylen,omitempty" toml:"keylen"`
+	KeyLen        int            `json:"keylen,omitempty" toml:"keylen"`
+	KeyDerivation string         `json:"keyderivation,omitempty" toml:"keyderivation"`
+	PBKDF2        *pbkdf2.PBKDF2 `json:"pbkdf2,omitempty" toml:"pbkdf2"`
+	// These three Pbkdf2 configs are required for backwards-compatiblity :(
 	Pbkdf2Hash       string `json:"pbkdf2hash,omitempty" toml:"pbkdf2hash"`
 	Pbkdf2Iterations int    `json:"pbkdf2iterations,omitempty" toml:"pbkdf2iterations"`
 	Pbkdf2SaltLen    int    `json:"pbkdf2saltlen,omitempty" toml:"pbkdf2saltlen"`
@@ -32,24 +33,39 @@ type AESGCMStore struct {
 }
 
 const (
-	aesGCMDefaultKeyLen           = 32
-	aesGCMDefaultPbkdf2Hash       = hashSHA512
-	aesGCMDefaultPbkdf2Iterations = 100000
-	aesGCMDefaultPbkdf2SaltLen    = 16
+	aesGCMDefaultKeyLen        = 32
+	aesGCMDefaultKeyDerivation = "pbkdf2"
 )
 
 func DefaultAESGCMSettings() *AESGCMSettings {
 	return &AESGCMSettings{
-		KeyLen:           aesGCMDefaultKeyLen,
-		Pbkdf2Hash:       aesGCMDefaultPbkdf2Hash,
-		Pbkdf2Iterations: aesGCMDefaultPbkdf2Iterations,
-		Pbkdf2SaltLen:    aesGCMDefaultPbkdf2SaltLen,
+		KeyLen:        aesGCMDefaultKeyLen,
+		KeyDerivation: aesGCMDefaultKeyDerivation,
+		PBKDF2:        pbkdf2.New(),
 	}
 }
 
-func NewAESGCMClient(settings AESGCMSettings) (*AESGCMClient, error) {
+func NewAESGCMClient(settings *AESGCMSettings) (*AESGCMClient, error) {
+	if settings.PBKDF2 == nil {
+		// Probably a safe which uses the old config, backwards-compatibility mode
+		settings.PBKDF2 = pbkdf2.New()
+		settings.PBKDF2.Hash = settings.Pbkdf2Hash
+		settings.PBKDF2.Iterations = settings.Pbkdf2Iterations
+		settings.PBKDF2.SaltLen = settings.Pbkdf2SaltLen
+	}
+	var kdf KeyDerivation
+	switch settings.KeyDerivation {
+	default:
+		if settings.KeyDerivation != "" {
+			fmt.Println("Invalid keyDerivation, using default")
+		}
+		fallthrough
+	case "pbkdf2":
+		kdf = settings.PBKDF2
+	}
 	return &AESGCMClient{
-		settings: settings,
+		settings:      *settings,
+		keyDerivation: kdf,
 	}, nil
 }
 
@@ -68,43 +84,12 @@ func (c *AESGCMClient) keyLen() int {
 	return keyLen
 }
 
-func (c *AESGCMClient) pbkdf2HashFunc() func() hash.Hash {
-	pbkdf2Hash := c.settings.Pbkdf2Hash
-	switch pbkdf2Hash {
-	default:
-		if pbkdf2Hash != "" {
-			fmt.Println("Invalid PBKDF2 Hash, using default")
-		}
-		fallthrough
-	case hashSHA512:
-		return sha512.New
-	case hashSHA256:
-		return sha256.New
-	}
+func (c *AESGCMClient) deriveKey(password []byte, keyLen int) ([]byte, []byte, error) {
+	return c.keyDerivation.DeriveKey(password, keyLen)
 }
 
-func (c *AESGCMClient) pbkdf2SaltLen() int {
-	return c.settings.Pbkdf2SaltLen
-}
-
-func (c *AESGCMClient) pbkdf2Iterations() int {
-	return c.settings.Pbkdf2Iterations
-}
-
-func (c *AESGCMClient) deriveKeyWithSalt(password []byte, salt []byte) []byte {
-	keyLen := c.keyLen()
-	pbkdf2Iterations := c.pbkdf2Iterations()
-	pbkdf2HashFunc := c.pbkdf2HashFunc()
-	return pbkdf2.Key(password, salt, pbkdf2Iterations, keyLen, pbkdf2HashFunc)
-}
-
-func (c *AESGCMClient) deriveKey(password []byte) ([]byte, []byte, error) {
-	salt := make([]byte, c.pbkdf2SaltLen())
-	if _, err := rand.Read(salt); err != nil {
-		return nil, nil, err
-	}
-
-	return c.deriveKeyWithSalt(password, salt), salt, nil
+func (c *AESGCMClient) deriveKeyWithSalt(password, salt []byte, keyLen int) ([]byte, error) {
+	return c.keyDerivation.DeriveKeyWithSalt(password, salt, keyLen)
 }
 
 func (c *AESGCMClient) Decrypt(data []byte, password []byte) (plaintext []byte, err error) {
@@ -113,7 +98,10 @@ func (c *AESGCMClient) Decrypt(data []byte, password []byte) (plaintext []byte, 
 		return nil, err
 	}
 
-	key := c.deriveKeyWithSalt(password, store.Salt)
+	key, err := c.deriveKeyWithSalt(password, store.Salt, c.keyLen())
+	if err != nil {
+		return
+	}
 
 	ac, err := aes.NewCipher(key)
 	if err != nil {
@@ -134,7 +122,7 @@ func (c *AESGCMClient) Decrypt(data []byte, password []byte) (plaintext []byte, 
 }
 
 func (c *AESGCMClient) Encrypt(plaintext []byte, password []byte) (data []byte, err error) {
-	key, salt, err := c.deriveKey(password)
+	key, salt, err := c.deriveKey(password, c.keyLen())
 	if err != nil {
 		return
 	}
