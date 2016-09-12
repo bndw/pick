@@ -37,8 +37,7 @@ type = "file"
 #   # Not all values in the 1024-65011712 range are legal and if an illegal value is selected,
 #   # the value is automatically rounded up to the nearest legal value.
 #   s2kcount = 65011712
-   
-
+#   
 # type = "aes_gcm"
 #   [encryption.aes_gcm]
 #   # Specifies the key length (in bytes) to use for AES.
