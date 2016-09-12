@@ -6,9 +6,9 @@ type Client interface {
 	Backup() error
 }
 
-func New(config Config) (Client, error) {
+func New(config *Config) (Client, error) {
 	switch config.Type {
 	default:
-		return NewDiskBackend(config)
+		return NewDiskBackend(*config)
 	}
 }

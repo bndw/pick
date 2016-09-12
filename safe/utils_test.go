@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/bndw/pick/backends"
+	"github.com/bndw/pick/config"
 	"github.com/bndw/pick/crypto"
 )
 
@@ -14,19 +15,19 @@ func init() {
 
 const (
 	// testSafeContent has one account in it, "foo".
-	testSafeContent = `-----BEGIN PGP SIGNATURE-----
+	testSafeContent = `-----BEGIN PGP MESSAGE-----
 
-wx4EBwMIEp9YTGqqetBgwXj5+80vLdBMeIvLS49/GPDS4AHkVDeGlKy/bXalpl9M
-q7YwLOEBo+DO4CTh9ujgVeKriVie4HjmoykOiH3REZLAJO7U3ejMIP4onlD0u6SJ
-vD4U2ipsQIWhWaWfASmpl6T0Qq39tDqE8XZjFcTt/Btujfb5zoPpbeA84s53sEXg
-suDC4K7k5IYOU66CG3XbOaafkrrfmeKCjJGG4aZyAA==
-=Wzqv
------END PGP SIGNATURE-----`
+wx4EBwMI/EyvqWA12cNgJBnoGRxYO1D0/F/w5Ro5uafS4AHkLjgl3wFVjIRB1vbo
+GSX6FeE9q+Ap4JzhoTTgcOLB6iyW4HDmGZFzcVq+JgYYg0+7Q+4jlC/bBxyhtb1h
+UHBuCvFGG4ENExdLliCsixI1bP8KB2TlLH459U859KWkg1aEJJ+1FeDR5E1GwV5y
+Jn766KqjJFAUxwvguuNHI0fMMcIyfeA+4uNDsmXg+uRsGhwVdCP509FRtqes0EPh
+4mqkkV7hFAgA=geI2
+-----END PGP MESSAGE-----`
 	testSafeName = "test.safe"
 )
 
 var (
-	testSafePassword = []byte("seabreezes\n")
+	testSafePassword = []byte("seabreezes")
 )
 
 func createTestSafe() (*Safe, error) {
@@ -35,28 +36,34 @@ func createTestSafe() (*Safe, error) {
 		return nil, err
 	}
 
-	backendClient, err := backends.New(backends.Config{
+	backendConfig := backends.Config{
 		Type: "file",
 		Settings: map[string]interface{}{
 			"path": testSafeName,
 		},
-	})
+	}
+	backendClient, err := backends.New(&backendConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	cryptoClient, err := crypto.New(crypto.Config{
-		Type:     "aes-openpgp",
-		Settings: map[string]interface{}{},
-	})
+	cryptoConfig := crypto.NewDefaultConfig()
+	cryptoClient, err := crypto.New(&cryptoConfig)
 	if err != nil {
 		return nil, err
+	}
+
+	config := &config.Config{
+		Encryption: cryptoConfig,
+		Storage:    backendConfig,
+		Version:    "1.2.3 test",
 	}
 
 	return Load(
 		testSafePassword,
 		backendClient,
 		cryptoClient,
+		config,
 	)
 }
 

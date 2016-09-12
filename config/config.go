@@ -25,9 +25,11 @@ func Load(version string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	configFile := fmt.Sprintf(defaultConfigFileTmpl, home)
 
-	config := Config{}
+	configFile := fmt.Sprintf(defaultConfigFileTmpl, home)
+	config := Config{
+		Encryption: crypto.NewDefaultConfig(),
+	}
 	if _, err := os.Stat(configFile); err != nil {
 		if os.IsNotExist(err) {
 			// TODO(): No config found, should we create one?
