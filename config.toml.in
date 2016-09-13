@@ -8,7 +8,8 @@
 
 
 ## Storage
-# The storage section controls the where the safe file is stored.
+# The storage section controls where the safe is stored and which storage type
+# to use.
 [storage]
 type = "file"
   [storage.settings]
