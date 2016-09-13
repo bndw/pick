@@ -26,6 +26,8 @@ type = "file"
 #    type let's you specify the encryption method to use.
 #
 # [encryption]
+#   type let's you specify the encryption method to use.
+#   Either use "openpgp" or "aes_gcm".
 # type = "openpgp"
 #   [encryption.openpgp]
 #   # The cipher to use, currently supported: "aes256", "aes128".
