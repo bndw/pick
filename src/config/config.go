@@ -12,12 +12,18 @@ import (
 
 const (
 	defaultConfigFileTmpl = "%s/.pick/config.toml"
+	defaultPasswordLen    = 25
 )
 
 type Config struct {
 	Encryption crypto.Config
 	Storage    backends.Config
+	General    generalConfig `toml:"general"`
 	Version    string
+}
+
+type generalConfig struct {
+	PasswordLen int
 }
 
 func Load(version string) (*Config, error) {
@@ -29,6 +35,9 @@ func Load(version string) (*Config, error) {
 	configFile := fmt.Sprintf(defaultConfigFileTmpl, home)
 	config := Config{
 		Encryption: crypto.NewDefaultConfig(),
+		General: generalConfig{
+			PasswordLen: defaultPasswordLen,
+		},
 	}
 	if _, err := os.Stat(configFile); err != nil {
 		if os.IsNotExist(err) {

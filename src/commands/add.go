@@ -9,11 +9,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	// TODO: Pull this from config
-	passwordLength = 25
-)
-
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "add [name] [username] [password]",
@@ -96,7 +91,7 @@ func parseAddArgs(args []string) (name, username, password string, errCode int) 
 
 	if password == "" {
 		if utils.Confirm("Generate password", true) {
-			password, err = utils.GeneratePassword(passwordLength)
+			password, err = utils.GeneratePassword(config.General.PasswordLen)
 			if err != nil {
 				fmt.Println(err)
 				return
