@@ -8,8 +8,7 @@
 
 
 ## Storage
-# The storage section controls where the safe is stored and which storage type
-# to use.
+# The storage section controls where the safe is stored and which storage type to use.
 [storage]
 type = "file"
   [storage.settings]
@@ -19,16 +18,16 @@ type = "file"
 ## Encryption
 #
 #    Danger Area!
-#    Only adjust the settings below this line if you know what you are doing.
-#    If you change something and we update our recommended settings, your safe will
+#    Only uncomment / adjust the settings in the [encryption] section if you know what you are doing.
+#    If you change something and we update our default (recommended) settings, your safe will
 #    _not_ automatically upgrade to our new recommendations.
 #    The encryption section controls the configuration of the safe encryption.
-#    type let's you specify the encryption method to use.
 #
 # [encryption]
-#   type lets you specify the encryption method to use.
-#   Currently supported: "openpgp", "aes_gcm".
+# # type lets you specify the encryption method to use.
+# # Currently supported: "openpgp", "aes_gcm".
 # type = "openpgp"
+#
 #   [encryption.openpgp]
 #   # The cipher to use, currently supported: "aes256", "aes128".
 #   # The number after "aes" specifies the key length (in bits).
@@ -40,8 +39,7 @@ type = "file"
 #   # Not all values in the 1024-65011712 range are legal and if an illegal value is selected,
 #   # the value is automatically rounded up to the nearest legal value.
 #   s2kcount = 65011712
-#   
-# type = "aes_gcm"
+#
 #   [encryption.aes_gcm]
 #   # Specifies the key length (in bytes) to use for AES.
 #   # Currently supported values: 32, 24, 16 for 256bit, 192bit, 128bit respectively.
