@@ -19,6 +19,7 @@
 [storage]
 type = "file"
 auto_backup = true
+max_backups = 100
   [storage.settings]
   path = "$HOME/.pick/pick.safe"
 

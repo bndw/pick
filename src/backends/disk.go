@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -27,8 +28,12 @@ var (
 )
 
 type DiskBackend struct {
-	path string
+	path       string
+	backupDir  string
+	maxBackups int
 }
+
+type fileInfoSlice []os.FileInfo
 
 func NewDiskBackend(config Config) (*DiskBackend, error) {
 	var err error
@@ -46,7 +51,11 @@ func NewDiskBackend(config Config) (*DiskBackend, error) {
 		}
 	}
 
-	return &DiskBackend{safePath}, nil
+	return &DiskBackend{
+		path:       safePath,
+		backupDir:  fmt.Sprintf(defaultBackupDir, homeDir, defaultSafeDirName),
+		maxBackups: config.MaxBackups,
+	}, nil
 }
 
 func (db *DiskBackend) Load() ([]byte, error) {
@@ -74,8 +83,55 @@ func (db *DiskBackend) Save(data []byte) error {
 	return nil
 }
 
+func (f fileInfoSlice) Len() int {
+	return len(f)
+}
+
+func (f fileInfoSlice) Less(i, j int) bool {
+	return f[i].ModTime().Before(f[j].ModTime())
+}
+
+func (f fileInfoSlice) Swap(i, j int) {
+	f[i], f[j] = f[j], f[i]
+}
+
+func (db *DiskBackend) cleanOldBackups(max int) error {
+	files, err := ioutil.ReadDir(db.backupDir)
+	if err != nil {
+		return err
+	}
+
+	filesSorted := make(fileInfoSlice, 0, len(files))
+	for _, f := range files {
+		filesSorted = append(filesSorted, f)
+	}
+	sort.Sort(filesSorted)
+	max = min(max, len(filesSorted))
+
+	for _, f := range filesSorted[:len(filesSorted)-max] {
+		p := fmt.Sprintf("%s/%s", db.backupDir, f.Name())
+		if err := os.Remove(p); err != nil {
+			fmt.Println("Error", err.Error())
+		}
+	}
+
+	return nil
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
+}
+
 func (db *DiskBackend) Backup() error {
-	backupDir := fmt.Sprintf(defaultBackupDir, homeDir, defaultSafeDirName)
+	// Subtract one as we are about to create another backup
+	if db.maxBackups > 0 {
+		db.cleanOldBackups(db.maxBackups - 1)
+	}
+
+	backupDir := db.backupDir
 	timeFormat := time.Now().Format(defaultBackupTimeFormat)
 	backupFileName := fmt.Sprintf(defaultBackupFileName, timeFormat)
 	backupPath := backupDir + "/" + backupFileName
