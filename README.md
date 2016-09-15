@@ -30,9 +30,6 @@ Available Commands:
   ls          List all credentials
   rm          Remove a credential
 
-Flags:
-  -h, --help   help for pick
-
 Use "pick [command] --help" for more information about a command.
 ```
 
