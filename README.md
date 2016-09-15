@@ -29,6 +29,7 @@ Available Commands:
   export      Export decrypted credentials in JSON format
   ls          List all credentials
   rm          Remove a credential
+  version     Print the version number of pick
 
 Flags:
   -h, --help   help for pick
