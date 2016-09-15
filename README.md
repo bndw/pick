@@ -31,9 +31,6 @@ Available Commands:
   rm          Remove a credential
   version     Print the version number of pick
 
-Flags:
-  -h, --help   help for pick
-
 Use "pick [command] --help" for more information about a command.
 ```
 
