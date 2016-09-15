@@ -11,8 +11,8 @@ type Account struct {
 	CreatedOn int64  `json:"createdOn"`
 }
 
-func NewAccount(name, username, password string) Account {
-	return Account{
+func NewAccount(name, username, password string) *Account {
+	return &Account{
 		Name:      name,
 		Username:  username,
 		Password:  password,
