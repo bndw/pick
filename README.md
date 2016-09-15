@@ -23,15 +23,13 @@ Usage:
 
 Available Commands:
   add         Add a credential
-  backup      Backup safe
+  backup      Backup the safe
   cat         Cat a credential
   cp          Copy a credential to the clipboard
   export      Export decrypted credentials in JSON format
   ls          List all credentials
   rm          Remove a credential
-
-Flags:
-  -h, --help   help for pick
+  version     Print the version number of pick
 
 Use "pick [command] --help" for more information about a command.
 ```
