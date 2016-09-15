@@ -7,6 +7,13 @@
 # $HOME - Replaced with the path to your home directory, e.g. $HOME/.pick -> /home/john/.pick
 
 
+## General
+# # The general section controls general settings for pick.
+# [general]
+# # Specifies the length of generated passwords.
+# passwordlen = 25
+
+
 ## Storage
 # The storage section controls where the safe is stored and which storage type to use.
 [storage]
