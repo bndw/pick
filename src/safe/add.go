@@ -5,17 +5,16 @@ import (
 )
 
 func (s *Safe) Add(name, username, password string) (*Account, error) {
-	if _, exists := s.Accounts[name]; exists {
-		account := s.Accounts[name]
-		return &account, &errors.AccountExists{}
+	if existingAccount, _ := s.Get(name); existingAccount != nil {
+		return existingAccount, &errors.AccountExists{}
 	}
 
 	account := NewAccount(name, username, password)
-	s.Accounts[name] = account
+	s.Accounts[name] = *account
 
 	if err := s.save(); err != nil {
 		return nil, err
 	}
 
-	return &account, nil
+	return account, nil
 }
