@@ -28,9 +28,8 @@ var (
 )
 
 type DiskBackend struct {
-	path       string
-	backupDir  string
-	maxBackups int
+	path         string
+	backupConfig backupConfig
 }
 
 type fileInfoSlice []os.FileInfo
@@ -51,10 +50,11 @@ func NewDiskBackend(config Config) (*DiskBackend, error) {
 		}
 	}
 
+	config.Backup.DirPath = fmt.Sprintf(defaultBackupDir, homeDir, defaultSafeDirName)
+
 	return &DiskBackend{
-		path:       safePath,
-		backupDir:  fmt.Sprintf(defaultBackupDir, homeDir, defaultSafeDirName),
-		maxBackups: config.MaxBackups,
+		path:         safePath,
+		backupConfig: config.Backup,
 	}, nil
 }
 
@@ -96,7 +96,7 @@ func (f fileInfoSlice) Swap(i, j int) {
 }
 
 func (db *DiskBackend) cleanOldBackups(max int) error {
-	files, err := ioutil.ReadDir(db.backupDir)
+	files, err := ioutil.ReadDir(db.backupConfig.DirPath)
 	if err != nil {
 		return err
 	}
@@ -109,7 +109,7 @@ func (db *DiskBackend) cleanOldBackups(max int) error {
 	max = min(max, len(filesSorted))
 
 	for _, f := range filesSorted[:len(filesSorted)-max] {
-		p := fmt.Sprintf("%s/%s", db.backupDir, f.Name())
+		p := fmt.Sprintf("%s/%s", db.backupConfig.DirPath, f.Name())
 		if err := os.Remove(p); err != nil {
 			fmt.Println("Error", err.Error())
 		}
@@ -126,16 +126,16 @@ func min(a, b int) int {
 }
 
 func (db *DiskBackend) Backup() error {
-	if db.maxBackups == 0 {
+	if db.backupConfig.MaxFiles == 0 {
 		// Keep no backups
 		db.cleanOldBackups(0)
 		return &errors.BackupDisabled{}
-	} else if db.maxBackups > 0 {
+	} else if db.backupConfig.MaxFiles > 0 {
 		// Subtract one as we are about to create another backup
-		db.cleanOldBackups(db.maxBackups - 1)
+		db.cleanOldBackups(db.backupConfig.MaxFiles - 1)
 	}
 
-	backupDir := db.backupDir
+	backupDir := db.backupConfig.DirPath
 	timeFormat := time.Now().Format(defaultBackupTimeFormat)
 	backupFileName := fmt.Sprintf(defaultBackupFileName, timeFormat)
 	backupPath := backupDir + "/" + backupFileName

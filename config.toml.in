@@ -18,13 +18,14 @@
 # The storage section controls where the safe is stored and which storage type to use.
 [storage]
 type = "file"
-# Whether to auto-create backups before the safe is modified.
-auto_backup = true
-# The number of backups to keep.
-# Specify -1 to allow unlimited backups, 0 to not create backups at all.
-max_backups = 100
   [storage.settings]
   path = "$HOME/.pick/pick.safe"
+  #[storage.backup]
+  # Whether to auto-create backups before the safe is modified.
+  #auto = true
+  # The number of backups to keep.
+  # Specify -1 to allow unlimited backups, 0 to not create backups at all.
+  #max = 100
 
 
 ## Encryption

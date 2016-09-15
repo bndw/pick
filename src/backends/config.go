@@ -1,10 +1,15 @@
 package backends
 
 type Config struct {
-	Type              string                 `toml:"type"`
-	AutoBackupEnabled bool                   `toml:"auto_backup"`
-	MaxBackups        int                    `toml:"max_backups"`
-	Settings          map[string]interface{} `toml:"settings"`
+	Type     string                 `toml:"type"`
+	Backup   backupConfig           `toml:"backup"`
+	Settings map[string]interface{} `toml:"settings"`
+}
+
+type backupConfig struct {
+	DirPath     string
+	AutoEnabled bool `toml:"auto"`
+	MaxFiles    int  `toml:"max"`
 }
 
 const (
@@ -14,8 +19,10 @@ const (
 
 func NewDefaultConfig() Config {
 	return Config{
-		Type:              ConfigTypeFile,
-		AutoBackupEnabled: true,
-		MaxBackups:        100,
+		Type: ConfigTypeFile,
+		Backup: backupConfig{
+			AutoEnabled: true,
+			MaxFiles:    100,
+		},
 	}
 }
