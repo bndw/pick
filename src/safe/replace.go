@@ -1,14 +1,17 @@
 package safe
 
-import (
-	"github.com/bndw/pick/errors"
-)
-
-func (s *Safe) Replace(name, username, password string) error {
-	if _, exists := s.Accounts[name]; exists {
-		s.Accounts[name] = NewAccount(name, username, password)
-		return s.save()
+func (s *Safe) Replace(name, username, password string) (*Account, error) {
+	account, err := s.Get(name)
+	if err != nil {
+		return nil, err
 	}
 
-	return &errors.AccountNotFound{}
+	account = NewAccount(name, username, password)
+	s.Accounts[name] = *account
+
+	if err = s.save(); err != nil {
+		return nil, err
+	}
+
+	return account, nil
 }

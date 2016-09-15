@@ -34,8 +34,9 @@ func Add(args ...string) int {
 
 	account, err := safe.Add(name, username, password)
 	if _, conflict := err.(*errors.AccountExists); conflict && overwrite(name) {
-		if rerr := safe.Replace(name, username, password); rerr != nil {
-			return handleError(rerr)
+		var replaceErr error
+		if account, replaceErr = safe.Replace(name, username, password); replaceErr != nil {
+			return handleError(replaceErr)
 		}
 	} else if err != nil {
 		return handleError(err)

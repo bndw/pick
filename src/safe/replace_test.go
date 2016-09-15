@@ -11,15 +11,7 @@ func TestReplace(t *testing.T) {
 	}
 	defer removeTestSafe()
 
-	if err = safe.Replace("foo", "Bubbles", "kitt3ns"); err != nil {
-		t.Error(err)
-	}
-
-	account, err := safe.Get("foo")
-	if err != nil {
-		t.Error(err)
-	}
-
+	account, err := safe.Replace("foo", "Bubbles", "kitt3ns")
 	if account.Username != "Bubbles" {
 		t.Errorf("Expected username Bubbles, got %s", account.Username)
 	}
