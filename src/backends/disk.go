@@ -126,8 +126,12 @@ func min(a, b int) int {
 }
 
 func (db *DiskBackend) Backup() error {
-	// Subtract one as we are about to create another backup
-	if db.maxBackups > 0 {
+	if db.maxBackups == 0 {
+		// Keep no backups
+		db.cleanOldBackups(0)
+		return &errors.BackupDisabled{}
+	} else if db.maxBackups > 0 {
+		// Subtract one as we are about to create another backup
 		db.cleanOldBackups(db.maxBackups - 1)
 	}
 
