@@ -3,12 +3,6 @@ pick
 A minimal password manager for OS X and Linux.
 
 ```sh
-$ go get -u github.com/bndw/pick
-```
-
-or
-
-```sh
 $ git clone https://github.com/bndw/pick && cd pick
 $ make
 $ make install
