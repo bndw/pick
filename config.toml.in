@@ -28,6 +28,8 @@ type = "file"
 #    Only uncomment / adjust the settings in the [encryption] section if you know what you are doing.
 #    If you change something and we update our default (recommended) settings, your safe will
 #    _not_ automatically upgrade to our new recommendations.
+#    All settings in the [encryption] section can be modified on-the-fly, i.e. your safe
+#    will automatically upgrade from the old to the new encryption settings.
 #    The encryption section controls the configuration of the safe encryption.
 #
 # [encryption]
