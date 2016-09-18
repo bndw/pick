@@ -111,7 +111,7 @@ func (db *DiskBackend) cleanOldBackups(max int) error {
 	for _, f := range filesSorted[:len(filesSorted)-max] {
 		p := fmt.Sprintf("%s/%s", db.backupConfig.DirPath, f.Name())
 		if err := os.Remove(p); err != nil {
-			fmt.Println("Error", err.Error())
+			fmt.Println("Error removing old backup", err.Error())
 		}
 	}
 
@@ -132,7 +132,9 @@ func (db *DiskBackend) Backup() error {
 		return &errors.BackupDisabled{}
 	} else if db.backupConfig.MaxFiles > 0 {
 		// Subtract one as we are about to create another backup
-		db.cleanOldBackups(db.backupConfig.MaxFiles - 1)
+		if err := db.cleanOldBackups(db.backupConfig.MaxFiles - 1); err != nil {
+			fmt.Println("Failed to remove old backup(s)", err.Error())
+		}
 	}
 
 	backupDir := db.backupConfig.DirPath
