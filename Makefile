@@ -49,6 +49,9 @@ fmt: gofmt
 gofmt:
 	GOPATH=$(GOPATH) go fmt $(FOLDERS)
 
+govet:
+	GOPATH=$(GOPATH) go tool vet src/
+
 config:
 	@if [ ! -f "$(PICK_DIR)/config.toml" ]; then \
 		OLD_UMASK=$(shell echo `umask`) ; \

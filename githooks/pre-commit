@@ -23,3 +23,9 @@ if [ $? -ne 0 ]; then
 	echo "Failed to run go fmt. Please check the output of make fmt"
 	exit 1
 fi
+
+make govet > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+	echo "Failed to run go vet. Please check the output of make govet"
+	exit 1
+fi
