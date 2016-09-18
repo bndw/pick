@@ -73,7 +73,9 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 	// This check is required for the OpenPGP mode, as it gets its config from the ciphertext.
 	if upgradeNeeded || !reflect.DeepEqual(*safeDTO.Config, s.Config.Encryption) {
 		fmt.Println("Upgrading safe")
-		s.save()
+		if err := s.save(); err != nil {
+			fmt.Println("Error", err.Error())
+		}
 	}
 
 	return &s, err

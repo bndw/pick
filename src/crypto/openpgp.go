@@ -33,9 +33,9 @@ func DefaultOpenPGPSettings() *OpenPGPSettings {
 	}
 }
 
-func NewOpenPGPClient(settings OpenPGPSettings) (*OpenPGPClient, error) {
+func NewOpenPGPClient(settings *OpenPGPSettings) (*OpenPGPClient, error) {
 	c := &OpenPGPClient{
-		settings: settings,
+		settings: *settings,
 	}
 	c.packetConfig = &packet.Config{
 		DefaultCipher: c.cipherFunc(),
