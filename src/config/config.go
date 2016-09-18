@@ -34,6 +34,7 @@ func Load(version string) (*Config, error) {
 
 	configFile := fmt.Sprintf(defaultConfigFileTmpl, home)
 	config := Config{
+		Storage:    backends.NewDefaultConfig(),
 		Encryption: crypto.NewDefaultConfig(),
 		General: generalConfig{
 			PasswordLen: defaultPasswordLen,

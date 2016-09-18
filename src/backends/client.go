@@ -10,9 +10,9 @@ func New(config *Config) (Client, error) {
 	switch config.Type {
 	default:
 		fallthrough
-	case "file":
+	case ConfigTypeFile:
 		return NewDiskBackend(*config)
-	case "mock":
+	case ConfigTypeMock:
 		return NewMockBackend(), nil
 	}
 }

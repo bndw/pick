@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -27,8 +28,11 @@ var (
 )
 
 type DiskBackend struct {
-	path string
+	path         string
+	backupConfig backupConfig
 }
+
+type fileInfoSlice []os.FileInfo
 
 func NewDiskBackend(config Config) (*DiskBackend, error) {
 	var err error
@@ -46,7 +50,12 @@ func NewDiskBackend(config Config) (*DiskBackend, error) {
 		}
 	}
 
-	return &DiskBackend{safePath}, nil
+	config.Backup.DirPath = fmt.Sprintf(defaultBackupDir, homeDir, defaultSafeDirName)
+
+	return &DiskBackend{
+		path:         safePath,
+		backupConfig: config.Backup,
+	}, nil
 }
 
 func (db *DiskBackend) Load() ([]byte, error) {
@@ -74,8 +83,61 @@ func (db *DiskBackend) Save(data []byte) error {
 	return nil
 }
 
+func (f fileInfoSlice) Len() int {
+	return len(f)
+}
+
+func (f fileInfoSlice) Less(i, j int) bool {
+	return f[i].ModTime().Before(f[j].ModTime())
+}
+
+func (f fileInfoSlice) Swap(i, j int) {
+	f[i], f[j] = f[j], f[i]
+}
+
+func (db *DiskBackend) cleanOldBackups(max int) error {
+	files, err := ioutil.ReadDir(db.backupConfig.DirPath)
+	if err != nil {
+		return err
+	}
+
+	filesSorted := make(fileInfoSlice, 0, len(files))
+	for _, f := range files {
+		filesSorted = append(filesSorted, f)
+	}
+	sort.Sort(filesSorted)
+	max = min(max, len(filesSorted))
+
+	for _, f := range filesSorted[:len(filesSorted)-max] {
+		p := fmt.Sprintf("%s/%s", db.backupConfig.DirPath, f.Name())
+		if err := os.Remove(p); err != nil {
+			fmt.Println("Error removing old backup", err.Error())
+		}
+	}
+
+	return nil
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
+}
+
 func (db *DiskBackend) Backup() error {
-	backupDir := fmt.Sprintf(defaultBackupDir, homeDir, defaultSafeDirName)
+	if db.backupConfig.MaxFiles == 0 {
+		// Keep no backups
+		db.cleanOldBackups(0)
+		return &errors.BackupDisabled{}
+	} else if db.backupConfig.MaxFiles > 0 {
+		// Subtract one as we are about to create another backup
+		if err := db.cleanOldBackups(db.backupConfig.MaxFiles - 1); err != nil {
+			fmt.Println("Failed to remove old backup(s)", err.Error())
+		}
+	}
+
+	backupDir := db.backupConfig.DirPath
 	timeFormat := time.Now().Format(defaultBackupTimeFormat)
 	backupFileName := fmt.Sprintf(defaultBackupFileName, timeFormat)
 	backupPath := backupDir + "/" + backupFileName

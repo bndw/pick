@@ -21,6 +21,13 @@ func (e *SafeDecryptionFailed) Error() string {
 	return "Unable to unlock safe with provided password"
 }
 
+type BackupDisabled struct {
+}
+
+func (e *BackupDisabled) Error() string {
+	return "Backups are disabled, increase `max_backups` to re-enable"
+}
+
 type BackupFileExists struct {
 }
 

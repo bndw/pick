@@ -37,7 +37,7 @@ func createTestSafe() (*Safe, error) {
 	}
 
 	backendConfig := backends.Config{
-		Type: "file",
+		Type: backends.ConfigTypeFile,
 		Settings: map[string]interface{}{
 			"path": testSafeName,
 		},
