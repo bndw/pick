@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestDefaultOpenPGPSettings(t *testing.T) {
+func TestOpenPGPDefaultSettings(t *testing.T) {
 	defaultSettings := DefaultOpenPGPSettings()
 	if defaultSettings == nil {
 		t.Errorf("Expected default settings, got nil")
@@ -20,14 +20,14 @@ func TestDefaultOpenPGPSettings(t *testing.T) {
 	}
 }
 
-func TestNewOpenPGPClient(t *testing.T) {
+func TestOpenPGPNewClient(t *testing.T) {
 	_, err := NewOpenPGPClient(DefaultOpenPGPSettings())
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func TestS2kCount(t *testing.T) {
+func TestOpenPGPS2kCount(t *testing.T) {
 	c, err := NewOpenPGPClient(DefaultOpenPGPSettings())
 	if err != nil {
 		t.Error(err)
@@ -42,7 +42,7 @@ func TestS2kCount(t *testing.T) {
 	}
 }
 
-func TestDecrypt(t *testing.T) {
+func TestOpenPGPDecrypt(t *testing.T) {
 	const ciphertext = `-----BEGIN PGP MESSAGE-----
 
 wy4ECQMIlYyEIihH6mD/sYAV1dj5VBXNexlblCUJQK/Tgabg0b9hO+e+Rc3hzdrI
@@ -63,7 +63,7 @@ K+I87kKs4YINAA==
 	}
 }
 
-func TestEncrypt(t *testing.T) {
+func TestOpenPGPEncrypt(t *testing.T) {
 	c, err := NewOpenPGPClient(DefaultOpenPGPSettings())
 	if err != nil {
 		t.Error(err)
