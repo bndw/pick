@@ -22,8 +22,7 @@ func TestOpenPGPDefaultSettings(t *testing.T) {
 }
 
 func TestOpenPGPNewClient(t *testing.T) {
-	_, err := NewOpenPGPClient(DefaultOpenPGPSettings())
-	if err != nil {
+	if _, err := NewOpenPGPClient(DefaultOpenPGPSettings()); err != nil {
 		t.Error(err)
 	}
 }
