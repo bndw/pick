@@ -70,7 +70,7 @@ func TestAESGCMDeriveKeyWithSalt(t *testing.T) {
 	}
 }
 
-func TestDecrypt(t *testing.T) {
+func TestAESGCMDecrypt(t *testing.T) {
 	const ciphertext = `{"salt":"5hoAENJ0RMEa5Mu4Il8AsA==","nonce":"rgTzBsZfX/sBxDcW","ciphertext":"A+EU28usBw82UfagOQdlyPnmdX/CCR7dvoP1+Ff8NVXS7jStZvaLIJilYzI8"}`
 
 	c, err := NewAESGCMClient(DefaultAESGCMSettings())
@@ -84,7 +84,7 @@ func TestDecrypt(t *testing.T) {
 	}
 }
 
-func TestEncrypt(t *testing.T) {
+func TestAESGCMEncrypt(t *testing.T) {
 	c, err := NewAESGCMClient(DefaultAESGCMSettings())
 	if err != nil {
 		t.Error(err)
