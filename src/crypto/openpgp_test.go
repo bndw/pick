@@ -11,7 +11,8 @@ func TestOpenPGPDefaultSettings(t *testing.T) {
 	}
 
 	if defaultSettings.Cipher != openpgpDefaultCipher {
-		t.Errorf("DefaultCipher is unexpected")
+		t.Errorf("DefaultCipher is unexpected. Expected %s, actual %s",
+			openpgpDefaultCipher, defaultSettings.Cipher)
 	}
 
 	if defaultSettings.S2KCount != openpgpDefaultS2KCount {
