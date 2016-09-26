@@ -11,7 +11,8 @@ func TestAESGCMDefaultSettings(t *testing.T) {
 	}
 
 	if defaultSettings.KeyLen != aesGCMDefaultKeyLen {
-		t.Errorf("DefaultCipher is unexpected")
+		t.Errorf("KeyLen is unexpected, expected %d, actual %d",
+			aesGCMDefaultKeyLen, defaultSettings.KeyLen)
 	}
 
 	if defaultSettings.KeyDerivation != aesGCMDefaultKeyDerivation {
