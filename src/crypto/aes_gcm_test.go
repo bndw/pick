@@ -30,8 +30,7 @@ func TestAESGCMDefaultSettings(t *testing.T) {
 }
 
 func TestAESGCMNewClient(t *testing.T) {
-	_, err := NewAESGCMClient(DefaultAESGCMSettings())
-	if err != nil {
+	if _, err := NewAESGCMClient(DefaultAESGCMSettings()); err != nil {
 		t.Error(err)
 	}
 }
