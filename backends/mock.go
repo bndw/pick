@@ -7,6 +7,7 @@ type mockBackend struct {
 
 func NewMockBackend() *mockBackend {
 	safeData := []byte(`-----BEGIN PGP MESSAGE-----
+
 wx4EBwMI/EyvqWA12cNgJBnoGRxYO1D0/F/w5Ro5uafS4AHkLjgl3wFVjIRB1vbo
 GSX6FeE9q+Ap4JzhoTTgcOLB6iyW4HDmGZFzcVq+JgYYg0+7Q+4jlC/bBxyhtb1h
 UHBuCvFGG4ENExdLliCsixI1bP8KB2TlLH459U859KWkg1aEJJ+1FeDR5E1GwV5y
