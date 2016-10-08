@@ -133,7 +133,9 @@ func (db *DiskBackend) Backup() error {
 	} else if db.backupConfig.MaxFiles > 0 {
 		// Subtract one as we are about to create another backup
 		if err := db.cleanOldBackups(db.backupConfig.MaxFiles - 1); err != nil {
-			fmt.Println("Failed to remove old backup(s)", err.Error())
+			if !os.IsNotExist(err) {
+				fmt.Println("Failed to remove old backup(s)", err.Error())
+			}
 		}
 	}
 
