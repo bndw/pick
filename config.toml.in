@@ -20,6 +20,12 @@
 type = "file"
   [storage.settings]
   path = "$HOME/.pick/pick.safe"
+  #[storage.backup]
+  # Whether to auto-create backups before the safe is modified.
+  #auto = true
+  # The number of backups to keep.
+  # Specify -1 to allow unlimited backups, 0 to not create backups at all.
+  #max = 100
 
 
 ## Encryption
@@ -28,6 +34,8 @@ type = "file"
 #    Only uncomment / adjust the settings in the [encryption] section if you know what you are doing.
 #    If you change something and we update our default (recommended) settings, your safe will
 #    _not_ automatically upgrade to our new recommendations.
+#    All settings in the [encryption] section can be modified on-the-fly, i.e. your safe
+#    will automatically upgrade from the old to the new encryption settings.
 #    The encryption section controls the configuration of the safe encryption.
 #
 # [encryption]
@@ -51,10 +59,22 @@ type = "file"
 #   # Specifies the key length (in bytes) to use for AES.
 #   # Currently supported values: 32, 24, 16 for 256bit, 192bit, 128bit respectively.
 #   keylen = 32
-#   # The hash function to use for PBKDF2.
-#   # Currently supported values: "sha512", "sha256".
-#   pbkdf2hash = "sha512"
-#   # The number of iterations used to derive the key from your password.
-#   pbkdf2iterations = 100000
-#   # Specifies the salt length (in bytes) for the PBKDF2.
-#   pbkdf2saltlen = 16
+#   # Specifies the key derivation function to use.
+#   # Currently supported values: "pbkdf2", "scrypt".
+#   keyderivation = "pbkdf2"
+#     # Settings for the "pbkdf2" Key-Derivation type
+#     [encryption.aes_gcm.pbkdf2]
+#     # The hash function to use for PBKDF2.
+#     # Currently supported values: "sha512", "sha256".
+#     hash = "sha512"
+#     # The number of iterations used to derive the key from your password.
+#     iterations = 100000
+#     # Specifies the salt length (in bytes) for the PBKDF2.
+#     saltlen = 16
+#     # Settings for the "scrypt" key-derivation type
+#     [encryption.aes_gcm.scrypt]
+#     n = 131072
+#     r = 8
+#     p = 1
+#     # Specifies the salt length (in bytes) for Scrypt.
+#     saltlen = 16

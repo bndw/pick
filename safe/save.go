@@ -25,5 +25,10 @@ func (s *Safe) save() error {
 		return err
 	}
 
+	// Before saving the new safe, do an auto-backup if enabled
+	if s.Config.Storage.Backup.AutoEnabled {
+		Backup(s.backend)
+	}
+
 	return s.backend.Save(data)
 }

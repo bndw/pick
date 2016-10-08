@@ -7,7 +7,7 @@ PICK_DIR = $(HOME)/.pick
 BIN_DIR = /usr/local/bin
 INSTALL = install
 
-FOLDERS = $(shell find ./src -mindepth 1 -maxdepth 1 -type d)
+FOLDERS = $(shell find . -mindepth 1 -type d -not -path "*.git*" -not -path "./githooks*" -not -path "./vendor*" -not -path "*bin*")
 
 all: build
 
@@ -29,10 +29,10 @@ goget:
 	GOPATH=$(GOPATH) $(CURDIR)/vendor/bin/godeps -u dependencies.tsv
 	mkdir -p $(shell dirname "$(CURDIR)/vendor/src/$(GOPKG)")
 	rm -f $(CURDIR)/vendor/src/$(GOPKG)
-	ln -sf $(PWD)/src $(CURDIR)/vendor/src/$(GOPKG)
+	ln -sf $(PWD) $(CURDIR)/vendor/src/$(GOPKG)
 
 build: install_hooks goget
-	GOPATH=$(GOPATH) go build -o bin/pick $(GOPKG)
+	GOPATH=$(GOPATH) go build -o bin/pick .
 
 test: goget
 	GOPATH=$(GOPATH) go test -v $(FOLDERS)
@@ -48,6 +48,9 @@ fmt: gofmt
 
 gofmt:
 	GOPATH=$(GOPATH) go fmt $(FOLDERS)
+
+govet:
+	GOPATH=$(GOPATH) go tool vet $(FOLDERS)
 
 config:
 	@if [ ! -f "$(PICK_DIR)/config.toml" ]; then \

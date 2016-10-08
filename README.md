@@ -3,7 +3,8 @@ pick
 A minimal password manager for OS X and Linux.
 
 ```sh
-$ go get -u github.com/bndw/pick
+$ brew tap bndw/pick
+$ brew install bndw/pick/pick-pass
 ```
 
 or

@@ -9,6 +9,11 @@ type Client interface {
 	Encrypt(plaintext, password []byte) (data []byte, err error)
 }
 
+type KeyDerivation interface {
+	DeriveKey(password []byte, keyLen int) ([]byte, []byte, error)
+	DeriveKeyWithSalt(password, salt []byte, keyLen int) ([]byte, error)
+}
+
 func New(config *Config) (Client, error) {
 	switch config.Type {
 	default:
@@ -20,11 +25,11 @@ func New(config *Config) (Client, error) {
 		// Remove other settings
 		// TODO(leon): This is shitty.
 		config.AESGCMSettings = nil
-		return NewOpenPGPClient(*config.OpenPGPSettings)
+		return NewOpenPGPClient(config.OpenPGPSettings)
 	case ConfigTypeAESGCM:
 		// Remove other settings
 		// TODO(leon): This is shitty.
 		config.OpenPGPSettings = nil
-		return NewAESGCMClient(*config.AESGCMSettings)
+		return NewAESGCMClient(config.AESGCMSettings)
 	}
 }

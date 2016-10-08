@@ -7,12 +7,15 @@ type Config struct {
 }
 
 const (
-	ConfigTypeOpenPGP = "openpgp"
-	ConfigTypeAESGCM  = "aes_gcm"
-	cipherAES256      = "aes256"
-	cipherAES128      = "aes128"
-	hashSHA256        = "sha256"
-	hashSHA512        = "sha512"
+	ConfigTypeOpenPGP       = "openpgp"
+	ConfigTypeAESGCM        = "aes_gcm"
+	keyDerivationTypePBKDF2 = "pbkdf2"
+	keyDerivationTypeScrypt = "scrypt"
+	cipherAES256            = "aes256"
+	cipherAES128            = "aes128"
+	cipherLenAES256         = 32
+	cipherLenAES192         = 24
+	cipherLenAES128         = 16
 )
 
 func NewDefaultConfig() Config {
