@@ -7,7 +7,7 @@ PICK_DIR = $(HOME)/.pick
 BIN_DIR = /usr/local/bin
 INSTALL = install
 
-FOLDERS = $(shell find . -mindepth 1 -maxdepth 1 -type d -not -path "*.git" -not -path "./githooks" -not -path "*vendor" -not -path "*bin")
+FOLDERS = $(shell find . -mindepth 1 -type d -not -path "*.git*" -not -path "./githooks*" -not -path "./vendor*" -not -path "*bin*")
 
 all: build
 
