@@ -2,20 +2,27 @@ pick
 ====
 A minimal password manager for OS X and Linux.
 
+![demo](https://github.com/bndw/pick/raw/master/demo.gif)
+
+## Install
+
+#### go get
+```sh
+$ go get github.com/bndw/pick
+```
+
+#### Homebrew
 ```sh
 $ brew tap bndw/pick
 $ brew install bndw/pick/pick-pass
 ```
 
-or
-
+#### The old fashioned way
 ```sh
 $ git clone https://github.com/bndw/pick && cd pick
 $ make
 $ make install
 ```
-
-![demo](https://github.com/bndw/pick/raw/master/demo.gif)
 
 ## Usage
 ```
