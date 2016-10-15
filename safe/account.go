@@ -12,7 +12,8 @@ type Account struct {
 	History    []Account `json:"history,omitempty"`
 }
 
-func (acc *Account) UpdateLastModifed() {
+func (acc *Account) Update(cb func(*Account)) {
+	cb(acc)
 	acc.ModifiedOn = time.Now().Unix()
 }
 
