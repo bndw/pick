@@ -11,8 +11,8 @@ import (
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   `edit name ("username" | "password")`,
-		Short: "Edit an account",
-		Long: `The edit command is used to edit an existing account.
+		Short: "Edit a credential",
+		Long: `The edit command is used to edit an existing credential.
             `,
 		Run: func(cmd *cobra.Command, args []string) {
 			os.Exit(Edit(args...))
