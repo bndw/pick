@@ -41,7 +41,9 @@ func Cat(args ...string) int {
 username: %s
 password: %s
 created:  %s
+modified: %s
 `, name, account.Username, account.Password,
-		utils.FormatUnixTime(account.CreatedOn))
+		utils.FormatUnixTime(account.CreatedOn),
+		utils.FormatUnixTime(account.ModifiedOn))
 	return 0
 }
