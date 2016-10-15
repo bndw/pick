@@ -31,7 +31,8 @@ func Cat(args ...string) int {
 		return handleError(err)
 	}
 
-	account, err := safe.Get(args[0])
+	name := args[0]
+	account, err := safe.Get(name)
 	if err != nil {
 		return handleError(err)
 	}
@@ -40,7 +41,7 @@ func Cat(args ...string) int {
 username: %s
 password: %s
 created:  %s
-`, account.Name, account.Username, account.Password,
+`, name, account.Username, account.Password,
 		utils.FormatUnixTime(account.CreatedOn))
 	return 0
 }

@@ -1,10 +1,5 @@
 package safe
 
-func (s *Safe) List() []Account {
-	var accounts []Account
-	for _, account := range s.Accounts {
-		accounts = append(accounts, account)
-	}
-
-	return accounts
+func (s *Safe) List() map[string]Account {
+	return s.Accounts
 }
