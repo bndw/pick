@@ -5,10 +5,11 @@ import (
 )
 
 type Account struct {
-	Username   string `json:"username"`
-	Password   string `json:"password"`
-	CreatedOn  int64  `json:"createdOn"`
-	ModifiedOn int64  `json:"modifiedOn"`
+	Username   string    `json:"username"`
+	Password   string    `json:"password"`
+	CreatedOn  int64     `json:"createdOn"`
+	ModifiedOn int64     `json:"modifiedOn"`
+	History    []Account `json:"history,omitempty"`
 }
 
 func (acc *Account) UpdateLastModifed() {
@@ -22,5 +23,6 @@ func NewAccount(name, username, password string) *Account {
 		Password:   password,
 		CreatedOn:  ts,
 		ModifiedOn: ts,
+		History:    make([]Account, 0),
 	}
 }
