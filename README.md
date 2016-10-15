@@ -36,6 +36,7 @@ Available Commands:
   backup      Backup the safe
   cat         Cat a credential
   cp          Copy a credential to the clipboard
+  edit        Edit an account
   export      Export decrypted credentials in JSON format
   ls          List all credentials
   rm          Remove a credential
