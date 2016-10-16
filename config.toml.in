@@ -40,7 +40,7 @@ type = "file"
 #
 # [encryption]
 # # type lets you specify the encryption method to use.
-# # Currently supported: "openpgp", "aes_gcm".
+# # Currently supported: "openpgp", "aes_gcm", "chachapoly".
 # type = "openpgp"
 #
 #   [encryption.openpgp]
@@ -73,6 +73,27 @@ type = "file"
 #     saltlen = 16
 #     # Settings for the "scrypt" key-derivation type
 #     [encryption.aes_gcm.scrypt]
+#     n = 131072
+#     r = 8
+#     p = 1
+#     # Specifies the salt length (in bytes) for Scrypt.
+#     saltlen = 16
+#
+#   [encryption.chachapoly]
+#   # Specifies the key derivation function to use.
+#   # Currently supported values: "pbkdf2", "scrypt".
+#   keyderivation = "pbkdf2"
+#     # Settings for the "pbkdf2" Key-Derivation type
+#     [encryption.chachapoly.pbkdf2]
+#     # The hash function to use for PBKDF2.
+#     # Currently supported values: "sha512", "sha256".
+#     hash = "sha512"
+#     # The number of iterations used to derive the key from your password.
+#     iterations = 100000
+#     # Specifies the salt length (in bytes) for the PBKDF2.
+#     saltlen = 16
+#     # Settings for the "scrypt" key-derivation type
+#     [encryption.chachapoly.scrypt]
 #     n = 131072
 #     r = 8
 #     p = 1

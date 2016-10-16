@@ -25,11 +25,19 @@ func New(config *Config) (Client, error) {
 		// Remove other settings
 		// TODO(leon): This is shitty.
 		config.AESGCMSettings = nil
+		config.ChaCha20Poly1305Settings = nil
 		return NewOpenPGPClient(config.OpenPGPSettings)
 	case ConfigTypeAESGCM:
 		// Remove other settings
 		// TODO(leon): This is shitty.
 		config.OpenPGPSettings = nil
+		config.ChaCha20Poly1305Settings = nil
 		return NewAESGCMClient(config.AESGCMSettings)
+	case ConfigTypeChaChaPoly:
+		// Remove other settings
+		// TODO(leon): This is shitty.
+		config.OpenPGPSettings = nil
+		config.AESGCMSettings = nil
+		return NewChaCha20Poly1305Client(config.ChaCha20Poly1305Settings)
 	}
 }
