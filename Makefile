@@ -9,8 +9,8 @@ INSTALL = install
 
 FOLDERS = $(shell find . -mindepth 1 -type d -not -path "*.git*" -not -path "./githooks*" -not -path "./vendor*" -not -path "*bin*")
 
-VERSION=$(shell cat VERSION)
-LDFLAGS=--ldflags "-X main.version=$(VERSION)"
+VERSION = $(shell cat VERSION)
+LDFLAGS = -ldflags "-X main.version=$(VERSION)"
 
 all: build
 
