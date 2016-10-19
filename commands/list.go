@@ -27,8 +27,8 @@ func List(args ...string) int {
 	}
 
 	var accountNames []string
-	for _, account := range safe.List() {
-		accountNames = append(accountNames, account.Name)
+	for name := range safe.List() {
+		accountNames = append(accountNames, name)
 	}
 
 	if len(accountNames) > 0 {
