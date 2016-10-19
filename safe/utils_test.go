@@ -63,7 +63,7 @@ func createTestSafe() (*Safe, error) {
 	config := &config.Config{
 		Encryption: cryptoConfig,
 		Storage:    backendConfig,
-		Version:    "1.2.3 test",
+		Version:    "1.2.3",
 	}
 
 	return Load(

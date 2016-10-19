@@ -9,6 +9,7 @@ import (
 	"github.com/bndw/pick/config"
 	"github.com/bndw/pick/crypto"
 	"github.com/bndw/pick/errors"
+	"github.com/bndw/pick/utils"
 )
 
 func Load(password []byte, backend backends.Client, encryptionClient crypto.Client, config *config.Config) (*Safe, error) {
@@ -66,6 +67,15 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		return nil, &errors.SafeCorrupt{}
 	}
 
+	if tmp.Config != nil && tmp.Config.Version != "" {
+		incompatible, err := versionIncompatible(tmp.Config.Version, config.Version)
+		if err != nil {
+			return nil, err
+		} else if incompatible {
+			return nil, fmt.Errorf("Safe is using a non-backwards compatible version. Please upgrade pick. pick version: %s, safe version: %s", config.Version, tmp.Config.Version)
+		}
+	}
+
 	s.Accounts = tmp.Accounts
 
 	// Default 'ModifiedOn' to 'CreatedOn' if it is empty
@@ -87,4 +97,16 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 	}
 
 	return &s, err
+}
+
+func versionIncompatible(v1, v2 string) (bool, error) {
+	v1p, err := utils.ParseVersion(v1)
+	if err != nil {
+		return false, err
+	}
+	v2p, err := utils.ParseVersion(v2)
+	if err != nil {
+		return false, err
+	}
+	return v1p[0] > v2p[0] || v1p[1] > v2p[1], nil
 }
