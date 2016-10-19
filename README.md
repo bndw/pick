@@ -1,5 +1,7 @@
 pick
 ====
+[![Build Status](https://travis-ci.org/bndw/pick.svg?branch=master)](https://travis-ci.org/bndw/pick)
+
 A minimal password manager for OS X and Linux.
 
 ![demo](https://github.com/bndw/pick/raw/master/demo.gif)
