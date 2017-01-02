@@ -40,25 +40,27 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		safeDTO.Config = &defaultOpenPGPConfig
 	}
 
-	upgradeNeeded := false
+	// We first try to decrypt a safe using its own configuration
+	s.crypto, err = crypto.New(safeDTO.Config)
+	if err != nil {
+		return nil, err
+	}
+
+	upgradeCrypto := encryptionClient
 	plaintext, err := s.crypto.Decrypt(safeDTO.Ciphertext, password)
 	if err != nil {
-		// Wasn't able to decrypt the safe with the default / user-provided config.
-		// Now use config from the safe. If this doesn't work, then the password
-		// is _definitely_ incorrect. If however decryption works now, we need
-		// to upgrade the safe to use the default / user-provided config.
-		userCrypto := s.crypto
-		s.crypto, err = crypto.New(safeDTO.Config)
-		if err != nil {
-			return nil, err
-		}
+		// Wasn't able to decrypt the safe with its own configuration.
+		// Normally this shouldn't happen, never. As a fallback, we try
+		// to decrypt using the user-provided config. If this fails, the
+		// password is _definitely_ incorrect. If however decryption works
+		// now, we need to upgrade the safe to use the user-provided config.
+		// Therefore, store current crypto for possible upgrade.
+		upgradeCrypto = s.crypto
+		s.crypto = encryptionClient
 		plaintext, err = s.crypto.Decrypt(safeDTO.Ciphertext, password)
 		if err != nil {
 			return nil, err
 		}
-		// Safe upgrade is needed, restore default / user-provided config
-		upgradeNeeded = true
-		s.crypto = userCrypto
 	}
 
 	var tmp Safe
@@ -86,11 +88,11 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		}
 	}
 
-	// We still need to compare the default / user-provided config with the safe config.
+	// We need to compare the default / user-provided config with the safe config.
 	// If they differ -> Upgrade safe
-	// This check is required for the OpenPGP mode, as it gets its config from the ciphertext.
-	if upgradeNeeded || !reflect.DeepEqual(*safeDTO.Config, s.Config.Encryption) {
+	if !reflect.DeepEqual(*safeDTO.Config, s.Config.Encryption) {
 		fmt.Println("Upgrading safe")
+		s.crypto = upgradeCrypto
 		if err := s.save(); err != nil {
 			fmt.Println("Error", err.Error())
 		}
