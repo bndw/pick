@@ -68,4 +68,4 @@ clean:
 	rm -rf vendor/
 	rm -rf bin/
 
-.PHONY: all install_hooks goget build test install uninstall fmt gofmt config clean
+.PHONY: all install_hooks goget build test install uninstall fmt gofmt govet config clean
