@@ -70,7 +70,7 @@ func (sl *safeLoader) LoadWithBackendClient(backendClient backends.Client) (*saf
 	)
 	if err != nil {
 		if sl.maxLoadTries > sl.loadTries {
-			// Try to reset stored password and ask for a new one
+			// Reset stored password and load again — asking for a new password
 			sl.password = nil
 			sl.loadTries++
 			return sl.LoadWithBackendClient(backendClient)
