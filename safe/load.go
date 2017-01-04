@@ -68,6 +68,14 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 
 	s.Accounts = tmp.Accounts
 
+	// Default 'ModifiedOn' to 'CreatedOn' if it is empty
+	for i, acc := range s.Accounts {
+		if acc.ModifiedOn == 0 {
+			acc.ModifiedOn = acc.CreatedOn
+			s.Accounts[i] = acc
+		}
+	}
+
 	// We still need to compare the default / user-provided config with the safe config.
 	// If they differ -> Upgrade safe
 	// This check is required for the OpenPGP mode, as it gets its config from the ciphertext.
