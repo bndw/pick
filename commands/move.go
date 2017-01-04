@@ -20,7 +20,7 @@ func init() {
 }
 
 func Move(args ...string) int {
-	safe, err := loadSafe()
+	safe, err := newSafeLoader().Load()
 	if err != nil {
 		return handleError(err)
 	}

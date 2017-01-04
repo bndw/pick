@@ -25,7 +25,7 @@ func Remove(args []string, flags *pflag.FlagSet) error {
 	}
 	name := args[0]
 
-	safe, err := loadSafe()
+	safe, err := newSafeLoader().Load()
 	if err != nil {
 		return err
 	}
