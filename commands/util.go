@@ -50,7 +50,7 @@ func (sl *safeLoader) Load() (*safe.Safe, error) {
 
 func (sl *safeLoader) LoadWithBackendClient(backendClient backends.Client) (*safe.Safe, error) {
 	if sl.password == nil {
-		password, err := utils.GetPasswordInput("Enter your master password")
+		password, err := utils.GetPasswordInput(fmt.Sprintf("Enter your master password for safe '%s'", backendClient.SafeLocation()))
 		if err != nil {
 			return nil, err
 		}
