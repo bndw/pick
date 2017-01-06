@@ -28,6 +28,7 @@ func TestLoad(t *testing.T) {
 		conf := &config.Config{
 			Encryption: cryptoConfig,
 			Storage:    backendConfig,
+			Version:    "1.2.3",
 		}
 		for j, data := range safeData {
 			backendClient.Data = []byte(data)
