@@ -23,6 +23,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 	if err != nil {
 		if _, ok := err.(*errors.SafeNotFound); ok {
 			s.Accounts = make(map[string]Account)
+			s.Notes = newNotesManager(&s)
 			return &s, nil
 		}
 		return nil, err
@@ -67,6 +68,10 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 	}
 
 	s.Accounts = tmp.Accounts
+	s.Notes = newNotesManager(&s)
+	if tmp.Notes != nil {
+		s.Notes.Notes = tmp.Notes.Notes
+	}
 
 	// Default 'ModifiedOn' to 'CreatedOn' if it is empty
 	for i, acc := range s.Accounts {

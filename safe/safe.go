@@ -12,6 +12,7 @@ type Safe struct {
 	Config   *config.Config
 	password []byte
 	Accounts map[string]Account `json:"accounts"`
+	Notes    *notesManager
 }
 
 type safeDTO struct {
