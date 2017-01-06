@@ -10,7 +10,7 @@ A minimal password manager for OS X and Linux.
 
 #### go get
 ```sh
-$ go get github.com/bndw/pick
+$ go get -u github.com/bndw/pick
 ```
 
 #### Homebrew
