@@ -5,6 +5,7 @@ import (
 
 	"github.com/bndw/pick/errors"
 	"github.com/bndw/pick/utils"
+	"github.com/bndw/pick/utils/pswdgen"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -67,7 +68,7 @@ func parseEditArgs(args []string) (name, username, password string, err error) {
 		}
 	} else if action == "password" {
 		if utils.Confirm("Generate new password", true) {
-			password, err = utils.GeneratePassword(config.General.PasswordLen)
+			password, err = pswdgen.Generate(config.General.Password)
 			if err != nil {
 				return
 			}

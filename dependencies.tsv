@@ -1,6 +1,7 @@
 github.com/BurntSushi/toml	git	99064174e013895bbd9b025c31100bd1d9b590ca	2016-07-17T15:07:09Z
 github.com/atotto/clipboard	git	bb272b845f1112e10117e3e45ce39f690c0001ad	2016-02-19T03:44:21Z
 github.com/mitchellh/go-homedir	git	756f7b183b7ab78acdbbee5c7f392838ed459dda	2016-06-21T17:42:43Z
+github.com/pkg/term	git	b1f72af2d63057363398bec5873d16a98b453312	2016-07-05T08:19:19Z
 github.com/spf13/cobra	git	856b96dcb49d6427babe192998a35190a12c2230	2016-10-14T22:20:36Z
 github.com/spf13/pflag	git	bf8481a6aebc13a8aab52e699ffe2e79771f5a3f	2016-10-11T12:08:26Z
 golang.org/x/crypto	git	14f9af67c679edd414f72f13d67c917447113df2	2016-10-17T20:27:11Z
