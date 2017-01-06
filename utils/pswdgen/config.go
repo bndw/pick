@@ -1,11 +1,16 @@
 package pswdgen
 
-const (
-	defaultPasswordLength   = 25
-	defaultPasswordStrength = 2 // alphanum
-	defaultPasswordMode     = "nonInteractive"
+import (
+	"strings"
+)
 
-	passwordModeInteractive = "interactive"
+const (
+	PasswordModeNonInteractive = "interactive"
+	PasswordModeInteractive    = "nonInteractive"
+
+	DefaultPasswordLength   = 25
+	defaultPasswordStrength = 2 // alphanum
+	defaultPasswordMode     = PasswordModeNonInteractive
 )
 
 type Config struct {
@@ -16,8 +21,24 @@ type Config struct {
 
 func NewDefaultConfig() Config {
 	return Config{
-		Length:   defaultPasswordLength,
+		Length:   DefaultPasswordLength,
 		Strength: defaultPasswordStrength,
 		Mode:     defaultPasswordMode,
+	}
+}
+
+func StrengthByString(s string) int {
+	s = strings.ToLower(s)
+	switch s {
+	default:
+		fallthrough
+	case "full":
+		return 3
+	case "alphanum":
+		return 2
+	case "alpha":
+		return 1
+	case "num":
+		return 0
 	}
 }
