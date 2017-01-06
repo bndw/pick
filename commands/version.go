@@ -10,7 +10,7 @@ func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "version",
 		Short: "Print the version number of pick",
-		Long:  `The version command prints the version of pick`,
+		Long:  "The version command prints the version of pick",
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Printf("pick v%s\n", config.Version)
 		},

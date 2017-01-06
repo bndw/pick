@@ -2,54 +2,54 @@ package commands
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/bndw/pick/errors"
 	"github.com/bndw/pick/utils"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   `edit name ("username" | "password")`,
 		Short: "Edit a credential",
-		Long: `The edit command is used to edit an existing credential.
-            `,
+		Long:  "The edit command is used to edit an existing credential.",
 		Run: func(cmd *cobra.Command, args []string) {
-			os.Exit(Edit(args...))
+			runCommand(Edit, cmd, args)
 		},
 	})
 }
 
-func Edit(args ...string) int {
+func Edit(args []string, flags *pflag.FlagSet) error {
 	safe, err := loadSafe()
 	if err != nil {
-		return handleError(err)
+		return err
 	}
 
-	name, username, password, errCode := parseEditArgs(args)
-	if errCode > 0 {
-		return errCode
+	name, username, password, err := parseEditArgs(args)
+	if err != nil {
+		return err
 	}
 
 	account, err := safe.Edit(name, username, password)
 	if err != nil {
-		return handleError(err)
+		return err
 	}
 
 	fmt.Println("Credential updated")
 	if utils.Confirm("Copy password to clipboard", true) {
 		if err := utils.CopyToClipboard(account.Password); err != nil {
-			return handleError(err)
+			return err
 		}
 	}
 
-	return 0
+	return nil
 }
 
-func parseEditArgs(args []string) (name, username, password string, errCode int) {
+func parseEditArgs(args []string) (name, username, password string, err error) {
 	if len(args) > 2 {
-		fmt.Println(`Usage: edit name ("username" | "password")`)
-		return "", "", "", 1
+		err = &errors.InvalidCommandUsage{}
+		return
 	}
 
 	var action string
@@ -61,35 +61,28 @@ func parseEditArgs(args []string) (name, username, password string, errCode int)
 		name = args[0]
 	}
 
-	errCode = 1
-	var err error
-
 	if action == "username" {
 		if username, err = utils.GetInput(fmt.Sprintf("Enter a new username for %s", name)); err != nil {
-			fmt.Println(err)
 			return
 		}
 	} else if action == "password" {
 		if utils.Confirm("Generate new password", true) {
 			password, err = utils.GeneratePassword(config.General.PasswordLen)
 			if err != nil {
-				fmt.Println(err)
 				return
 			}
 		} else {
 			var _password []byte
 			if _password, err = utils.GetPasswordInput(fmt.Sprintf("Enter a new password for %s", name)); err != nil {
-				fmt.Println(err)
 				return
 			}
 
 			password = string(_password)
 		}
 	} else {
-		fmt.Printf("Invalid edit action specified: %s\n", action)
+		err = fmt.Errorf("Invalid edit action specified: %s\n", action)
 		return
 	}
 
-	errCode = 0
 	return
 }

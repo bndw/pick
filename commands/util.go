@@ -2,12 +2,27 @@ package commands
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/bndw/pick/backends"
 	"github.com/bndw/pick/crypto"
+	"github.com/bndw/pick/errors"
 	"github.com/bndw/pick/safe"
 	"github.com/bndw/pick/utils"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
+
+func runCommand(c func([]string, *pflag.FlagSet) error, cmd *cobra.Command, args []string) {
+	if err := c(args, cmd.Flags()); err != nil {
+		if _, isUsageErr := err.(*errors.InvalidCommandUsage); isUsageErr {
+			cmd.Usage()
+			os.Exit(1)
+		}
+		os.Exit(handleError(err))
+	}
+	os.Exit(0)
+}
 
 func loadSafe() (*safe.Safe, error) {
 	password, err := utils.GetPasswordInput("Enter your master password")
@@ -44,4 +59,9 @@ func newCryptoClient() (crypto.Client, error) {
 func handleError(err error) int {
 	fmt.Println(err)
 	return 1
+}
+
+func isInvalidCommandUsage(err error) bool {
+	_, ok := err.(*errors.InvalidCommandUsage)
+	return ok
 }

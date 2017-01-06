@@ -48,3 +48,10 @@ type AccountNotFound struct {
 func (e *AccountNotFound) Error() string {
 	return "Account not found"
 }
+
+type InvalidCommandUsage struct {
+}
+
+func (e *InvalidCommandUsage) Error() string {
+	return "Invalid use of command"
+}
