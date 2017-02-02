@@ -2,11 +2,10 @@ package pswdgen
 
 import (
 	"bytes"
-	"crypto/rand"
 	"fmt"
-	"math/big"
 	"strings"
 
+	"github.com/leonklingele/randomstring"
 	"github.com/pkg/term"
 )
 
@@ -55,15 +54,15 @@ func (p *passwordGenerator) New() (string, error) {
 	default:
 		fallthrough
 	case 3:
-		chars = charsFull
+		chars = randomstring.CharsASCII
 	case 2:
-		chars = charsAlphaNum
+		chars = randomstring.CharsAlphaNum
 	case 1:
-		chars = charsAlpha
+		chars = randomstring.CharsAlpha
 	case 0:
-		chars = charsNum
+		chars = randomstring.CharsNum
 	}
-	password, err := generateUsingAlphabet(chars, p.config.Length)
+	password, err := randomstring.Generate(p.config.Length, chars)
 	if err != nil {
 		return "", err
 	}
@@ -117,33 +116,6 @@ func newPasswordGenerator(config Config) passwordGenerator {
 func Generate(config Config) (string, error) {
 	pswdGen := newPasswordGenerator(config)
 	return pswdGen.Generate()
-}
-
-func generateUsingAlphabet(alphabet string, length int) (string, error) {
-	buffer := make([]byte, length)
-	max := big.NewInt(int64(len(alphabet)))
-
-	var index int
-	var err error
-	for i := 0; i < length; i++ {
-		index, err = randomInt(max)
-		if err != nil {
-			return "", err
-		}
-
-		buffer[i] = alphabet[index]
-	}
-
-	return string(buffer), nil
-}
-
-func randomInt(max *big.Int) (int, error) {
-	rand, err := rand.Int(rand.Reader, max)
-	if err != nil {
-		return 0, err
-	}
-
-	return int(rand.Int64()), nil
 }
 
 func readTermChar() ([]byte, error) {

@@ -1,11 +1,6 @@
 package pswdgen
 
 const (
-	charsNum      = "0123456789"
-	charsAlpha    = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	charsAlphaNum = charsNum + charsAlpha
-	charsFull     = charsAlphaNum + "-_.:,;()[]{}?!\"§$%&/=´`°^@|#'"
-
 	defaultPasswordLength   = 25
 	defaultPasswordStrength = 2 // alphanum
 	defaultPasswordMode     = "nonInteractive"
