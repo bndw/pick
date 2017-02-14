@@ -21,6 +21,12 @@ func New(config *Config) (Client, error) {
 			fmt.Println("Invalid encryption type, using default")
 		}
 		fallthrough
+	case ConfigTypeChaChaPoly:
+		// Remove other settings
+		// TODO(leon): This is shitty.
+		config.OpenPGPSettings = nil
+		config.AESGCMSettings = nil
+		return NewChaCha20Poly1305Client(config.ChaCha20Poly1305Settings)
 	case ConfigTypeOpenPGP:
 		// Remove other settings
 		// TODO(leon): This is shitty.
@@ -33,11 +39,5 @@ func New(config *Config) (Client, error) {
 		config.OpenPGPSettings = nil
 		config.ChaCha20Poly1305Settings = nil
 		return NewAESGCMClient(config.AESGCMSettings)
-	case ConfigTypeChaChaPoly:
-		// Remove other settings
-		// TODO(leon): This is shitty.
-		config.OpenPGPSettings = nil
-		config.AESGCMSettings = nil
-		return NewChaCha20Poly1305Client(config.ChaCha20Poly1305Settings)
 	}
 }
