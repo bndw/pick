@@ -7,22 +7,24 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/bndw/pick/backends"
 	"github.com/bndw/pick/crypto"
+	"github.com/bndw/pick/utils/pswdgen"
 	"github.com/mitchellh/go-homedir"
 )
 
 const (
 	defaultConfigFileTmpl = "%s/.pick/config.toml"
-	defaultPasswordLen    = 25
 )
 
 type Config struct {
 	Encryption crypto.Config
 	Storage    backends.Config
-	General    generalConfig `toml:"general"`
+	General    generalConfig
 	Version    string
 }
 
 type generalConfig struct {
+	Password pswdgen.Config
+	// Warning: Deprecated. The PasswordLen field is required for backwards-compatiblity :(
 	PasswordLen int
 }
 
@@ -37,7 +39,7 @@ func Load(version string) (*Config, error) {
 		Storage:    backends.NewDefaultConfig(),
 		Encryption: crypto.NewDefaultConfig(),
 		General: generalConfig{
-			PasswordLen: defaultPasswordLen,
+			Password: pswdgen.NewDefaultConfig(),
 		},
 	}
 	if _, err := os.Stat(configFile); err != nil {
@@ -53,6 +55,10 @@ func Load(version string) (*Config, error) {
 	}
 
 	config.Version = version
+	// Warning: Deprecated. The PasswordLen field is required for backwards-compatiblity :(
+	if l := config.General.PasswordLen; l > 0 {
+		config.General.Password.Length = l
+	}
 
 	return &config, nil
 }
