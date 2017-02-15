@@ -1,6 +1,7 @@
 package safe
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -21,6 +22,9 @@ type notesManager struct {
 }
 
 func (n *notesManager) Edit(name string) error {
+	if len(name) == 0 {
+		return errors.New("Empty note name specified")
+	}
 	note, exists := n.Notes[name]
 	if !exists {
 		note = NewEmptyNote(name)
