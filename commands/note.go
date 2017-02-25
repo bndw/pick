@@ -41,7 +41,7 @@ func Note(args []string, flags *pflag.FlagSet) error {
 		return err
 	}
 
-	safe, err := loadSafe()
+	safe, err := newSafeLoader().Load()
 	if err != nil {
 		return err
 	}
