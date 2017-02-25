@@ -64,12 +64,12 @@ func Cat(args []string, flags *pflag.FlagSet) error {
 		return err
 	}
 
-	s, err := loadSafe()
+	safe, err := newSafeLoader().Load()
 	if err != nil {
 		return err
 	}
 
-	account, err := s.Get(name)
+	account, err := safe.Get(name)
 	if err != nil {
 		return err
 	}

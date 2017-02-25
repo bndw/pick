@@ -24,15 +24,37 @@ func runCommand(c func([]string, *pflag.FlagSet) error, cmd *cobra.Command, args
 	os.Exit(0)
 }
 
-func loadSafe() (*safe.Safe, error) {
-	password, err := utils.GetPasswordInput("Enter your master password")
-	if err != nil {
-		return nil, err
-	}
+type safeLoader struct {
+	password     *[]byte
+	maxLoadTries int
+	loadTries    int
+}
 
+func newSafeLoader() *safeLoader {
+	return &safeLoader{
+		maxLoadTries: 0,
+	}
+}
+
+func (sl *safeLoader) RememberPassword() {
+	sl.maxLoadTries++
+}
+
+func (sl *safeLoader) Load() (*safe.Safe, error) {
 	backendClient, err := newBackendClient()
 	if err != nil {
 		return nil, err
+	}
+	return sl.LoadWithBackendClient(backendClient)
+}
+
+func (sl *safeLoader) LoadWithBackendClient(backendClient backends.Client) (*safe.Safe, error) {
+	if sl.password == nil {
+		password, err := utils.GetPasswordInput(fmt.Sprintf("Enter your master password for safe '%s'", backendClient.SafeLocation()))
+		if err != nil {
+			return nil, err
+		}
+		sl.password = &password
 	}
 
 	cryptoClient, err := newCryptoClient()
@@ -40,12 +62,22 @@ func loadSafe() (*safe.Safe, error) {
 		return nil, err
 	}
 
-	return safe.Load(
-		password,
+	s, err := safe.Load(
+		*sl.password,
 		backendClient,
 		cryptoClient,
 		config,
 	)
+	if err != nil {
+		if sl.maxLoadTries > sl.loadTries {
+			// Reset stored password and load again — asking for a new password
+			sl.password = nil
+			sl.loadTries++
+			return sl.LoadWithBackendClient(backendClient)
+		}
+		return nil, err
+	}
+	return s, nil
 }
 
 func newBackendClient() (backends.Client, error) {

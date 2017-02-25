@@ -22,7 +22,7 @@ func init() {
 }
 
 func Add(args []string, flags *pflag.FlagSet) error {
-	safe, err := loadSafe()
+	safe, err := newSafeLoader().Load()
 	if err != nil {
 		return err
 	}

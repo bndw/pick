@@ -41,7 +41,11 @@ func Note(args []string, flags *pflag.FlagSet) error {
 		return err
 	}
 
-	safe, err := loadSafe()
+	if action == "edit" {
+		fmt.Printf("You are about to add or edit a note named '%s'\n", name)
+	}
+
+	safe, err := newSafeLoader().Load()
 	if err != nil {
 		return err
 	}

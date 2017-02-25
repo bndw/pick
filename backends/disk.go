@@ -83,6 +83,10 @@ func (db *DiskBackend) Save(data []byte) error {
 	return nil
 }
 
+func (db *DiskBackend) SafeLocation() string {
+	return db.path
+}
+
 func (f fileInfoSlice) Len() int {
 	return len(f)
 }

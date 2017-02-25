@@ -30,3 +30,7 @@ func (b *mockBackend) Save(ciphertext []byte) error {
 	b.Data = ciphertext
 	return nil
 }
+
+func (b *mockBackend) SafeLocation() string {
+	return "mock-safe-location"
+}
