@@ -4,6 +4,10 @@ import (
 	"fmt"
 )
 
+// SyncWith syncs the current safe with another safe if they're branching off the same
+// safe, i.e. are not completely different safes. It simply imports non-existing
+// accounts into the current safe and updates existing accounts if the other safe has
+// a more recent version of the account. A backup is made when updating existing accounts
 func (s *Safe) SyncWith(otherSafe *Safe) error {
 	localAccounts := s.Accounts
 	remoteAccounts := otherSafe.Accounts
