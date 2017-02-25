@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/bndw/pick/errors"
+	"github.com/bndw/pick/strings"
 	"github.com/bndw/pick/utils"
 	"github.com/bndw/pick/utils/pswdgen"
 	"github.com/spf13/cobra"
@@ -42,6 +43,7 @@ func Edit(args []string, flags *pflag.FlagSet) error {
 		if err := utils.CopyToClipboard(account.Password); err != nil {
 			return err
 		}
+		fmt.Println(strings.PasswordCopiedToClipboard)
 	}
 
 	return nil

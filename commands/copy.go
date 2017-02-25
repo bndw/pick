@@ -1,7 +1,10 @@
 package commands
 
 import (
+	"fmt"
+
 	"github.com/bndw/pick/errors"
+	"github.com/bndw/pick/strings"
 	"github.com/bndw/pick/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -37,6 +40,7 @@ func Copy(args []string, flags *pflag.FlagSet) error {
 	if err := utils.CopyToClipboard(account.Password); err != nil {
 		return err
 	}
+	fmt.Println(strings.PasswordCopiedToClipboard)
 
 	return nil
 }
