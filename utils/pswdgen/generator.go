@@ -9,17 +9,35 @@ import (
 	"github.com/pkg/term"
 )
 
+var (
+	// Exit
+	ctrlC    = []byte{3}
+	keyEnter = []byte{13}
+	// Up
+	keyUp = []byte{27, 91, 65}
+	keyK  = []byte{107}
+	// Down
+	keyDown = []byte{27, 91, 66}
+	keyJ    = []byte{106}
+	// Right
+	keyRight = []byte{27, 91, 67}
+	keyL     = []byte{108}
+	// Left
+	keyLeft = []byte{27, 91, 68}
+	keyH    = []byte{104}
+)
+
 type passwordGenerator struct {
 	config Config
 }
 
-func (p *passwordGenerator) IncreaseStrengh() {
+func (p *passwordGenerator) IncreaseStrength() {
 	if p.config.Strength < 3 {
 		p.config.Strength++
 	}
 }
 
-func (p *passwordGenerator) DecreaseStrengh() {
+func (p *passwordGenerator) DecreaseStrength() {
 	if p.config.Strength > 0 {
 		p.config.Strength--
 	}
@@ -36,7 +54,7 @@ func (p *passwordGenerator) DecreaseLength() {
 }
 
 func (p *passwordGenerator) Generate() (string, error) {
-	if p.config.Mode != passwordModeInteractive {
+	if p.config.Mode != PasswordModeInteractive {
 		return p.New()
 	}
 	fmt.Println("Entering interactive password generation mode")
@@ -89,17 +107,18 @@ func (p *passwordGenerator) NewInteractively() (password string, err error) {
 		if readErr != nil {
 			continue
 		}
+
 		switch {
-		case bytes.Equal(c, []byte{3}), bytes.Equal(c, []byte{13}): // exit
+		case bytes.Equal(c, ctrlC), bytes.Equal(c, keyEnter): // exit
 			print("Password generated\n")
 			return
-		case bytes.Equal(c, []byte{27, 91, 65}), bytes.Equal(c, []byte{107}): // up
-			p.IncreaseStrengh()
-		case bytes.Equal(c, []byte{27, 91, 66}), bytes.Equal(c, []byte{106}): // down
-			p.DecreaseStrengh()
-		case bytes.Equal(c, []byte{27, 91, 67}), bytes.Equal(c, []byte{108}): // right
+		case bytes.Equal(c, keyUp), bytes.Equal(c, keyK): // up
+			p.IncreaseStrength()
+		case bytes.Equal(c, keyDown), bytes.Equal(c, keyJ): // down
+			p.DecreaseStrength()
+		case bytes.Equal(c, keyRight), bytes.Equal(c, keyL): // right
 			p.IncreaseLength()
-		case bytes.Equal(c, []byte{27, 91, 68}), bytes.Equal(c, []byte{104}): // left
+		case bytes.Equal(c, keyLeft), bytes.Equal(c, keyH): // left
 			p.DecreaseLength()
 		}
 		genNew()
