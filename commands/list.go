@@ -1,44 +1,43 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
-	"os"
 	"sort"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "ls",
 		Short: "List all credentials",
-		Long: `The list command is used to list the saved credentials.
-            `,
+		Long:  "The list command is used to list the saved credentials.",
 		Run: func(cmd *cobra.Command, args []string) {
-			os.Exit(List(args...))
+			runCommand(List, cmd, args)
 		},
 	})
 }
 
-func List(args ...string) int {
-	safe, err := loadSafe()
+func List(args []string, flags *pflag.FlagSet) error {
+	safe, err := newSafeLoader().Load()
 	if err != nil {
-		return handleError(err)
+		return err
 	}
 
 	var accountNames []string
-	for _, account := range safe.List() {
-		accountNames = append(accountNames, account.Name)
+	for name := range safe.List() {
+		accountNames = append(accountNames, name)
 	}
 
-	if len(accountNames) > 0 {
-		sort.Strings(accountNames)
-		for _, name := range accountNames {
-			fmt.Println(name)
-		}
-	} else {
-		fmt.Println("No accounts found")
+	if len(accountNames) == 0 {
+		return errors.New("No accounts found")
 	}
 
-	return 0
+	sort.Strings(accountNames)
+	for _, name := range accountNames {
+		fmt.Println(name)
+	}
+	return nil
 }

@@ -8,10 +8,11 @@ import (
 	"github.com/bndw/pick/config"
 )
 
-const Version = "v0.3.0"
+// Injected in build
+var version string
 
 func main() {
-	cfg, err := config.Load(Version)
+	cfg, err := config.Load(version)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)

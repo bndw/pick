@@ -4,6 +4,7 @@ type Client interface {
 	Load() ([]byte, error)
 	Save([]byte) error
 	Backup() error
+	SafeLocation() string
 }
 
 func New(config *Config) (Client, error) {

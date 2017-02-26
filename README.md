@@ -1,5 +1,7 @@
 pick
 ====
+[![Build Status](https://travis-ci.org/bndw/pick.svg?branch=master)](https://travis-ci.org/bndw/pick)
+
 A minimal password manager for OS X and Linux.
 
 ![demo](https://github.com/bndw/pick/raw/master/demo.gif)
@@ -8,7 +10,7 @@ A minimal password manager for OS X and Linux.
 
 #### go get
 ```sh
-$ go get github.com/bndw/pick
+$ go get -u github.com/bndw/pick
 ```
 
 #### Homebrew
@@ -34,6 +36,7 @@ Available Commands:
   backup      Backup the safe
   cat         Cat a credential
   cp          Copy a credential to the clipboard
+  edit        Edit a credential
   export      Export decrypted credentials in JSON format
   ls          List all credentials
   rm          Remove a credential

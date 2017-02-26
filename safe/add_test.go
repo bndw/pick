@@ -22,9 +22,6 @@ func TestAdd(t *testing.T) {
 		t.Error(err)
 	}
 
-	if account.Name != name {
-		t.Error("Unexpected account name:", name)
-	}
 	if account.Username != username {
 		t.Error("Unexpected account username:", username)
 	}

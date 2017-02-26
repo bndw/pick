@@ -9,6 +9,9 @@ INSTALL = install
 
 FOLDERS = $(shell find . -mindepth 1 -type d -not -path "*.git*" -not -path "./githooks*" -not -path "./vendor*" -not -path "*bin*")
 
+VERSION = $(shell cat VERSION)
+LDFLAGS = -ldflags "-X main.version=$(VERSION)"
+
 all: build
 
 install_hooks:
@@ -32,7 +35,7 @@ goget:
 	ln -sf $(PWD) $(CURDIR)/vendor/src/$(GOPKG)
 
 build: install_hooks goget
-	GOPATH=$(GOPATH) go build -o bin/pick .
+	GOPATH=$(GOPATH) go build $(LDFLAGS) -o bin/pick .
 
 test: goget
 	GOPATH=$(GOPATH) go test -v $(FOLDERS)
@@ -65,4 +68,4 @@ clean:
 	rm -rf vendor/
 	rm -rf bin/
 
-.PHONY: all install_hooks goget build test install uninstall fmt gofmt config clean
+.PHONY: all install_hooks goget build test install uninstall fmt gofmt govet config clean

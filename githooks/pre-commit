@@ -2,19 +2,12 @@
 #
 # Hook to perform various Go checks on the source, including:
 # - make build
-# - make test
 # - make fmt
 #
 
 make build > /dev/null 2>&1
 if [ $? -ne 0 ]; then
 	echo "Failed to build project. Please check the output of make build"
-	exit 1
-fi
-
-make test > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-	echo "Failed to run tests. Please check the output of make test"
 	exit 1
 fi
 

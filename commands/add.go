@@ -2,53 +2,55 @@ package commands
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/bndw/pick/errors"
+	"github.com/bndw/pick/strings"
 	"github.com/bndw/pick/utils"
+	"github.com/bndw/pick/utils/pswdgen"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "add [name] [username] [password]",
 		Short: "Add a credential",
-		Long: `The add command is used to add a new credential.
-            `,
+		Long:  "The add command is used to add a new credential.",
 		Run: func(cmd *cobra.Command, args []string) {
-			os.Exit(Add(args...))
+			runCommand(Add, cmd, args)
 		},
 	})
 }
 
-func Add(args ...string) int {
-	safe, err := loadSafe()
+func Add(args []string, flags *pflag.FlagSet) error {
+	safe, err := newSafeLoader().Load()
 	if err != nil {
-		return handleError(err)
+		return err
 	}
 
-	name, username, password, errCode := parseAddArgs(args)
-	if errCode > 0 {
-		return errCode
+	name, username, password, err := parseAddArgs(args)
+	if err != nil {
+		return err
 	}
 
 	account, err := safe.Add(name, username, password)
 	if _, conflict := err.(*errors.AccountExists); conflict && overwrite(name) {
-		var replaceErr error
-		if account, replaceErr = safe.Replace(name, username, password); replaceErr != nil {
-			return handleError(replaceErr)
+		var editErr error
+		if account, editErr = safe.Edit(name, username, password); editErr != nil {
+			return editErr
 		}
 	} else if err != nil {
-		return handleError(err)
+		return err
 	}
 
 	fmt.Println("Credential added")
 	if utils.Confirm("Copy password to clipboard", true) {
 		if err := utils.CopyToClipboard(account.Password); err != nil {
-			return handleError(err)
+			return err
 		}
+		fmt.Println(strings.PasswordCopiedToClipboard)
 	}
-	return 0
+	return nil
 }
 
 func overwrite(name string) bool {
@@ -56,10 +58,10 @@ func overwrite(name string) bool {
 	return utils.Confirm(prompt, false)
 }
 
-func parseAddArgs(args []string) (name, username, password string, errCode int) {
+func parseAddArgs(args []string) (name, username, password string, err error) {
 	if len(args) > 3 {
-		fmt.Println("Usage: add [name] [username] [password]")
-		return "", "", "", 1
+		err = &errors.InvalidCommandUsage{}
+		return
 	}
 
 	switch len(args) {
@@ -73,34 +75,26 @@ func parseAddArgs(args []string) (name, username, password string, errCode int) 
 		name = args[0]
 	}
 
-	errCode = 1
-	var err error
-
 	if name == "" {
 		if name, err = utils.GetInput("Enter a credential name"); err != nil {
-			fmt.Println(err)
 			return
 		}
 	}
 
 	if username == "" {
 		if username, err = utils.GetInput(fmt.Sprintf("Enter a username for %s", name)); err != nil {
-			fmt.Println(err)
 			return
 		}
 	}
 
 	if password == "" {
 		if utils.Confirm("Generate password", true) {
-			password, err = utils.GeneratePassword(config.General.PasswordLen)
-			if err != nil {
-				fmt.Println(err)
+			if password, err = pswdgen.Generate(config.General.Password); err != nil {
 				return
 			}
 		} else {
 			var _password []byte
 			if _password, err = utils.GetPasswordInput(fmt.Sprintf("Enter a password for %s", name)); err != nil {
-				fmt.Println(err)
 				return
 			}
 
@@ -108,6 +102,5 @@ func parseAddArgs(args []string) (name, username, password string, errCode int) 
 		}
 	}
 
-	errCode = 0
 	return
 }

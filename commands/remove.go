@@ -2,33 +2,38 @@ package commands
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/bndw/pick/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "rm [name]",
 		Short: "Remove a credential",
-		Long: `The remove command is used to remove a saved credential.
-            `,
+		Long:  "The remove command is used to remove a saved credential.",
 		Run: func(cmd *cobra.Command, args []string) {
-			os.Exit(Remove(args...))
+			runCommand(Remove, cmd, args)
 		},
 	})
 }
 
-func Remove(args ...string) int {
-	safe, err := loadSafe()
+func Remove(args []string, flags *pflag.FlagSet) error {
+	if len(args) != 1 {
+		return &errors.InvalidCommandUsage{}
+	}
+	name := args[0]
+
+	safe, err := newSafeLoader().Load()
 	if err != nil {
-		return handleError(err)
+		return err
 	}
 
-	if err := safe.Remove(args[0]); err != nil {
-		return handleError(err)
+	if err := safe.Remove(name); err != nil {
+		return err
 	}
 
 	fmt.Println("Credential removed")
-	return 0
+	return nil
 }
