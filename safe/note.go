@@ -29,7 +29,7 @@ func (n *notesManager) Edit(name string) error {
 	if !exists {
 		note = NewEmptyNote(name)
 	}
-	if err := note.Edit(); err != nil {
+	if err := note.EditInEditor(); err != nil {
 		return err
 	}
 	n.Notes[name] = note
@@ -66,14 +66,34 @@ type note struct {
 	ModifiedOn int64  `json:"modifiedOn"`
 }
 
-func (n *note) Edit() error {
+func (n *note) update(text string) {
+	n.Text = text
+	n.ModifiedOn = time.Now().Unix()
+}
+
+func (n *note) EditInEditor() error {
 	text, err := editorReadText(n.Text)
 	if err != nil {
 		return err
 	}
-	n.Text = text
-	n.ModifiedOn = time.Now().Unix()
+	n.update(text)
 	return nil
+}
+
+func (n *note) SyncWith(otherNote *note, name string) (bool, error) {
+	if n.CreatedOn != otherNote.CreatedOn {
+		// Apparently not the same note
+		// TODO(leon): Implement unique ID for a note
+		return false, fmt.Errorf("Notes '%s' differ in creation date, skipping", name)
+	}
+	if n.ModifiedOn < otherNote.ModifiedOn {
+		// Other note is newer, update ourself
+		n.Text = otherNote.Text
+		// Update ModifiedOn
+		n.ModifiedOn = otherNote.ModifiedOn
+		return true, nil
+	}
+	return false, nil
 }
 
 func NewEmptyNote(name string) note {
