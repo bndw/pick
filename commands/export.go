@@ -21,6 +21,10 @@ func init() {
 }
 
 func Export(args []string, flags *pflag.FlagSet) error {
+	if !utils.Confirm("Do you really want to dump your whole pick safe?", false) {
+		return errors.New("Aborted as requested")
+	}
+
 	safe, err := newSafeLoader().Load()
 	if err != nil {
 		return err
