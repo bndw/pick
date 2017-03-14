@@ -1,57 +1,19 @@
 package errors
 
-type SafeNotFound struct {
-}
+import (
+	"errors"
+)
 
-func (e *SafeNotFound) Error() string {
-	return "Safe not found"
-}
+var (
+	ErrSafeNotFound         = errors.New("Safe not found")
+	ErrSafeCorrupt          = errors.New("Safe currupt")
+	ErrSafeDecryptionFailed = errors.New("Unable to unlock safe with provided password")
 
-type SafeCorrupt struct {
-}
+	ErrBackupDisabled   = errors.New("Backups are disabled, increase `max_backups` to re-enable")
+	ErrBackupFileExists = errors.New("Backup file already exists")
 
-func (e *SafeCorrupt) Error() string {
-	return "Safe currupt"
-}
+	ErrAccountAlreadyExists = errors.New("Account already exists")
+	ErrAccountNotFound      = errors.New("Account not found")
 
-type SafeDecryptionFailed struct {
-}
-
-func (e *SafeDecryptionFailed) Error() string {
-	return "Unable to unlock safe with provided password"
-}
-
-type BackupDisabled struct {
-}
-
-func (e *BackupDisabled) Error() string {
-	return "Backups are disabled, increase `max_backups` to re-enable"
-}
-
-type BackupFileExists struct {
-}
-
-func (e *BackupFileExists) Error() string {
-	return "Backup file already exists"
-}
-
-type AccountExists struct {
-}
-
-func (e *AccountExists) Error() string {
-	return "Account exists"
-}
-
-type AccountNotFound struct {
-}
-
-func (e *AccountNotFound) Error() string {
-	return "Account not found"
-}
-
-type InvalidCommandUsage struct {
-}
-
-func (e *InvalidCommandUsage) Error() string {
-	return "Invalid use of command"
-}
+	ErrInvalidCommandUsage = errors.New("Invalid use of command")
+)

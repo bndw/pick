@@ -126,7 +126,7 @@ func (c *AESGCMClient) Decrypt(data []byte, password []byte) (plaintext []byte, 
 
 	plaintext, err = gcm.Open(nil, store.Nonce, store.Ciphertext, nil)
 	if err != nil {
-		return nil, &errors.SafeDecryptionFailed{}
+		return nil, errors.ErrSafeDecryptionFailed
 	}
 
 	return

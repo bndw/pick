@@ -78,7 +78,7 @@ func (c *OpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext [
 		// This method will fail fast.
 		// Ref: https://godoc.org/golang.org/x/crypto/openpgp#PromptFunction
 		if failed {
-			return nil, &errors.SafeDecryptionFailed{}
+			return nil, errors.ErrSafeDecryptionFailed
 		}
 
 		failed = true
