@@ -106,12 +106,19 @@ func NewEmptyNote(name string) note {
 	}
 }
 
-func editorReadText(existingText string) (string, error) {
-	editor := os.Getenv("EDITOR")
+func editorPath() (string, error) {
+	editor := os.Getenv("VISUAL")
 	if editor == "" {
-		editor = defaultNoteEditor
+		editor = os.Getenv("EDITOR")
+		if editor == "" {
+			editor = defaultNoteEditor
+		}
 	}
-	editorPath, err := exec.LookPath(editor)
+	return exec.LookPath(editor)
+}
+
+func editorReadText(existingText string) (string, error) {
+	editorPath, err := editorPath()
 	if err != nil {
 		return "", err
 	}
