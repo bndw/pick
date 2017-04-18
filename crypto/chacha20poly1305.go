@@ -96,7 +96,7 @@ func (c *ChaCha20Poly1305Client) Decrypt(data []byte, password []byte) (plaintex
 
 	plaintext, err = cpc.Open(nil, store.Nonce, store.Ciphertext, nil)
 	if err != nil {
-		return nil, &errors.SafeDecryptionFailed{}
+		return nil, errors.ErrSafeDecryptionFailed
 	}
 
 	return

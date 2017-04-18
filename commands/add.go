@@ -34,7 +34,7 @@ func Add(args []string, flags *pflag.FlagSet) error {
 	}
 
 	account, err := safe.Add(name, username, password)
-	if _, conflict := err.(*errors.AccountExists); conflict && overwrite(name) {
+	if err == errors.ErrAccountAlreadyExists && overwrite(name) {
 		var editErr error
 		if account, editErr = safe.Edit(name, username, password); editErr != nil {
 			return editErr
@@ -60,7 +60,7 @@ func overwrite(name string) bool {
 
 func parseAddArgs(args []string) (name, username, password string, err error) {
 	if len(args) > 3 {
-		err = &errors.InvalidCommandUsage{}
+		err = errors.ErrInvalidCommandUsage
 		return
 	}
 

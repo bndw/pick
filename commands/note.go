@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"errors"
+	builtinerrors "errors"
 	"fmt"
 
-	pickErrors "github.com/bndw/pick/errors"
+	"github.com/bndw/pick/errors"
 	"github.com/bndw/pick/utils"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -56,7 +56,7 @@ func Note(args []string, flags *pflag.FlagSet) error {
 	case "ls", "export":
 		notes := safe.Notes.List()
 		if len(notes) == 0 {
-			return errors.New("No notes found")
+			return builtinerrors.New("No notes found")
 		}
 		if action == "ls" {
 			for name, note := range notes {
@@ -74,7 +74,7 @@ func Note(args []string, flags *pflag.FlagSet) error {
 
 func parseNoteArgs(args []string) (name string, err error) {
 	if len(args) > 1 {
-		err = &pickErrors.InvalidCommandUsage{}
+		err = errors.ErrInvalidCommandUsage
 		return
 	}
 	if len(args) == 0 {

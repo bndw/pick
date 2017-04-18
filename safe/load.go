@@ -22,7 +22,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 
 	data, err := s.backend.Load()
 	if err != nil {
-		if _, ok := err.(*errors.SafeNotFound); ok {
+		if err == errors.ErrSafeNotFound {
 			s.Accounts = make(map[string]Account)
 			s.Notes = newNotesManager(&s)
 			return &s, nil
@@ -67,7 +67,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 	var tmp Safe
 
 	if err := json.Unmarshal(plaintext, &tmp); err != nil {
-		return nil, &errors.SafeCorrupt{}
+		return nil, errors.ErrSafeCorrupt
 	}
 
 	if tmp.Config != nil && tmp.Config.Version != "" {

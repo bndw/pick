@@ -23,7 +23,7 @@ func init() {
 
 func Copy(args []string, flags *pflag.FlagSet) error {
 	if len(args) != 1 {
-		return &errors.InvalidCommandUsage{}
+		return errors.ErrInvalidCommandUsage
 	}
 	name := args[0]
 
