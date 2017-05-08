@@ -1,5 +1,7 @@
 pick
 ====
+
+[![Join the chat at https://gitter.im/pick-pass/Lobby](https://badges.gitter.im/pick-pass/Lobby.svg)](https://gitter.im/pick-pass/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/bndw/pick.svg?branch=master)](https://travis-ci.org/bndw/pick)
 
 A minimal password manager for OS X and Linux.
