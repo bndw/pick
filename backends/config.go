@@ -15,6 +15,7 @@ type backupConfig struct {
 const (
 	ConfigTypeFile = "file"
 	ConfigTypeMock = "mock"
+	ConfigTypeS3   = "s3"
 )
 
 func NewDefaultConfig() Config {

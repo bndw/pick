@@ -15,5 +15,7 @@ func New(config *Config) (Client, error) {
 		return NewDiskBackend(*config)
 	case ConfigTypeMock:
 		return NewMockBackend(), nil
+	case ConfigTypeS3:
+		return NewS3Backend(*config)
 	}
 }
