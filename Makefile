@@ -1,13 +1,14 @@
 PWD := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 GOPKG = github.com/bndw/pick
-GOPATH = "$(CURDIR)/vendor:$(CURDIR)"
+GOVENDOR = vendor
+GOPATH = "$(CURDIR)/$(GOVENDOR)"
 
 PICK_DIR = $(HOME)/.pick
 BIN_DIR = /usr/local/bin
 INSTALL = install
 
-FOLDERS = $(shell find . -mindepth 1 -type d -not -path "*.git*" -not -path "./githooks*" -not -path "./vendor*" -not -path "*bin*")
+FOLDERS = $(shell find . -mindepth 1 -type d -not -path "*.git*" -not -path "./githooks*" -not -path "./$(GOVENDOR)*" -not -path "./Godeps*" -not -path "*bin*")
 
 VERSION = $(shell cat VERSION)
 LDFLAGS = -ldflags "-X main.version=$(VERSION)"
@@ -27,17 +28,24 @@ install_hooks:
 		done \
 	fi
 
-goget:
-	GOPATH=$(GOPATH) go get github.com/rogpeppe/godeps
-	GOPATH=$(GOPATH) $(CURDIR)/vendor/bin/godeps -u dependencies.tsv
-	mkdir -p $(shell dirname "$(CURDIR)/vendor/src/$(GOPKG)")
-	rm -f $(CURDIR)/vendor/src/$(GOPKG)
-	ln -sf $(PWD) $(CURDIR)/vendor/src/$(GOPKG)
+dependencies:
+	@$(shell \
+		cd $(GOVENDOR) ; \
+		rm -rf src ; \
+		find . -mindepth 3 -maxdepth 3 -path ./src -prune -o -type d -print | \
+		sed -e 's/.\///' | \
+		xargs -I{} sh -c ' \
+			mkdir -p "src/`dirname {}`" ; \
+			ln -sfn "../../../{}" "src/{}" ; \
+		' \
+	)
+	@mkdir -p $(shell dirname $(GOVENDOR)/src/$(GOPKG))
+	@ln -sfn ../../../.. $(GOVENDOR)/src/$(GOPKG)
 
-build: install_hooks goget
+build: install_hooks dependencies
 	GOPATH=$(GOPATH) go build $(LDFLAGS) -o bin/pick .
 
-test: goget
+test: dependencies
 	GOPATH=$(GOPATH) go test -v $(FOLDERS)
 
 install:
@@ -65,7 +73,6 @@ config:
 	fi
 
 clean:
-	rm -rf vendor/
 	rm -rf bin/
 
-.PHONY: all install_hooks goget build test install uninstall fmt gofmt govet config clean
+.PHONY: all install_hooks dependencies build test install uninstall fmt gofmt govet config clean
