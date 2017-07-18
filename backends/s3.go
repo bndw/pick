@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -16,6 +17,9 @@ import (
 const (
 	defaultS3Bucket = "pick"
 	defaultS3Key    = "safes/default.safe"
+	// Backups
+	defaultS3BackupTimeFormat  = "2006-01-02_15-04-05"
+	defaultS3BackupKeyTemplate = "backups/%s.safe"
 )
 
 // S3Backend provides AWS S3 backed safe storage
@@ -29,10 +33,9 @@ const (
 //		AWS_REGION
 //
 type S3Backend struct {
-	Bucket  string
-	Key     string
-	Session *session.Session
-	svc     *s3.S3
+	Bucket string
+	Key    string
+	svc    *s3.S3
 }
 
 // NewS3Backend returns a new S3 Backend implementation.
@@ -83,17 +86,57 @@ func NewS3Backend(config Config) (*S3Backend, error) {
 	}
 
 	return &S3Backend{
-		Bucket:  bucket,
-		Key:     key,
-		Session: sess,
-		svc:     s3.New(sess),
+		Bucket: bucket,
+		Key:    key,
+		svc:    s3.New(sess),
 	}, nil
 }
 
+// Backup creates a backup of the current safe
+func (s *S3Backend) Backup() error {
+	var (
+		now       = time.Now().Format(defaultS3BackupTimeFormat)
+		backupKey = fmt.Sprintf(defaultS3BackupKeyTemplate, now)
+	)
+
+	data, err := s.Load()
+	if err != nil {
+		return err
+	}
+
+	return s.putObject(bytes.NewReader(data), s.Bucket, backupKey)
+}
+
+// Load loads data from S3
 func (s *S3Backend) Load() ([]byte, error) {
+	result, err := s.getObject(s.Bucket, s.Key)
+	if err != nil {
+		return nil, err
+	}
+	defer result.Close()
+
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, result); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+// SafeLocation return the path to the current safe
+func (s *S3Backend) SafeLocation() string {
+	return fmt.Sprintf("s3://%s/%s", s.Bucket, s.Key)
+}
+
+// Save writes data to S3
+func (s *S3Backend) Save(data []byte) error {
+	return s.putObject(bytes.NewReader(data), s.Bucket, s.Key)
+}
+
+func (s *S3Backend) getObject(bucket, key string) (io.ReadCloser, error) {
 	result, err := s.svc.GetObject(&s3.GetObjectInput{
-		Bucket: aws.String(s.Bucket),
-		Key:    aws.String(s.Key),
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
 	})
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
@@ -109,26 +152,17 @@ func (s *S3Backend) Load() ([]byte, error) {
 			}
 		}
 
-		// A generic error
-		fmt.Println(err.Error())
 		return nil, err
 	}
 
-	defer result.Body.Close()
-
-	buf := bytes.NewBuffer(nil)
-	if _, err := io.Copy(buf, result.Body); err != nil {
-		return nil, err
-	}
-
-	return buf.Bytes(), nil
+	return result.Body, nil
 }
 
-func (s *S3Backend) Save(data []byte) error {
+func (s *S3Backend) putObject(data *bytes.Reader, bucket, key string) error {
 	_, err := s.svc.PutObject(&s3.PutObjectInput{
-		Body:   aws.ReadSeekCloser(bytes.NewReader(data)),
-		Bucket: aws.String(s.Bucket),
-		Key:    aws.String(s.Key),
+		Body:   aws.ReadSeekCloser(data),
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
 	})
 	if err != nil {
 		if aerr, ok := err.(awserr.Error); ok {
@@ -138,16 +172,7 @@ func (s *S3Backend) Save(data []byte) error {
 				return err
 			}
 		}
-		return err
 	}
 
-	return nil
-}
-
-func (s *S3Backend) Backup() error {
-	return fmt.Errorf("S3 Backups are not implemented!")
-}
-
-func (s *S3Backend) SafeLocation() string {
-	return fmt.Sprintf("s3://%s/%s", s.Bucket, s.Key)
+	return err
 }
