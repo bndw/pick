@@ -15,7 +15,7 @@ func TestNewDefaultS3Backend(t *testing.T) {
 	}
 
 	if backend == nil {
-		t.Errorf("Expected new S3Backend, got nil")
+		t.Fatalf("Expected new S3Backend, got nil")
 	}
 
 	if backend.Bucket != defaultS3Bucket {
@@ -40,7 +40,7 @@ func TestNewS3BackendWithBucket(t *testing.T) {
 	}
 
 	if backend == nil {
-		t.Errorf("Expected new S3Backend, got nil")
+		t.Fatalf("Expected new S3Backend, got nil")
 	}
 
 	if backend.Bucket != bucket {
@@ -69,7 +69,7 @@ func TestNewS3BackendWithBucketAndKey(t *testing.T) {
 	}
 
 	if backend == nil {
-		t.Errorf("Expected new S3Backend, got nil")
+		t.Fatalf("Expected new S3Backend, got nil")
 	}
 
 	if backend.Bucket != bucket {
@@ -102,7 +102,7 @@ func TestNewS3BackendWithAllOverrides(t *testing.T) {
 	}
 
 	if backend == nil {
-		t.Errorf("Expected new S3Backend, got nil")
+		t.Fatalf("Expected new S3Backend, got nil")
 	}
 
 	if backend.Bucket != bucket {
