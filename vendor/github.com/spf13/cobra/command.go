@@ -59,6 +59,8 @@ type Command struct {
 	// but accepted if entered manually.
 	ArgAliases []string
 
+	// Expected arguments
+	Args PositionalArgs
 	// BashCompletionFunction is custom functions used by the bash autocompletion generator.
 	BashCompletionFunction string
 
@@ -513,31 +515,27 @@ func (c *Command) Find(args []string) (*Command, []string, error) {
 	}
 
 	commandFound, a := innerfind(c, args)
-	argsWOflags := stripFlags(a, commandFound)
-
-	// no subcommand, always take args
-	if !commandFound.HasSubCommands() {
-		return commandFound, a, nil
+	if commandFound.Args == nil {
+		return commandFound, a, legacyArgs(commandFound, stripFlags(a, commandFound))
 	}
-
-	// root command with subcommands, do subcommand checking
-	if commandFound == c && len(argsWOflags) > 0 {
-		suggestionsString := ""
-		if !c.DisableSuggestions {
-			if c.SuggestionsMinimumDistance <= 0 {
-				c.SuggestionsMinimumDistance = 2
-			}
-			if suggestions := c.SuggestionsFor(argsWOflags[0]); len(suggestions) > 0 {
-				suggestionsString += "\n\nDid you mean this?\n"
-				for _, s := range suggestions {
-					suggestionsString += fmt.Sprintf("\t%v\n", s)
-				}
-			}
-		}
-		return commandFound, a, fmt.Errorf("unknown command %q for %q%s", argsWOflags[0], commandFound.CommandPath(), suggestionsString)
-	}
-
 	return commandFound, a, nil
+}
+
+func (c *Command) findSuggestions(arg string) string {
+	if c.DisableSuggestions {
+		return ""
+	}
+	if c.SuggestionsMinimumDistance <= 0 {
+		c.SuggestionsMinimumDistance = 2
+	}
+	suggestionsString := ""
+	if suggestions := c.SuggestionsFor(arg); len(suggestions) > 0 {
+		suggestionsString += "\n\nDid you mean this?\n"
+		for _, s := range suggestions {
+			suggestionsString += fmt.Sprintf("\t%v\n", s)
+		}
+	}
+	return suggestionsString
 }
 
 // SuggestionsFor provides suggestions for the typedName.
@@ -624,6 +622,10 @@ func (c *Command) execute(a []string) (err error) {
 		argWoFlags = a
 	}
 
+	if err := c.ValidateArgs(argWoFlags); err != nil {
+		return err
+	}
+
 	for p := c; p != nil; p = p.Parent() {
 		if p.PersistentPreRunE != nil {
 			if err := p.PersistentPreRunE(c, argWoFlags); err != nil {
@@ -678,7 +680,7 @@ func (c *Command) preRun() {
 	}
 }
 
-// Execute Call execute to use the args (os.Args[1:] by default)
+// Execute uses the args (os.Args[1:] by default)
 // and run through the command tree finding appropriate matches
 // for commands and then corresponding flags.
 func (c *Command) Execute() error {
@@ -700,7 +702,7 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 
 	// initialize help as the last point possible to allow for user
 	// overriding
-	c.initHelpCmd()
+	c.InitDefaultHelpCmd()
 
 	var args []string
 
@@ -743,9 +745,15 @@ func (c *Command) ExecuteC() (cmd *Command, err error) {
 		if !cmd.SilenceUsage && !c.SilenceUsage {
 			c.Println(cmd.UsageString())
 		}
-		return cmd, err
 	}
-	return cmd, nil
+	return cmd, err
+}
+
+func (c *Command) ValidateArgs(args []string) error {
+	if c.Args == nil {
+		return nil
+	}
+	return c.Args(c, args)
 }
 
 // InitDefaultHelpFlag adds default help flag to c.
@@ -764,19 +772,20 @@ func (c *Command) InitDefaultHelpFlag() {
 	}
 }
 
-func (c *Command) initHelpCmd() {
-	if c.helpCommand == nil {
-		if !c.HasSubCommands() {
-			return
-		}
+// InitDefaultHelpCmd adds default help command to c.
+// It is called automatically by executing the c or by calling help and usage.
+// If c already has help command or c has no subcommands, it will do nothing.
+func (c *Command) InitDefaultHelpCmd() {
+	if !c.HasSubCommands() {
+		return
+	}
 
+	if c.helpCommand == nil {
 		c.helpCommand = &Command{
 			Use:   "help [command]",
 			Short: "Help about any command",
 			Long: `Help provides help for any command in the application.
-    Simply type ` + c.Name() + ` help [path to command] for full details.`,
-			PersistentPreRun:  func(cmd *Command, args []string) {},
-			PersistentPostRun: func(cmd *Command, args []string) {},
+Simply type ` + c.Name() + ` help [path to command] for full details.`,
 
 			Run: func(c *Command, args []string) {
 				cmd, _, e := c.Root().Find(args)
@@ -1249,13 +1258,20 @@ func (c *Command) persistentFlag(name string) (flag *flag.Flag) {
 }
 
 // ParseFlags parses persistent flag tree and local flags.
-func (c *Command) ParseFlags(args []string) (err error) {
+func (c *Command) ParseFlags(args []string) error {
 	if c.DisableFlagParsing {
 		return nil
 	}
+
+	beforeErrorBufLen := c.flagErrorBuf.Len()
 	c.mergePersistentFlags()
-	err = c.Flags().Parse(args)
-	return
+	err := c.Flags().Parse(args)
+	// Print warnings if they occurred (e.g. deprecated flag messages).
+	if c.flagErrorBuf.Len()-beforeErrorBufLen > 0 && err == nil {
+		c.Print(c.flagErrorBuf.String())
+	}
+
+	return err
 }
 
 // Parent returns a commands parent command.
