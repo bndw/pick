@@ -64,23 +64,21 @@ func NewS3Backend(config Config) (*S3Backend, error) {
 	profile, overrideAWSProfile := config.Settings["profile"].(string)
 
 	var sess *session.Session
-	if overrideAWSRegion && overrideAWSProfile {
-		// Override both region and profile
+	switch {
+	case overrideAWSRegion && overrideAWSProfile:
 		sess = session.Must(session.NewSessionWithOptions(session.Options{
 			Config:  aws.Config{Region: aws.String(region)},
 			Profile: profile,
 		}))
-	} else if overrideAWSRegion {
-		// Override only region
+	case overrideAWSRegion:
 		sess = session.Must(session.NewSession(&aws.Config{
 			Region: aws.String(region),
 		}))
-	} else if overrideAWSProfile {
-		// Override only profile
+	case overrideAWSProfile:
 		sess = session.Must(session.NewSessionWithOptions(session.Options{
 			Profile: profile,
 		}))
-	} else {
+	default:
 		// Fallback to defaults/environment
 		sess = session.Must(session.NewSession())
 	}
