@@ -141,11 +141,8 @@ func (s *S3Backend) getObject(bucket, key string) (io.ReadCloser, error) {
 			switch aerr.Code() {
 			case s3.ErrCodeNoSuchKey:
 				// The safe at Key does not exist
-				fmt.Println(s3.ErrCodeNoSuchKey, aerr.Error())
 				return nil, errors.ErrSafeNotFound
 			default:
-				// Some other AWS error
-				fmt.Println(aerr.Error())
 				return nil, err
 			}
 		}
