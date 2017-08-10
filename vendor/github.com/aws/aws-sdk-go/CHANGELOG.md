@@ -1,3 +1,21 @@
+Release v1.10.22 (2017-08-09)
+===
+
+### Service Client Updates
+* `service/rds`: Updates service documentation
+  * Documentation updates for RDS.
+
+Release v1.10.21 (2017-08-09)
+===
+
+### Service Client Updates
+* `service/elasticbeanstalk`: Updates service API and documentation
+  * Add support for paginating the result of DescribeEnvironments     Include the ARN of described environments in DescribeEnvironments output
+
+### SDK Enhancements
+* `aws`: Add pointer conversion utilities to transform int64 to time.Time [#1433](https://github.com/aws/aws-sdk-go/pull/1433)
+  * Adds `SecondsTimeValue` and `MillisecondsTimeValue` utilities.
+
 Release v1.10.20 (2017-08-01)
 ===
 

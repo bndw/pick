@@ -16,8 +16,8 @@
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/restxml","private/protocol/xml/xmlutil","service/s3","service/sts"]
-  revision = "b33b08175d12b795daa7726c5577b39d06a2551c"
-  version = "v1.10.20"
+  revision = "d05c000e0b41647375a4093373eb1301e02c8a4e"
+  version = "v1.10.22"
 
 [[projects]]
   name = "github.com/go-ini/ini"
@@ -71,17 +71,17 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["cast5","chacha20poly1305","chacha20poly1305/internal/chacha20","openpgp","openpgp/armor","openpgp/elgamal","openpgp/errors","openpgp/packet","openpgp/s2k","pbkdf2","poly1305","scrypt","ssh/terminal"]
-  revision = "42ff06aea7c329876e5a0fe94acc96902accf0ad"
+  revision = "b176d7def5d71bdd214203491f89843ed217f420"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "d8f5ea21b9295e315e612b4bcf4bedea93454d4d"
+  revision = "e42485b6e20ae7d2304ec72e535b103ed350cc02"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ceee1ae6972d8e2cdeff5eb37290952063a71cea340af3eebf7ffb031c9875f4"
+  inputs-digest = "24a73ab1803f9c7e6713813d64943b830cf7c92d316f4bfe38e289d25cafd55b"
   solver-name = "gps-cdcl"
   solver-version = 1
