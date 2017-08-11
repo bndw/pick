@@ -13,6 +13,8 @@ func New(config *Config) (Client, error) {
 		fallthrough
 	case ConfigTypeFile:
 		return NewDiskBackend(*config)
+	case ConfigTypeS3:
+		return NewS3Backend(*config)
 	case ConfigTypeMock:
 		return NewMockBackend(), nil
 	}

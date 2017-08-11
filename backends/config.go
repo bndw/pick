@@ -14,6 +14,7 @@ type backupConfig struct {
 
 const (
 	ConfigTypeFile = "file"
+	ConfigTypeS3   = "s3"
 	ConfigTypeMock = "mock"
 )
 
