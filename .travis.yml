@@ -5,5 +5,7 @@ go:
 install: 
   - make
 script:
+  - make fmt
+  - make govet
   - make build
   - make test
