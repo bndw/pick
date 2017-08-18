@@ -1,6 +1,7 @@
 pick
 ====
 [![Build Status](https://travis-ci.org/bndw/pick.svg?branch=master)](https://travis-ci.org/bndw/pick)
+[![Go Report Card](https://goreportcard.com/badge/github.com/bndw/pick)](https://goreportcard.com/report/github.com/bndw/pick)
 
 A minimal password manager for OS X and Linux.
 
