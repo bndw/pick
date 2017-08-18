@@ -35,6 +35,23 @@ type = "file"
   # The number of backups to keep.
   # Specify -1 to allow unlimited backups, 0 to not create backups at all.
   #max = 100
+  
+# type = "s3"
+#   [storage.settings]
+#   # Name of AWS S3 bucket
+#   bucket = "bndw-pick"
+#   # Key for safe in bucket
+#   key = "public/default.safe"
+#   # AWS Region
+#   region = "us-west-2"
+#   # AWS Profile in ~/.aws/credentials. If none is provided, "default" will be used.
+#   profile = ""
+#   #[storage.backup]
+#   # Whether to auto-create backups before the safe is modified.
+#   #auto = true
+#   # The number of backups to keep.
+#   # Specify -1 to allow unlimited backups, 0 to not create backups at all.
+#   #max = 100
 
 
 ## Encryption

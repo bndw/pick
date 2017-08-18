@@ -14,6 +14,7 @@ type backupConfig struct {
 
 const (
 	ConfigTypeFile = "file"
+	ConfigTypeS3   = "s3"
 	ConfigTypeMock = "mock"
 )
 
@@ -24,5 +25,6 @@ func NewDefaultConfig() Config {
 			AutoEnabled: true,
 			MaxFiles:    100,
 		},
+		Settings: make(map[string]interface{}),
 	}
 }

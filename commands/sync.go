@@ -52,7 +52,7 @@ func Sync(args []string, flags *pflag.FlagSet) error {
 
 func parseSyncArgs(args []string) (otherSafePath string, err error) {
 	if len(args) != 1 {
-		err = &errors.InvalidCommandUsage{}
+		err = errors.ErrInvalidCommandUsage
 		return
 	}
 

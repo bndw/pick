@@ -1,6 +1,8 @@
 package commands
 
 import (
+	"bytes"
+	builtinerrors "errors"
 	"fmt"
 	"os"
 
@@ -15,7 +17,7 @@ import (
 
 func runCommand(c func([]string, *pflag.FlagSet) error, cmd *cobra.Command, args []string) {
 	if err := c(args, cmd.Flags()); err != nil {
-		if _, isUsageErr := err.(*errors.InvalidCommandUsage); isUsageErr {
+		if err == errors.ErrInvalidCommandUsage {
 			cmd.Usage()
 			os.Exit(1)
 		}
@@ -42,6 +44,9 @@ func (sl *safeLoader) RememberPassword() {
 
 func (sl *safeLoader) Load() (*safe.Safe, error) {
 	backendClient, err := newBackendClient()
+	if _, err := backendClient.Load(); err != nil {
+		return nil, builtinerrors.New("pick not yet initialized. Please run the init command first")
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -80,6 +85,51 @@ func (sl *safeLoader) LoadWithBackendClient(backendClient backends.Client) (*saf
 	return s, nil
 }
 
+func initSafe() error {
+	backendClient, err := newBackendClient()
+	if err != nil {
+		return err
+	}
+
+	if _, err := backendClient.Load(); err == nil {
+		return builtinerrors.New("pick was already initialized")
+	}
+
+	password, err := utils.GetPasswordInput("Please set a master password. This is the only password you need to remember")
+	if err != nil {
+		return err
+	}
+	passwordConfirm, err := utils.GetPasswordInput("Please confirm your master password")
+	if err != nil {
+		return err
+	}
+	if !bytes.Equal(password, passwordConfirm) {
+		return builtinerrors.New("Master passwords do not match")
+	}
+
+	cryptoClient, err := newCryptoClient()
+	if err != nil {
+		return err
+	}
+
+	s, err := safe.Load(
+		password,
+		backendClient,
+		cryptoClient,
+		config,
+	)
+	if err != nil {
+		return err
+	}
+
+	if err := s.Init(); err != nil {
+		return err
+	}
+
+	fmt.Println("pick initialized")
+	return nil
+}
+
 func newBackendClient() (backends.Client, error) {
 	return backends.New(&config.Storage)
 }
@@ -91,9 +141,4 @@ func newCryptoClient() (crypto.Client, error) {
 func handleError(err error) int {
 	fmt.Println(err)
 	return 1
-}
-
-func isInvalidCommandUsage(err error) bool {
-	_, ok := err.(*errors.InvalidCommandUsage)
-	return ok
 }

@@ -51,7 +51,7 @@ func Edit(args []string, flags *pflag.FlagSet) error {
 
 func parseEditArgs(args []string) (name, username, password string, err error) {
 	if len(args) > 2 {
-		err = &errors.InvalidCommandUsage{}
+		err = errors.ErrInvalidCommandUsage
 		return
 	}
 

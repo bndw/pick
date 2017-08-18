@@ -55,7 +55,7 @@ func printCredential(account *safe.Account, printPrefix string, isInitialAccount
 
 func Cat(args []string, flags *pflag.FlagSet) error {
 	if len(args) != 1 {
-		return &errors.InvalidCommandUsage{}
+		return errors.ErrInvalidCommandUsage
 	}
 	name := args[0]
 

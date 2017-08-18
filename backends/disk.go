@@ -61,7 +61,7 @@ func NewDiskBackend(config Config) (*DiskBackend, error) {
 func (db *DiskBackend) Load() ([]byte, error) {
 	if _, err := os.Stat(db.path); err != nil {
 		if os.IsNotExist(err) {
-			return nil, &errors.SafeNotFound{}
+			return nil, errors.ErrSafeNotFound
 		} else {
 			return nil, err
 		}
@@ -133,7 +133,7 @@ func (db *DiskBackend) Backup() error {
 	if db.backupConfig.MaxFiles == 0 {
 		// Keep no backups
 		db.cleanOldBackups(0)
-		return &errors.BackupDisabled{}
+		return errors.ErrBackupDisabled
 	} else if db.backupConfig.MaxFiles > 0 {
 		// Subtract one as we are about to create another backup
 		if err := db.cleanOldBackups(db.backupConfig.MaxFiles - 1); err != nil {
@@ -159,7 +159,7 @@ func (db *DiskBackend) Backup() error {
 	}
 
 	if _, err := os.Stat(backupPath); err == nil {
-		return &errors.BackupFileExists{}
+		return errors.ErrBackupFileExists
 	}
 
 	data, err := db.Load()

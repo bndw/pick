@@ -1,9 +1,13 @@
 language: go
 go:
   - 1.6
+  - 1.7
+  - 1.8
   - tip
 install: 
   - make
 script:
+  - make fmt
+  - make govet
   - make build
   - make test
