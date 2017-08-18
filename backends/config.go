@@ -25,5 +25,6 @@ func NewDefaultConfig() Config {
 			AutoEnabled: true,
 			MaxFiles:    100,
 		},
+		Settings: make(map[string]interface{}),
 	}
 }
