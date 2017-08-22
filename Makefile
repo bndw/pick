@@ -10,9 +10,6 @@ INSTALL = install
 
 FOLDERS = $(shell find . -mindepth 1 -type d -not -path "*.git*" -not -path "./githooks*" -not -path "./$(GOVENDOR)*" -not -path "./Godeps*" -not -path "*bin*")
 
-VERSION = $(shell cat VERSION)
-LDFLAGS = -ldflags "-X main.version=$(VERSION)"
-
 all: build
 
 install_hooks:
@@ -43,7 +40,7 @@ dependencies:
 	@ln -sfn ../../../.. $(GOVENDOR)/src/$(GOPKG)
 
 build: install_hooks dependencies
-	GOPATH=$(GOPATH) go build $(LDFLAGS) -o bin/pick .
+	GOPATH=$(GOPATH) go build -o bin/pick .
 
 test: dependencies
 	GOPATH=$(GOPATH) go test -v $(FOLDERS)
