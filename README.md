@@ -3,7 +3,7 @@ pick
 [![Build Status](https://travis-ci.org/bndw/pick.svg?branch=master)](https://travis-ci.org/bndw/pick)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bndw/pick)](https://goreportcard.com/report/github.com/bndw/pick)
 
-A minimal password manager for OS X and Linux.
+A minimal password manager for macOS and Linux.
 
 ![demo](./demo.gif)
 
@@ -11,27 +11,27 @@ A minimal password manager for OS X and Linux.
 
 #### go get
 ```sh
-$ go get -u github.com/bndw/pick
+go get -u github.com/bndw/pick
 ```
 
 #### Homebrew
 ```sh
-$ brew tap bndw/pick
-$ brew install bndw/pick/pick-pass
+brew tap bndw/pick
+brew install bndw/pick/pick-pass
 ```
 
-#### The old fashioned way
+#### make
 ```sh
-$ git clone https://github.com/bndw/pick && cd pick
-$ make
-$ make install
+git clone https://github.com/bndw/pick && cd pick
+make
+make install
 ```
 
 ## Getting started
 
 If you haven't used `pick` before, you first need to initialize your pick safe. This is straightforward:
 ```sh
-$ pick init
+pick init
 ```
 Running `pick init` will ask you for a master password. Your master password is used to encrypt your pick safe. As this is the only password you need to remember to access all passwords and notes stored in your pick safe, make this a strong and unique one! Use `pick pass` to generate a strong password if you think you're not creative enough :).
 
@@ -39,7 +39,7 @@ Running `pick init` will ask you for a master password. Your master password is 
 
 Once `pick` has been initialized, adding a new credential is easy:
 ```sh
-$ pick add github
+pick add github
 ```
 This will ask you for your master password first which is required to store something in the pick safe.
 Then type in your username which should be used for the `github` credential.
@@ -49,13 +49,13 @@ Done. Credential added.
 ### Listing your credentials
 
 ```sh
-$ pick ls
+pick ls
 ```
 
 ### Copy a credential's password to your clipboard
 
 ```sh
-$ pick cp github
+pick cp github
 ```
 
 For all commands, please refer to [Usage](#usage).
@@ -85,7 +85,7 @@ Use "pick [command] --help" for more information about a command.
 
 ## Threat model
 
-Although `pick` is focussed on security, once an adversary somehow gains write access to your computer where the `pick` binary is stored, he can simply exchange it and record your master password to decrypt your pick safe.
+Although `pick` is focused on security, once an adversary somehow gains write access to your computer where the `pick` binary is stored, he can simply exchange it and record your master password to decrypt your pick safe.
 If you decide to store the pick safe on a remote drive (e.g. a remote server), the system will be secure even if an adversary can modify the pick safe. As this safe is encrypted and authenticated, he can not modify or decrypt it.
 
 ## Similar software
