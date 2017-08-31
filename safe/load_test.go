@@ -45,42 +45,42 @@ func TestLoad(t *testing.T) {
 
 var safeCryptoConfigs = []crypto.Config{
 	crypto.NewDefaultConfigWithType(crypto.ConfigTypeOpenPGP),
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeOpenPGP,
 		OpenPGPSettings: &crypto.OpenPGPSettings{
 			Cipher:   "aes128",
 			S2KCount: 1024,
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeOpenPGP,
 		OpenPGPSettings: &crypto.OpenPGPSettings{
 			Cipher:   "aes256",
 			S2KCount: 1024,
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeOpenPGP,
 		OpenPGPSettings: &crypto.OpenPGPSettings{
 			Cipher:   "does-not-exist",
 			S2KCount: 1024,
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeOpenPGP,
 		OpenPGPSettings: &crypto.OpenPGPSettings{
 			Cipher:   "aes128",
 			S2KCount: 4096,
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeOpenPGP,
 		OpenPGPSettings: &crypto.OpenPGPSettings{
 			Cipher:   "aes256",
 			S2KCount: 4096,
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeOpenPGP,
 		OpenPGPSettings: &crypto.OpenPGPSettings{
 			Cipher:   "does-not-exist",
@@ -88,7 +88,7 @@ var safeCryptoConfigs = []crypto.Config{
 		},
 	},
 	crypto.NewDefaultConfigWithType(crypto.ConfigTypeAESGCM),
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeAESGCM,
 		AESGCMSettings: &crypto.AESGCMSettings{
 			KeyLen:           16,
@@ -98,7 +98,7 @@ var safeCryptoConfigs = []crypto.Config{
 			Pbkdf2SaltLen:    16,
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeAESGCM,
 		AESGCMSettings: &crypto.AESGCMSettings{
 			KeyLen:           32,
@@ -108,7 +108,7 @@ var safeCryptoConfigs = []crypto.Config{
 			Pbkdf2SaltLen:    32,
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeAESGCM,
 		AESGCMSettings: &crypto.AESGCMSettings{
 			KeyLen:        16,
@@ -120,7 +120,7 @@ var safeCryptoConfigs = []crypto.Config{
 			},
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeAESGCM,
 		AESGCMSettings: &crypto.AESGCMSettings{
 			KeyLen:        32,
@@ -132,7 +132,7 @@ var safeCryptoConfigs = []crypto.Config{
 			},
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeAESGCM,
 		AESGCMSettings: &crypto.AESGCMSettings{
 			KeyLen:        16,
@@ -145,7 +145,7 @@ var safeCryptoConfigs = []crypto.Config{
 			},
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeAESGCM,
 		AESGCMSettings: &crypto.AESGCMSettings{
 			KeyLen:        32,
@@ -159,7 +159,7 @@ var safeCryptoConfigs = []crypto.Config{
 		},
 	},
 	crypto.NewDefaultConfigWithType(crypto.ConfigTypeChaChaPoly),
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeChaChaPoly,
 		ChaCha20Poly1305Settings: &crypto.ChaCha20Poly1305Settings{
 			KeyDerivation: "pbkdf2",
@@ -170,7 +170,7 @@ var safeCryptoConfigs = []crypto.Config{
 			},
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeChaChaPoly,
 		ChaCha20Poly1305Settings: &crypto.ChaCha20Poly1305Settings{
 			KeyDerivation: "pbkdf2",
@@ -181,7 +181,7 @@ var safeCryptoConfigs = []crypto.Config{
 			},
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeChaChaPoly,
 		ChaCha20Poly1305Settings: &crypto.ChaCha20Poly1305Settings{
 			KeyDerivation: "scrypt",
@@ -193,7 +193,7 @@ var safeCryptoConfigs = []crypto.Config{
 			},
 		},
 	},
-	crypto.Config{
+	{
 		Type: crypto.ConfigTypeChaChaPoly,
 		ChaCha20Poly1305Settings: &crypto.ChaCha20Poly1305Settings{
 			KeyDerivation: "scrypt",
