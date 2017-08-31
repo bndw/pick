@@ -24,7 +24,7 @@ type Config struct {
 
 type generalConfig struct {
 	Password pswdgen.Config
-	// Warning: Deprecated. The PasswordLen field is required for backwards-compatiblity :(
+	// Warning: Deprecated. The PasswordLen field is required for backwards-compatibility :(
 	PasswordLen int
 }
 
@@ -55,7 +55,7 @@ func Load(version string) (*Config, error) {
 	}
 
 	config.Version = version
-	// Warning: Deprecated. The PasswordLen field is required for backwards-compatiblity :(
+	// Warning: Deprecated. The PasswordLen field is required for backwards-compatibility :(
 	if l := config.General.PasswordLen; l > 0 {
 		config.General.Password.Length = l
 	}

@@ -22,7 +22,7 @@ type AESGCMSettings struct {
 	KeyDerivation string         `json:"keyderivation,omitempty" toml:"keyderivation"`
 	PBKDF2        *pbkdf2.PBKDF2 `json:"pbkdf2,omitempty" toml:"pbkdf2"`
 	Scrypt        *scrypt.Scrypt `json:"scrypt,omitempty" toml:"scrypt"`
-	// Warning: Deprecated. These three Pbkdf2 configs are required for backwards-compatiblity :(
+	// Warning: Deprecated. These three Pbkdf2 configs are required for backwards-compatibility :(
 	Pbkdf2Hash       string `json:"pbkdf2hash,omitempty" toml:"pbkdf2hash"`
 	Pbkdf2Iterations int    `json:"pbkdf2iterations,omitempty" toml:"pbkdf2iterations"`
 	Pbkdf2SaltLen    int    `json:"pbkdf2saltlen,omitempty" toml:"pbkdf2saltlen"`
