@@ -79,7 +79,7 @@ func (acc *Account) syncHistory(otherHistory accountHistory) {
 	acc.History = historySorted
 }
 
-func NewAccount(name, username, password string) *Account {
+func NewAccount(username, password string) *Account {
 	ts := time.Now().Unix()
 	return &Account{
 		Username:   username,
