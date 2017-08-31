@@ -153,7 +153,7 @@ func (s *S3Backend) getObject(bucket, key string) (io.ReadCloser, error) {
 	return result.Body, nil
 }
 
-func (s *S3Backend) putObject(data *bytes.Reader, bucket, key string) error {
+func (s *S3Backend) putObject(data io.Reader, bucket, key string) error {
 	_, err := s.svc.PutObject(&s3.PutObjectInput{
 		Body:   aws.ReadSeekCloser(data),
 		Bucket: aws.String(bucket),
