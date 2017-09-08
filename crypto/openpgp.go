@@ -110,13 +110,13 @@ func (c *OpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext [
 	if err != nil {
 		return
 	}
-	defer w.Close()
+	defer w.Close() // nolint: errcheck
 
 	pt, err := openpgp.SymmetricallyEncrypt(w, password, nil, c.packetConfig)
 	if err != nil {
 		return
 	}
-	defer pt.Close()
+	defer pt.Close() // nolint: errcheck
 
 	if _, err := pt.Write(plaintext); err != nil {
 		return nil, err

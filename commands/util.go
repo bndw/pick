@@ -18,7 +18,7 @@ import (
 func runCommand(c func([]string, *pflag.FlagSet) error, cmd *cobra.Command, args []string) {
 	if err := c(args, cmd.Flags()); err != nil {
 		if err == errors.ErrInvalidCommandUsage {
-			cmd.Usage()
+			_ = cmd.Usage()
 			os.Exit(1)
 		}
 		os.Exit(handleError(err))

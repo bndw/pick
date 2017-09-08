@@ -111,7 +111,7 @@ func (s *S3Backend) Load() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer result.Close()
+	defer result.Close() // nolint: errcheck
 
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, result); err != nil {

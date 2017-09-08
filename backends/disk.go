@@ -68,11 +68,11 @@ func (db *DiskBackend) Load() ([]byte, error) {
 func (db *DiskBackend) Save(data []byte) error {
 	tmpFile := db.path + ".tmp"
 	if err := ioutil.WriteFile(tmpFile, data, defaultSafeFileMode); err != nil {
-		os.Remove(tmpFile)
+		_ = os.Remove(tmpFile)
 		return err
 	}
 	if err := os.Rename(tmpFile, db.path); err != nil {
-		os.Remove(tmpFile)
+		_ = os.Remove(tmpFile)
 		return err
 	}
 	return nil
@@ -127,7 +127,7 @@ func min(a, b int) int {
 func (db *DiskBackend) Backup() error {
 	if db.backupConfig.MaxFiles == 0 {
 		// Keep no backups
-		db.cleanOldBackups(0)
+		_ = db.cleanOldBackups(0)
 		return errors.ErrBackupDisabled
 	} else if db.backupConfig.MaxFiles > 0 {
 		// Subtract one as we are about to create another backup

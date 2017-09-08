@@ -12,7 +12,7 @@ func PrettyPrint(v interface{}) {
 		panic(err)
 	}
 
-	os.Stdout.Write(b)
+	_, _ = os.Stdout.Write(b)
 }
 
 func FormatUnixTime(ts int64) string {
