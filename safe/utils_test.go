@@ -76,5 +76,4 @@ func createTestSafe() (*Safe, error) {
 
 func removeTestSafe() {
 	_ = os.Remove(testSafeName)
-	return
 }

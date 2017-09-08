@@ -72,6 +72,7 @@ func (acc *Account) syncHistory(otherHistory accountHistory) {
 	}
 	// Sort our history to preserve order
 	historySorted := make(accountHistory, 0, len(acc.History))
+	// nolint: megacheck
 	for _, account := range acc.History {
 		historySorted = append(historySorted, account)
 	}
