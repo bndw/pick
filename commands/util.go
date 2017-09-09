@@ -44,11 +44,11 @@ func (sl *safeLoader) RememberPassword() {
 
 func (sl *safeLoader) Load() (*safe.Safe, error) {
 	backendClient, err := newBackendClient()
-	if _, err := backendClient.Load(); err != nil {
-		return nil, builtinerrors.New("pick not yet initialized. Please run the init command first")
-	}
 	if err != nil {
 		return nil, err
+	}
+	if _, err := backendClient.Load(); err != nil {
+		return nil, builtinerrors.New("pick not yet initialized. Please run the init command first")
 	}
 	return sl.LoadWithBackendClient(backendClient)
 }
@@ -91,7 +91,7 @@ func initSafe() error {
 		return err
 	}
 
-	if _, err := backendClient.Load(); err == nil {
+	if _, err := backendClient.Load(); err == nil { // nolint: vetshadow
 		return builtinerrors.New("pick was already initialized")
 	}
 

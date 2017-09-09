@@ -15,12 +15,12 @@ func (s *Safe) save() error {
 		return err
 	}
 
-	safeDTO := safeDTO{
+	dto := safeDTO{
 		Config:     &s.Config.Encryption,
 		Ciphertext: ciphertext,
 	}
 
-	data, err := json.Marshal(safeDTO)
+	data, err := json.Marshal(dto)
 	if err != nil {
 		return err
 	}

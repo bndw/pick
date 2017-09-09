@@ -78,7 +78,7 @@ func (c *ChaCha20Poly1305Client) deriveKeyWithSalt(password, salt []byte, keyLen
 	return c.keyDerivation.DeriveKeyWithSalt(password, salt, keyLen)
 }
 
-func (c *ChaCha20Poly1305Client) Decrypt(data []byte, password []byte) (plaintext []byte, err error) {
+func (c *ChaCha20Poly1305Client) Decrypt(data []byte, password []byte) ([]byte, error) {
 	var store ChaCha20Poly1305Store
 	if err := json.Unmarshal(data, &store); err != nil {
 		return nil, err
@@ -86,20 +86,20 @@ func (c *ChaCha20Poly1305Client) Decrypt(data []byte, password []byte) (plaintex
 
 	key, err := c.deriveKeyWithSalt(password, store.Salt, c.keyLen())
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	cpc, err := chacha20poly1305.New(key)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	plaintext, err = cpc.Open(nil, store.Nonce, store.Ciphertext, nil)
+	plaintext, err := cpc.Open(nil, store.Nonce, store.Ciphertext, nil)
 	if err != nil {
 		return nil, errors.ErrSafeDecryptionFailed
 	}
 
-	return
+	return plaintext, err
 }
 
 func (c *ChaCha20Poly1305Client) Encrypt(plaintext []byte, password []byte) (data []byte, err error) {

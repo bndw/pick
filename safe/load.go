@@ -31,7 +31,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 	}
 
 	safeDTO := safeDTO{}
-	if err := json.Unmarshal(data, &safeDTO); err == nil {
+	if err := json.Unmarshal(data, &safeDTO); err == nil { // nolint: vetshadow
 		// Unmarshalling did succeed -> Safe uses new format
 		// Do nothing
 	} else {
@@ -66,12 +66,12 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 
 	var tmp Safe
 
-	if err := json.Unmarshal(plaintext, &tmp); err != nil {
+	if err := json.Unmarshal(plaintext, &tmp); err != nil { // nolint: vetshadow
 		return nil, errors.ErrSafeCorrupt
 	}
 
 	if tmp.Config != nil && tmp.Config.Version != "" {
-		incompatible, err := versionIncompatible(tmp.Config.Version, config.Version)
+		incompatible, err := versionIncompatible(tmp.Config.Version, config.Version) // nolint: vetshadow
 		if err != nil {
 			return nil, err
 		} else if incompatible {
@@ -98,7 +98,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 	if !reflect.DeepEqual(*safeDTO.Config, s.Config.Encryption) {
 		fmt.Println("Upgrading safe")
 		s.crypto = upgradeCrypto
-		if err := s.save(); err != nil {
+		if err := s.save(); err != nil { // nolint: vetshadow
 			fmt.Println("Error", err.Error())
 		}
 	}

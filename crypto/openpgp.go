@@ -64,12 +64,12 @@ func (c *OpenPGPClient) s2kCount() int {
 
 // decrypt uses PGP to decrypt symmetrically encrypted and armored text
 // with the provided password.
-func (c *OpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext []byte, err error) {
+func (c *OpenPGPClient) Decrypt(ciphertext []byte, password []byte) ([]byte, error) {
 	decbuf := bytes.NewBuffer(ciphertext)
 
 	armorBlock, err := armor.Decode(decbuf)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	failed := false
@@ -87,34 +87,32 @@ func (c *OpenPGPClient) Decrypt(ciphertext []byte, password []byte) (plaintext [
 	}
 
 	md, err := openpgp.ReadMessage(armorBlock.Body, nil, prompt, c.packetConfig)
-
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	decryptedBuf, err := ioutil.ReadAll(md.UnverifiedBody)
+	plaintext, err := ioutil.ReadAll(md.UnverifiedBody)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	plaintext = decryptedBuf
-	return
+	return plaintext, nil
 }
 
 // encrypt uses PGP to symmetrically encrypt and armor text with the
 // provided password.
-func (c *OpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext []byte, err error) {
+func (c *OpenPGPClient) Encrypt(plaintext []byte, password []byte) ([]byte, error) {
 	encbuf := bytes.NewBuffer(nil)
 
 	w, err := armor.Encode(encbuf, "PGP MESSAGE", nil)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer w.Close() // nolint: errcheck
 
 	pt, err := openpgp.SymmetricallyEncrypt(w, password, nil, c.packetConfig)
 	if err != nil {
-		return
+		return nil, err
 	}
 	defer pt.Close() // nolint: errcheck
 
@@ -123,13 +121,12 @@ func (c *OpenPGPClient) Encrypt(plaintext []byte, password []byte) (ciphertext [
 	}
 
 	// Force-close writer to flush their cache
-	if err = pt.Close(); err != nil {
-		return
+	if err := pt.Close(); err != nil {
+		return nil, err
 	}
-	if err = w.Close(); err != nil {
-		return
+	if err := w.Close(); err != nil {
+		return nil, err
 	}
 
-	ciphertext = encbuf.Bytes()
-	return
+	return encbuf.Bytes(), nil
 }
