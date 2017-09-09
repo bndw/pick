@@ -7,6 +7,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/bndw/pick/backends"
 	"github.com/bndw/pick/crypto"
+	"github.com/bndw/pick/utils/clipboard"
 	"github.com/bndw/pick/utils/pswdgen"
 	"github.com/mitchellh/go-homedir"
 )
@@ -26,6 +27,7 @@ type generalConfig struct {
 	Password pswdgen.Config
 	// Warning: Deprecated. The PasswordLen field is required for backwards-compatibility :(
 	PasswordLen int
+	Clipboard   clipboard.Config
 }
 
 func Load(version string) (*Config, error) {
@@ -39,7 +41,8 @@ func Load(version string) (*Config, error) {
 		Storage:    backends.NewDefaultConfig(),
 		Encryption: crypto.NewDefaultConfig(),
 		General: generalConfig{
-			Password: pswdgen.NewDefaultConfig(),
+			Password:  pswdgen.NewDefaultConfig(),
+			Clipboard: clipboard.NewDefaultConfig(),
 		},
 	}
 	if _, err := os.Stat(configFile); err != nil {
