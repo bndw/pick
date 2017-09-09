@@ -29,11 +29,11 @@ dependencies:
 	@$(shell \
 		cd $(GOVENDOR) ; \
 		rm -rf src ; \
-		find . -mindepth 3 -maxdepth 3 -path ./src -prune -o -type d -print | \
+		find . -mindepth 2 -maxdepth 2 -path ./src -prune -o -type d -print | \
 		sed -e 's/.\///' | \
 		xargs -I{} sh -c ' \
 			mkdir -p "src/`dirname {}`" ; \
-			ln -sfn "../../../{}" "src/{}" ; \
+			ln -sfn "../../{}" "src/{}" ; \
 		' \
 	)
 	@mkdir -p $(shell dirname $(GOVENDOR)/src/$(GOPKG))

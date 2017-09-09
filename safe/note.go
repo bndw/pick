@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/mitchellh/go-homedir"
+	"golang.leonklingele.de/securetemp"
 )
 
 const (
@@ -126,10 +127,17 @@ func editorReadText(existingText string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	tmpFile, err := ioutil.TempFile(homeDir, defaultNoteTmpFileName)
+	tmpFile, cleanupFunc, err := securetemp.TempFile(8 * securetemp.SizeMB)
 	if err != nil {
-		return "", err
+		tmpFile, err = ioutil.TempFile(homeDir, defaultNoteTmpFileName)
+		if err != nil {
+			return "", err
+		}
+		cleanupFunc = func() {
+			os.Remove(tmpFile.Name())
+		}
 	}
+	defer cleanupFunc()
 	if existingText != "" {
 		if _, err := tmpFile.WriteString(existingText); err != nil { // nolint: vetshadow
 			return "", err
@@ -147,9 +155,6 @@ func editorReadText(existingText string) (string, error) {
 	}
 	note, err := ioutil.ReadFile(tmpFile.Name())
 	if err != nil {
-		return "", err
-	}
-	if err := os.Remove(tmpFile.Name()); err != nil {
 		return "", err
 	}
 	return string(note), nil
