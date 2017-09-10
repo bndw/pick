@@ -9,7 +9,7 @@ func (s *Safe) Add(name, username, password string) (*Account, error) {
 		return existingAccount, errors.ErrAccountAlreadyExists
 	}
 
-	account := NewAccount(name, username, password)
+	account := NewAccount(username, password)
 	s.Accounts[name] = *account
 
 	if err := s.save(); err != nil {

@@ -111,7 +111,7 @@ func (s *S3Backend) Load() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer result.Close()
+	defer result.Close() // nolint: errcheck
 
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, result); err != nil {
@@ -153,7 +153,7 @@ func (s *S3Backend) getObject(bucket, key string) (io.ReadCloser, error) {
 	return result.Body, nil
 }
 
-func (s *S3Backend) putObject(data *bytes.Reader, bucket, key string) error {
+func (s *S3Backend) putObject(data io.Reader, bucket, key string) error {
 	_, err := s.svc.PutObject(&s3.PutObjectInput{
 		Body:   aws.ReadSeekCloser(data),
 		Bucket: aws.String(bucket),

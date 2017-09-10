@@ -22,7 +22,7 @@ type AESGCMSettings struct {
 	KeyDerivation string         `json:"keyderivation,omitempty" toml:"keyderivation"`
 	PBKDF2        *pbkdf2.PBKDF2 `json:"pbkdf2,omitempty" toml:"pbkdf2"`
 	Scrypt        *scrypt.Scrypt `json:"scrypt,omitempty" toml:"scrypt"`
-	// Warning: Deprecated. These three Pbkdf2 configs are required for backwards-compatiblity :(
+	// Warning: Deprecated. These three Pbkdf2 configs are required for backwards-compatibility :(
 	Pbkdf2Hash       string `json:"pbkdf2hash,omitempty" toml:"pbkdf2hash"`
 	Pbkdf2Iterations int    `json:"pbkdf2iterations,omitempty" toml:"pbkdf2iterations"`
 	Pbkdf2SaltLen    int    `json:"pbkdf2saltlen,omitempty" toml:"pbkdf2saltlen"`
@@ -103,7 +103,7 @@ func (c *AESGCMClient) deriveKeyWithSalt(password, salt []byte, keyLen int) ([]b
 	return c.keyDerivation.DeriveKeyWithSalt(password, salt, keyLen)
 }
 
-func (c *AESGCMClient) Decrypt(data []byte, password []byte) (plaintext []byte, err error) {
+func (c *AESGCMClient) Decrypt(data []byte, password []byte) ([]byte, error) {
 	var store AESGCMStore
 	if err := json.Unmarshal(data, &store); err != nil {
 		return nil, err
@@ -111,25 +111,25 @@ func (c *AESGCMClient) Decrypt(data []byte, password []byte) (plaintext []byte, 
 
 	key, err := c.deriveKeyWithSalt(password, store.Salt, c.keyLen())
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	ac, err := aes.NewCipher(key)
 	if err != nil {
-		return
+		return nil, err
 	}
 
 	gcm, err := cipher.NewGCM(ac)
 	if err != nil {
-		return
+		return nil, err
 	}
 
-	plaintext, err = gcm.Open(nil, store.Nonce, store.Ciphertext, nil)
+	plaintext, err := gcm.Open(nil, store.Nonce, store.Ciphertext, nil)
 	if err != nil {
 		return nil, errors.ErrSafeDecryptionFailed
 	}
 
-	return
+	return plaintext, nil
 }
 
 func (c *AESGCMClient) Encrypt(plaintext []byte, password []byte) (data []byte, err error) {

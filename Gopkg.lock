@@ -68,6 +68,12 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "golang.leonklingele.de/securetemp"
+  packages = ["."]
+  revision = "50a05cf002288328d2b1fdf97dd7ab9da3c004b1"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["cast5","chacha20poly1305","chacha20poly1305/internal/chacha20","openpgp","openpgp/armor","openpgp/elgamal","openpgp/errors","openpgp/packet","openpgp/s2k","pbkdf2","poly1305","scrypt","ssh/terminal"]
@@ -82,6 +88,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "24a73ab1803f9c7e6713813d64943b830cf7c92d316f4bfe38e289d25cafd55b"
+  inputs-digest = "3b34d012cd3d49c0eac41e29eb7e1a7f6148ab90ce2d33349c339a626e955ce5"
   solver-name = "gps-cdcl"
   solver-version = 1

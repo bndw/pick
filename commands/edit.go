@@ -6,6 +6,7 @@ import (
 	"github.com/bndw/pick/errors"
 	"github.com/bndw/pick/strings"
 	"github.com/bndw/pick/utils"
+	"github.com/bndw/pick/utils/clipboard"
 	"github.com/bndw/pick/utils/pswdgen"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -40,7 +41,7 @@ func Edit(args []string, flags *pflag.FlagSet) error {
 
 	fmt.Println("Credential updated")
 	if utils.Confirm("Copy password to clipboard", true) {
-		if err := utils.CopyToClipboard(account.Password); err != nil {
+		if err := clipboard.Copy(account.Password, safe.Config.General.Clipboard.ClearAfter); err != nil {
 			return err
 		}
 		fmt.Println(strings.PasswordCopiedToClipboard)

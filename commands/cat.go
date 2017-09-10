@@ -23,7 +23,7 @@ func init() {
 	rootCmd.AddCommand(cmd)
 }
 
-func printAccount(name string, account *safe.Account, showHistory bool) {
+func printAccount(account *safe.Account, showHistory bool) {
 	// Print header
 	if showHistory && account.History != nil {
 		history := account.History
@@ -74,7 +74,7 @@ func Cat(args []string, flags *pflag.FlagSet) error {
 		return err
 	}
 
-	printAccount(name, account, showHistory)
+	printAccount(account, showHistory)
 	return nil
 }
 

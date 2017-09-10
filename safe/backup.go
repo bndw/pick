@@ -5,8 +5,5 @@ import (
 )
 
 func Backup(client backends.Client) error {
-	if err := client.Backup(); err != nil {
-		return err
-	}
-	return nil
+	return client.Backup()
 }

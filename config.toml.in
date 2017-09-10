@@ -21,6 +21,9 @@
 #   #  - Decrease length via: Left-arrow key / "h"
 #   #  - Use current password: Enter key
 #   mode = "interactive"
+#   [general.clipboard]
+#   # Specifies the time after which the clipboard is cleared.
+#   clearAfter = "90s"
 
 
 ## Storage
@@ -35,7 +38,7 @@ type = "file"
   # The number of backups to keep.
   # Specify -1 to allow unlimited backups, 0 to not create backups at all.
   #max = 100
-  
+
 # type = "s3"
 #   [storage.settings]
 #   # Name of AWS S3 bucket

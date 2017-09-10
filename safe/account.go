@@ -72,6 +72,7 @@ func (acc *Account) syncHistory(otherHistory accountHistory) {
 	}
 	// Sort our history to preserve order
 	historySorted := make(accountHistory, 0, len(acc.History))
+	// nolint: megacheck
 	for _, account := range acc.History {
 		historySorted = append(historySorted, account)
 	}
@@ -79,7 +80,7 @@ func (acc *Account) syncHistory(otherHistory accountHistory) {
 	acc.History = historySorted
 }
 
-func NewAccount(name, username, password string) *Account {
+func NewAccount(username, password string) *Account {
 	ts := time.Now().Unix()
 	return &Account{
 		Username:   username,

@@ -138,13 +138,22 @@ func Generate(config Config) (string, error) {
 }
 
 func readTermChar() ([]byte, error) {
-	t, _ := term.Open("/dev/tty")
-	term.RawMode(t)
+	t, err := term.Open("/dev/tty")
+	if err != nil {
+		return nil, err
+	}
+	if err := term.RawMode(t); err != nil {
+		return nil, err
+	}
 	bytes := make([]byte, 3)
 	numRead, err := t.Read(bytes)
-	t.Restore()
-	t.Close()
 	if err != nil {
+		return nil, err
+	}
+	if err := t.Restore(); err != nil {
+		return nil, err
+	}
+	if err := t.Close(); err != nil {
 		return nil, err
 	}
 	return bytes[0:numRead], nil

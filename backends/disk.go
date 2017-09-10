@@ -22,11 +22,6 @@ const (
 	defaultBackupTimeFormat = "2006-01-02_15-04-05"
 )
 
-var (
-	safePath string
-	homeDir  string
-)
-
 type DiskBackend struct {
 	path         string
 	backupConfig backupConfig
@@ -35,8 +30,8 @@ type DiskBackend struct {
 type fileInfoSlice []os.FileInfo
 
 func NewDiskBackend(config Config) (*DiskBackend, error) {
-	var err error
-	if homeDir, err = homedir.Dir(); err != nil {
+	homeDir, err := homedir.Dir()
+	if err != nil {
 		return nil, err
 	}
 
@@ -44,7 +39,7 @@ func NewDiskBackend(config Config) (*DiskBackend, error) {
 	if ok {
 		safePath = formatHomeDir(safePath, homeDir)
 	} else {
-		safePath, err = defaultSafePath()
+		safePath, err = defaultSafePath(homeDir)
 		if err != nil {
 			return nil, err
 		}
@@ -73,11 +68,11 @@ func (db *DiskBackend) Load() ([]byte, error) {
 func (db *DiskBackend) Save(data []byte) error {
 	tmpFile := db.path + ".tmp"
 	if err := ioutil.WriteFile(tmpFile, data, defaultSafeFileMode); err != nil {
-		os.Remove(tmpFile)
+		_ = os.Remove(tmpFile)
 		return err
 	}
 	if err := os.Rename(tmpFile, db.path); err != nil {
-		os.Remove(tmpFile)
+		_ = os.Remove(tmpFile)
 		return err
 	}
 	return nil
@@ -132,7 +127,7 @@ func min(a, b int) int {
 func (db *DiskBackend) Backup() error {
 	if db.backupConfig.MaxFiles == 0 {
 		// Keep no backups
-		db.cleanOldBackups(0)
+		_ = db.cleanOldBackups(0)
 		return errors.ErrBackupDisabled
 	} else if db.backupConfig.MaxFiles > 0 {
 		// Subtract one as we are about to create another backup
@@ -169,7 +164,7 @@ func (db *DiskBackend) Backup() error {
 	return ioutil.WriteFile(backupPath, data, defaultSafeFileMode)
 }
 
-func defaultSafePath() (string, error) {
+func defaultSafePath(homeDir string) (string, error) {
 	safeDir := fmt.Sprintf("%s/%s", homeDir, defaultSafeDirName)
 
 	if _, err := os.Stat(safeDir); err != nil {

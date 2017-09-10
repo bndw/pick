@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/mitchellh/go-homedir"
+	"golang.leonklingele.de/securetemp"
 )
 
 const (
@@ -25,14 +26,14 @@ func (n *notesManager) Edit(name string) error {
 	if len(name) == 0 {
 		return errors.New("Empty note name specified")
 	}
-	note, exists := n.Notes[name]
+	nt, exists := n.Notes[name]
 	if !exists {
-		note = NewEmptyNote(name)
+		nt = NewEmptyNote(name)
 	}
-	if err := note.EditInEditor(); err != nil {
+	if err := nt.EditInEditor(); err != nil {
 		return err
 	}
-	n.Notes[name] = note
+	n.Notes[name] = nt
 	fmt.Println("Note saved")
 	return n.safe.save()
 }
@@ -126,12 +127,19 @@ func editorReadText(existingText string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	tmpFile, err := ioutil.TempFile(homeDir, defaultNoteTmpFileName)
+	tmpFile, cleanupFunc, err := securetemp.TempFile(8 * securetemp.SizeMB)
 	if err != nil {
-		return "", err
+		tmpFile, err = ioutil.TempFile(homeDir, defaultNoteTmpFileName)
+		if err != nil {
+			return "", err
+		}
+		cleanupFunc = func() {
+			os.Remove(tmpFile.Name())
+		}
 	}
+	defer cleanupFunc()
 	if existingText != "" {
-		if _, err := tmpFile.WriteString(existingText); err != nil {
+		if _, err := tmpFile.WriteString(existingText); err != nil { // nolint: vetshadow
 			return "", err
 		}
 	}
@@ -139,17 +147,14 @@ func editorReadText(existingText string) (string, error) {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	if err := cmd.Start(); err != nil {
+	if err := cmd.Start(); err != nil { // nolint: vetshadow
 		return "", err
 	}
-	if err := cmd.Wait(); err != nil {
+	if err := cmd.Wait(); err != nil { // nolint: vetshadow
 		return "", err
 	}
 	note, err := ioutil.ReadFile(tmpFile.Name())
 	if err != nil {
-		return "", err
-	}
-	if err := os.Remove(tmpFile.Name()); err != nil {
 		return "", err
 	}
 	return string(note), nil
