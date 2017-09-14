@@ -53,18 +53,18 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		notes = tmp.Notes.Notes
 	}
 
-	safe, err := NewSafe(password, backend, encryptionClient, config, tmp.Accounts, notes)
+	s, err := NewSafe(password, backend, encryptionClient, config, tmp.Accounts, notes)
 	if err != nil {
 		return nil, err
 	}
 
 	if configurationHasChanged {
-		if err := safe.save(); err != nil { // nolint: vetshadow
+		if err := s.save(); err != nil { // nolint: vetshadow
 			fmt.Println("Error", err.Error())
 		}
 	}
 
-	return safe, err
+	return s, err
 }
 
 // decryptSafeDTO attempts to decrypt the safeDTO ciphertext with the provided
