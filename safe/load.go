@@ -71,7 +71,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 // password and config
 func decryptSafeDTO(safeBytes, password []byte, cryptoClient crypto.Client) ([]byte, error) {
 	dto := safeDTO{}
-	if err := json.Unmarshal(safeBytes, &dto); err != nil { // nolint: vetshadow
+	if err := json.Unmarshal(safeBytes, &dto); err != nil {
 		// Safe likely uses a legacy format
 		dto.Ciphertext = safeBytes
 		// Use OpenPGP for backwards-compatibility
