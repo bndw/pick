@@ -24,7 +24,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		}
 	}
 
-	var configurationHasChanged bool
+	var configChanged bool
 	plaintext, err := decryptSafeDTO(ciphertext, password, nil)
 	if err != nil {
 		// Failed to decrypt the safe with its own configuration,
@@ -35,7 +35,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 			return nil, err
 		}
 
-		configurationHasChanged = true
+		configChanged = true
 	}
 
 	var tmp Safe
@@ -58,7 +58,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		return nil, err
 	}
 
-	if configurationHasChanged {
+	if configChanged {
 		if err := s.save(); err != nil { // nolint: vetshadow
 			fmt.Println("Error saving file", err.Error())
 		}
