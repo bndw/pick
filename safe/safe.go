@@ -74,11 +74,12 @@ func (s *Safe) RequireCompatibilityWith(version string) error {
 	incompatible, err := versionIncompatible(s.Config.Version, version)
 	if err != nil {
 		return err
-	} else if incompatible {
-		return fmt.Errorf("Safe is using a non-backwards compatible version. Please upgrade pick. pick version: %s, safe version: %s", version, s.Config.Version)
-	} else {
-		return nil
 	}
+	if incompatible {
+		return fmt.Errorf("Safe is using a non-backwards compatible version. Please upgrade pick. pick version: %s, safe version: %s", version, s.Config.Version)
+	}
+
+	return nil
 }
 
 // safeDTO holds the structure of how the Safe is persisted by the Backend
