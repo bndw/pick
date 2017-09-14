@@ -71,7 +71,7 @@ func (s *Safe) RequireCompatibilityWith(version string) error {
 		return nil
 	}
 
-	incompatible, err := versionIncompatible(s.Config.Version, version) // nolint: vetshadow
+	incompatible, err := versionIncompatible(s.Config.Version, version)
 	if err != nil {
 		return err
 	} else if incompatible {
