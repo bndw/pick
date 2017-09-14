@@ -43,7 +43,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		return nil, errors.ErrSafeCorrupt
 	}
 	if tmp.Config != nil && tmp.Config.Version != "" {
-		if err := tmp.IsVersionCompatible(config.Version); err != nil { // nolint: vetshadow
+		if err := tmp.RequireCompatibilityWith(config.Version); err != nil { // nolint: vetshadow
 			return nil, err
 		}
 	}

@@ -51,9 +51,9 @@ func New(password []byte, backend backends.Client, encryptionClient crypto.Clien
 	return &s, nil
 }
 
-// IsVersionCompatible returns error if the Safe version is incompatible
+// RequireCompatibilityWith returns an error if the Safe version is incompatible
 // with the provided version
-func (s *Safe) IsVersionCompatible(version string) error {
+func (s *Safe) RequireCompatibilityWith(version string) error {
 	versionIncompatible := func(v1, v2 string) (bool, error) {
 		v1p, err := utils.ParseVersion(v1)
 		if err != nil {
