@@ -18,7 +18,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 	if err != nil {
 		switch err {
 		case errors.ErrSafeNotFound:
-			return NewSafe(password, backend, encryptionClient, config, nil, nil)
+			return New(password, backend, encryptionClient, config, nil, nil)
 		default:
 			return nil, err
 		}
@@ -53,7 +53,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		notes = tmp.Notes.Notes
 	}
 
-	s, err := NewSafe(password, backend, encryptionClient, config, tmp.Accounts, notes)
+	s, err := New(password, backend, encryptionClient, config, tmp.Accounts, notes)
 	if err != nil {
 		return nil, err
 	}

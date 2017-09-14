@@ -19,9 +19,8 @@ type Safe struct {
 	Notes    *notesManager
 }
 
-// NewSafe returns a new, initialized Safe
-func NewSafe(password []byte, backend backends.Client, encryptionClient crypto.Client, config *config.Config, accounts map[string]Account, notes map[string]note) (*Safe, error) {
-
+// New returns a new, initialized Safe
+func New(password []byte, backend backends.Client, encryptionClient crypto.Client, config *config.Config, accounts map[string]Account, notes map[string]note) (*Safe, error) {
 	s := Safe{
 		backend:  backend,
 		crypto:   encryptionClient,
