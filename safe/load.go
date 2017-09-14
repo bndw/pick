@@ -60,7 +60,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 
 	if configurationHasChanged {
 		if err := s.save(); err != nil { // nolint: vetshadow
-			fmt.Println("Error", err.Error())
+			fmt.Println("Error saving file", err.Error())
 		}
 	}
 
