@@ -74,9 +74,9 @@ func decryptSafeDTO(safeBytes, password []byte, cryptoClient crypto.Client) ([]b
 	if err := json.Unmarshal(safeBytes, &dto); err != nil { // nolint: vetshadow
 		// Safe likely uses a legacy format
 		dto.Ciphertext = safeBytes
-		// If we don't have a config, use OpenPGP for backwards-compatibility
-		defaultOpenPGPConfig := crypto.NewDefaultConfigWithType(crypto.ConfigTypeOpenPGP)
-		dto.Config = &defaultOpenPGPConfig
+		// Use OpenPGP for backwards-compatibility
+		c := crypto.NewDefaultConfigWithType(crypto.ConfigTypeOpenPGP)
+		dto.Config = &c
 	}
 
 	if cryptoClient == nil {
