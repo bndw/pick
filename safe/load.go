@@ -33,9 +33,9 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		if err != nil {
 			// The password is definitely incorrect
 			return nil, err
-		} else {
-			configurationHasChanged = true
 		}
+
+		configurationHasChanged = true
 	}
 
 	var tmp Safe
