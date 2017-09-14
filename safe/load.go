@@ -11,7 +11,7 @@ import (
 )
 
 // Load loads, decrypts, and returns an instantiated Safe.
-// In the case that the Safe configuration as changed, the Safe will be upgraded
+// In the case that the Safe configuration has changed, the Safe will be upgraded
 // to the latest configuration and saved.
 func Load(password []byte, backend backends.Client, encryptionClient crypto.Client, config *config.Config) (*Safe, error) {
 	ciphertext, err := backend.Load()
