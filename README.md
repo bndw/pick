@@ -16,7 +16,6 @@ go get -u github.com/bndw/pick
 
 #### Homebrew
 ```sh
-brew tap bndw/pick
 brew install bndw/pick/pick-pass
 ```
 
