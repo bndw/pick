@@ -21,10 +21,10 @@ type Safe struct {
 }
 
 // New returns a new, initialized Safe
-func New(password []byte, backend backends.Client, encryptionClient crypto.Client, config *config.Config, accounts map[string]Account, notes map[string]note) (*Safe, error) {
+func New(password []byte, backendClient backends.Client, cryptoClient crypto.Client, config *config.Config, accounts map[string]Account, notes map[string]note) (*Safe, error) {
 	s := Safe{
-		backend:  backend,
-		crypto:   encryptionClient,
+		backend:  backendClient,
+		crypto:   cryptoClient,
 		password: password,
 		Accounts: accounts,
 		Config:   config,

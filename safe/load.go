@@ -14,12 +14,12 @@ import (
 // Load loads, decrypts, and returns an instantiated Safe.
 // In the case that the Safe configuration has changed, the Safe will be upgraded
 // to the latest configuration and saved.
-func Load(password []byte, backend backends.Client, encryptionClient crypto.Client, config *config.Config) (*Safe, error) {
-	ciphertext, err := backend.Load()
+func Load(password []byte, backendClient backends.Client, cryptoClient crypto.Client, config *config.Config) (*Safe, error) {
+	ciphertext, err := backendClient.Load()
 	if err != nil {
 		switch err {
 		case errors.ErrSafeNotFound:
-			return New(password, backend, encryptionClient, config, nil, nil)
+			return New(password, backendClient, cryptoClient, config, nil, nil)
 		default:
 			return nil, err
 		}
@@ -32,7 +32,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 	if err != nil {
 		// Failed to decrypt the safe with its own configuration, fall back to the
 		// user-provided config.
-		plaintext, err = dto.DecryptWithClient(password, encryptionClient)
+		plaintext, err = dto.DecryptWithClient(password, cryptoClient)
 		if err != nil {
 			// The password is definitely incorrect
 			return nil, err
@@ -59,7 +59,7 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		notes = tmp.Notes.Notes
 	}
 
-	s, err := New(password, backend, encryptionClient, config, tmp.Accounts, notes)
+	s, err := New(password, backendClient, cryptoClient, config, tmp.Accounts, notes)
 	if err != nil {
 		return nil, err
 	}
