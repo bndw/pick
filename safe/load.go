@@ -3,6 +3,7 @@ package safe
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"github.com/bndw/pick/backends"
 	"github.com/bndw/pick/config"
@@ -24,17 +25,22 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 		}
 	}
 
+	dto := NewSafeDTO(ciphertext)
+
 	var configChanged bool
-	plaintext, err := decryptSafeDTO(ciphertext, password, nil)
+	plaintext, err := dto.Decrypt(password)
 	if err != nil {
-		// Failed to decrypt the safe with its own configuration,
-		// fall back to the user-provided config.
-		plaintext, err = decryptSafeDTO(ciphertext, password, encryptionClient)
+		// Failed to decrypt the safe with its own configuration, fall back to the
+		// user-provided config.
+		plaintext, err = dto.DecryptWithClient(password, encryptionClient)
 		if err != nil {
 			// The password is definitely incorrect
 			return nil, err
 		}
-
+		configChanged = true
+	} else if !reflect.DeepEqual(*dto.Config, config.Encryption) {
+		// Although the safe was decrypted with its own configuration, the user's
+		// safe config has changed.
 		configChanged = true
 	}
 
@@ -59,33 +65,11 @@ func Load(password []byte, backend backends.Client, encryptionClient crypto.Clie
 	}
 
 	if configChanged {
+		fmt.Println("Upgrading safe")
 		if err := s.save(); err != nil { // nolint: vetshadow
-			fmt.Println("Error saving file", err.Error())
+			fmt.Println("Error saving safe", err.Error())
 		}
 	}
 
 	return s, err
-}
-
-// decryptSafeDTO attempts to decrypt the safeDTO ciphertext with the provided
-// password and config
-func decryptSafeDTO(safeBytes, password []byte, cryptoClient crypto.Client) ([]byte, error) {
-	dto := safeDTO{}
-	if err := json.Unmarshal(safeBytes, &dto); err != nil {
-		// Safe likely uses a legacy format
-		dto.Ciphertext = safeBytes
-		// Use OpenPGP for backwards-compatibility
-		c := crypto.NewDefaultConfigWithType(crypto.ConfigTypeOpenPGP)
-		dto.Config = &c
-	}
-
-	if cryptoClient == nil {
-		var err error
-		cryptoClient, err = crypto.New(dto.Config)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return cryptoClient.Decrypt(dto.Ciphertext, password)
 }

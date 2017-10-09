@@ -15,6 +15,54 @@ const (
 	password = "seabreezes"
 )
 
+func TestLoadWithUpdatedConfig(t *testing.T) {
+	// The safe defined in data was created with 100000 iterations. This test
+	// asserts that when providing an updated config the safe will be updated
+	// accordingly.
+	const expectedIterations = 1024
+	data := []byte(`{"config":{"type":"chachapoly","chachapoly":{"keyderivation":"pbkdf2","pbkdf2":{"hash":"sha512","iterations":100000,"saltlen":16}}},"ciphertext":"eyJzYWx0IjoiUmRMb1lwZ2RzbzNkMjFLWVBvc2ZVZz09Iiwibm9uY2UiOiJjNVVJTTgwZ2NUUEFXNytmIiwiY2lwaGVydGV4dCI6IndmY21Td1kwOWZ0UDNhVDhubjRLRlEzL3ZreXR3ZElHYWFZUThqa0s5NjhoUHhMWjViU21KTmd6YmVPTGRMTXIwdC9GaVVWK0gxdlpWY3ZSZzZnczJmWEljZUhVZXg0QmxBNjN3TkNaMVRxNVNZaEpvMG9nUXVua0xRZ0xVMEc0RFBML3V2bC9sVFRGcWtGd2tUUGhacitFYWp6ZDlaN2Z5QXg5TmpUQm1uM1B5SjhMb1R1Z3VWKzBiY3FJbzcxcmVXcmpUVmc3WWFEVlhlUXRycC92NTFyT0tSYzFtTmhCUkRrU202Q2ZMb2N4b0hEUnBWY3dDNVZzaDVKMTVrWWJXUzF2QlJvWVp4TGM4S1g0Nm1BbHJDZ3ZRYU51R0FCczVFbVd2WFg1ZVlQR0hwMWl5RTByWGVoRXV2YXFmVlg4OUF0T3Q3RUp2aTJMenBmR0tOSmFBN1hiWFlvZ1IyL0FBTTVvOVBxV3p1aUlqalJXYVRsTVJZVnJHUGc3UENRRWNteUZhWVRkdnZyZnRHbHpLdXlFdmk5VlJZY2NPS1A1cGFZSURwbTlEd0hTOTh1dlByNDdHeHJxdU9OOFhrREx2RXUzTGFrMk1pUFZjUGF0Y09LaTArRnFqV3QzZC8vc2NkMXNZMkpSVGFHTnhsVFUvZFhLNXJEV0xSTTlFT0FITlF2dE9oeHhTQXVSdmlKOUdwSm5FTXJram5ZdHFYZVhpcU4ybXdiTmx0b2VMdER1RjdOQUhxKzlCM3NUaC81ajVRMVhuWlRPN1BrTjFIQ1J5b0xKdHhIUnVIaWpUbHU2NG1JVFdEbTludDNQcDNmRzJBV3d2cHFqUGorV3dRUlZsanIyU3JtbGxsZ0pzZlVNL0xhQUNoV2dzTnV0M3dOTmJQRC9wVVFDL3k1d2hqcFlzZEIzQ3Y4QlZQY3dOR21ZK2hFMXEyZEZkRGs3SklqaS9JeG0yUTkwbnBjUnBDa29XS3lwUzNPQmtweW9QWGZMa1J5WWJjNkFNNGdSZWM2MGhxMC8ifQ=="}
+	`)
+	cryptoConfig := crypto.Config{
+		Type: crypto.ConfigTypeChaChaPoly,
+		ChaCha20Poly1305Settings: &crypto.ChaCha20Poly1305Settings{
+			KeyDerivation: "pbkdf2",
+			PBKDF2: &pbkdf2.PBKDF2{
+				Hash:       "sha512",
+				Iterations: expectedIterations,
+				SaltLen:    16,
+			},
+		},
+	}
+	cryptoClient, err := crypto.New(&cryptoConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	conf := &config.Config{
+		Encryption: cryptoConfig,
+		Storage: backends.Config{
+			Type: backends.ConfigTypeMock,
+		},
+		Version: "0.6.0",
+	}
+	backendClient := backends.NewMockBackend()
+	backendClient.Data = data
+
+	s, err := safe.Load([]byte(password), backendClient, cryptoClient, conf)
+	if err != nil {
+		t.Fatalf("Failed to load safe: %s", err.Error())
+	}
+	if _, err := s.Get("test"); err != nil {
+		t.Fatalf("Failed to get 'test' safe account: %s", err.Error())
+	}
+
+	// Make sure the safe's iterations have been updated
+	dto := safe.NewSafeDTO(backendClient.Data)
+	if dto.Config.ChaCha20Poly1305Settings.PBKDF2.Iterations != expectedIterations {
+		t.Fatalf("Expected safe to be upgraded when config changed")
+	}
+}
+
 func TestLoad(t *testing.T) {
 	backendConfig := backends.Config{
 		Type: backends.ConfigTypeMock,

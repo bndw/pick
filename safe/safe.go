@@ -1,6 +1,7 @@
 package safe
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/bndw/pick/backends"
@@ -86,4 +87,35 @@ func (s *Safe) RequireCompatibilityWith(version string) error {
 type safeDTO struct {
 	Config     *crypto.Config `json:"config"`
 	Ciphertext []byte         `json:"ciphertext"`
+}
+
+// NewSafeDTO returns a safeDTO from the bytes provided from a Backend.
+// If we cannot decode the bytes we assume the safe uses a very old, legacy
+// format and provide an OpenPGP Config.
+func NewSafeDTO(safeBytes []byte) *safeDTO {
+	dto := safeDTO{}
+	if err := json.Unmarshal(safeBytes, &dto); err != nil {
+		// Safe likely uses a legacy format
+		dto.Ciphertext = safeBytes
+		// Use OpenPGP for backwards-compatibility
+		c := crypto.NewDefaultConfigWithType(crypto.ConfigTypeOpenPGP)
+		dto.Config = &c
+	}
+
+	return &dto
+}
+
+// Decrypt decrypts a safeDTO using its crypto Client
+func (dto *safeDTO) Decrypt(password []byte) ([]byte, error) {
+	cryptoClient, err := crypto.New(dto.Config)
+	if err != nil {
+		return nil, err
+	}
+
+	return cryptoClient.Decrypt(dto.Ciphertext, password)
+}
+
+// DecryptWithClient decrypts a safeDTO using the provided crypto Client
+func (dto *safeDTO) DecryptWithClient(password []byte, c crypto.Client) ([]byte, error) {
+	return c.Decrypt(dto.Ciphertext, password)
 }
