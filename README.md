@@ -5,7 +5,7 @@ pick
 
 A minimal password manager for macOS and Linux.
 
-![demo](./demo.gif)
+![demo](https://user-images.githubusercontent.com/4248167/29298817-564f4f54-811f-11e7-9a54-934afa1374df.gif)
 
 ## Install
 
