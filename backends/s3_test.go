@@ -2,13 +2,11 @@ package backends
 
 import (
 	"testing"
-
-	"github.com/bndw/pick/backends"
 )
 
 func TestNewDefaultS3Backend(t *testing.T) {
-	backend, err := backends.NewS3Backend(backends.Config{
-		Type: backends.ConfigTypeS3,
+	backend, err := NewS3Backend(Config{
+		Type: ConfigTypeS3,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -29,8 +27,8 @@ func TestNewDefaultS3Backend(t *testing.T) {
 func TestNewS3BackendWithBucket(t *testing.T) {
 	const bucket = "pick"
 
-	backend, err := backends.NewS3Backend(backends.Config{
-		Type: backends.ConfigTypeS3,
+	backend, err := NewS3Backend(Config{
+		Type: ConfigTypeS3,
 		Settings: map[string]interface{}{
 			"bucket": bucket,
 		},
@@ -57,8 +55,8 @@ func TestNewS3BackendWithBucketAndKey(t *testing.T) {
 		key    = "public/default.safe"
 	)
 
-	backend, err := backends.NewS3Backend(backends.Config{
-		Type: backends.ConfigTypeS3,
+	backend, err := NewS3Backend(Config{
+		Type: ConfigTypeS3,
 		Settings: map[string]interface{}{
 			"bucket": bucket,
 			"key":    key,
@@ -88,8 +86,8 @@ func TestNewS3BackendWithAllOverrides(t *testing.T) {
 		profile = "dev"
 	)
 
-	backend, err := backends.NewS3Backend(backends.Config{
-		Type: backends.ConfigTypeS3,
+	backend, err := NewS3Backend(Config{
+		Type: ConfigTypeS3,
 		Settings: map[string]interface{}{
 			"bucket":  bucket,
 			"key":     key,
