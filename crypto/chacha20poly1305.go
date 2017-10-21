@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"golang.org/x/crypto/chacha20poly1305"
-
 	"github.com/bndw/pick/crypto/pbkdf2"
 	"github.com/bndw/pick/crypto/scrypt"
 	"github.com/bndw/pick/errors"
+	"golang.org/x/crypto/chacha20poly1305"
 )
 
 type ChaCha20Poly1305Client struct {
