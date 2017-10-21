@@ -17,9 +17,9 @@ const (
 )
 
 type Config struct {
-	Encryption crypto.Config
-	Storage    backends.Config
-	General    generalConfig
+	Encryption crypto.Config   `json:"-"`
+	Storage    backends.Config `json:"-"`
+	General    generalConfig   `json:"-"`
 	Version    string
 }
 
