@@ -1,8 +1,8 @@
 package backends
 
 type Client interface {
-	Load() ([]byte, error)
-	Save([]byte) error
+	Load() (data []byte, err error)
+	Save(data []byte) error
 	Backup() error
 	SafeLocation() string
 }
