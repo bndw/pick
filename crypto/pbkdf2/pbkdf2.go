@@ -59,7 +59,10 @@ func (p *PBKDF2) DeriveKey(password []byte, keyLen int) ([]byte, []byte, error) 
 		return nil, nil, err
 	}
 
-	key, _ := p.DeriveKeyWithSalt(password, salt, keyLen)
+	key, err := p.DeriveKeyWithSalt(password, salt, keyLen)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	return key, salt, nil
 }
