@@ -3,16 +3,19 @@ pick
 [![Build Status](https://travis-ci.org/bndw/pick.svg?branch=master)](https://travis-ci.org/bndw/pick)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bndw/pick)](https://goreportcard.com/report/github.com/bndw/pick)
 
-A secure and easy-to-use password manager for macOS and Linux
+A secure and easy-to-use password manager for macOS and Linux.
 
 ![demo](https://user-images.githubusercontent.com/4248167/29298817-564f4f54-811f-11e7-9a54-934afa1374df.gif)
 
 ## Features
+
 * Strong, configurable modern encryption with sensible defaults
 * Configurable backend storage
 * Password generator
 * Secure notes
 * Clipboard support
+* Sync support
+* Automatic backups
 * Export to JSON
 * No external dependencies
 
