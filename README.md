@@ -3,9 +3,21 @@ pick
 [![Build Status](https://travis-ci.org/bndw/pick.svg?branch=master)](https://travis-ci.org/bndw/pick)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bndw/pick)](https://goreportcard.com/report/github.com/bndw/pick)
 
-A minimal password manager for macOS and Linux.
+A secure and easy-to-use password manager for macOS and Linux.
 
 ![demo](https://user-images.githubusercontent.com/4248167/29298817-564f4f54-811f-11e7-9a54-934afa1374df.gif)
+
+## Features
+
+* Strong, configurable modern encryption with sensible defaults
+* Configurable backend storage
+* Password generator
+* Secure notes
+* Clipboard support
+* Sync support
+* Automatic backups
+* Export to JSON
+* No external dependencies
 
 ## Install
 
@@ -28,11 +40,11 @@ make install
 
 ## Getting started
 
-If you haven't used `pick` before, you first need to initialize your pick safe. This is straightforward:
+If you haven't used `pick` before, you first need to initialize your pick safe.
 ```sh
 pick init
 ```
-Running `pick init` will ask you for a master password. Your master password is used to encrypt your pick safe. As this is the only password you need to remember to access all passwords and notes stored in your pick safe, make this a strong and unique one! Use `pick pass` to generate a strong password if you think you're not creative enough :).
+Running `pick init` will ask you for a master password. Your master password is used to encrypt your pick safe. As this is the only password you need to remember to access all passwords and notes stored in your pick safe, make this a strong and unique one!
 
 ### Adding a credential
 
@@ -40,7 +52,7 @@ Once `pick` has been initialized, adding a new credential is easy:
 ```sh
 pick add github
 ```
-This will ask you for your master password first which is required to store something in the pick safe.
+This will ask you for your master password first which is required to access the pick safe.
 Then type in your username which should be used for the `github` credential.
 `pick` will now ask you if you already have a password for `github` or if should create a new one for you.
 Done. Credential added.
