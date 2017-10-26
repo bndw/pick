@@ -9,29 +9,32 @@ A secure and easy-to-use password manager for macOS and Linux.
 
 ## Features
 
-* Strong, configurable modern encryption with sensible defaults
-* Configurable backend storage
-* Password generator
+* Strong, modern encryption with sensible defaults (ChaChaPoly, AES-GCM, Open PGP)
+* Configurable safe storage (file, AWS S3)
 * Secure notes
+* Built-in password generator
 * Clipboard support
-* Sync support
 * Automatic backups
-* Export to JSON
+* Sync multiple safes
+* Export accounts to JSON
 * No external dependencies
 
 ## Install
+**go get**
 
-#### go get
 ```sh
 go get -u github.com/bndw/pick
 ```
 
-#### Homebrew
+**homebrew**
+
 ```sh
 brew install bndw/pick/pick-pass
 ```
 
-#### make
+
+**from source**
+
 ```sh
 git clone https://github.com/bndw/pick && cd pick
 make
@@ -40,38 +43,41 @@ make install
 
 ## Getting started
 
-If you haven't used `pick` before, you first need to initialize your pick safe.
+If you haven't used `pick` before, first initialize your safe and set a master password:
 ```sh
 pick init
 ```
-Running `pick init` will ask you for a master password. Your master password is used to encrypt your pick safe. As this is the only password you need to remember to access all passwords and notes stored in your pick safe, make this a strong and unique one!
+Make your master password strong, unique, and don't forget it! You'll need
+your master password to access your safe and without it your accounts will be lost.
 
-### Adding a credential
+**Store an account**
 
-Once `pick` has been initialized, adding a new credential is easy:
 ```sh
-pick add github
+pick add work/email
 ```
-This will ask you for your master password first which is required to access the pick safe.
-Then type in your username which should be used for the `github` credential.
-`pick` will now ask you if you already have a password for `github` or if should create a new one for you.
-Done. Credential added.
 
-### Listing your credentials
-
+**List accounts**
+ 
 ```sh
 pick ls
 ```
 
-### Copy a credential's password to your clipboard
+**View an account**
 
 ```sh
-pick cp github
+pick cat work/email
 ```
 
-For all commands, please refer to [Usage](#usage).
+**Copy a password to the clipboard**
+
+```sh
+pick cp work/email
+```
+
+*For all commands, please refer to the [Usage](#usage) with `pick --help`.*
 
 ## Usage
+
 ```
 Usage:
   pick [command]
@@ -96,10 +102,11 @@ Available Commands:
 Use "pick [command] --help" for more information about a command.
 ```
 
-## Threat model
+## Security
 
-Although `pick` is focused on security, once an adversary somehow gains write access to your computer where the `pick` binary is stored, he can simply exchange it and record your master password to decrypt your pick safe.
-If you decide to store the pick safe on a remote drive (e.g. a remote server), the system will be secure even if an adversary can modify the pick safe. As this safe is encrypted and authenticated, he can not modify or decrypt it.
+While `pick` is focused on security, vulnerabilities or backdoors in hardware, including hard drives, memory chips, CPU or peripherals are outside of our threat model.
+
+If you've found a vulnerability or a potential vulnerability in pick please let us know by [opening an issue](https://github.com/bndw/pick/issues/new).
 
 ## Similar software
 * [pwd.sh: Unix shell, GPG-based password manager](https://github.com/drduh/pwd.sh)
