@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/bndw/pick/backends"
+	fileBackend "github.com/bndw/pick/backends/file"
 	"github.com/bndw/pick/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -35,7 +36,7 @@ func Sync(args []string, flags *pflag.FlagSet) error {
 	otherStorageConfig := config.Storage
 	// TODO(leon): :(
 	otherStorageConfig.Settings["path"] = otherSafePath
-	otherBackendClient, err := backends.NewDiskBackend(otherStorageConfig)
+	otherBackendClient, err := backends.NewWithType(fileBackend.ClientName, &otherStorageConfig)
 	if err != nil {
 		return err
 	}

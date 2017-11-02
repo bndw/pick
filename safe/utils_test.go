@@ -1,19 +1,16 @@
 package safe
 
 import (
-	"io/ioutil"
-	"os"
+	"testing"
 
 	"github.com/bndw/pick/backends"
+	mockBackend "github.com/bndw/pick/backends/mock"
 	"github.com/bndw/pick/config"
 	"github.com/bndw/pick/crypto"
 )
 
-func init() {
-	removeTestSafe()
-}
-
 const (
+	testSafePassword = "seabreezes"
 	// testSafeContent has one account in it, "foo".
 	testSafeContent = `-----BEGIN PGP MESSAGE-----
 
@@ -23,29 +20,14 @@ UHBuCvFGG4ENExdLliCsixI1bP8KB2TlLH459U859KWkg1aEJJ+1FeDR5E1GwV5y
 Jn766KqjJFAUxwvguuNHI0fMMcIyfeA+4uNDsmXg+uRsGhwVdCP509FRtqes0EPh
 4mqkkV7hFAgA=geI2
 -----END PGP MESSAGE-----`
-	testSafeName = "test.safe"
 )
 
-var (
-	testSafePassword = []byte("seabreezes")
-)
+func createTestSafe(t *testing.T) (*Safe, error) {
+	// t.Helper() // TOOD(leon): Go 1.9 only :(
 
-func createTestSafe() (*Safe, error) {
-	err := ioutil.WriteFile(testSafeName, []byte(testSafeContent), 0600)
-	if err != nil {
-		return nil, err
-	}
-
-	backendConfig := backends.Config{
-		Type: backends.ConfigTypeFile,
-		Settings: map[string]interface{}{
-			"path": testSafeName,
-		},
-	}
-	backendClient, err := backends.New(&backendConfig)
-	if err != nil {
-		return nil, err
-	}
+	backendConfig := backends.NewDefaultConfig()
+	backendClient := mockBackend.NewForTesting(t, &backendConfig)
+	backendClient.Data = []byte(testSafeContent)
 
 	cryptoConfig := crypto.Config{
 		Type: crypto.ConfigTypeOpenPGP,
@@ -67,13 +49,9 @@ func createTestSafe() (*Safe, error) {
 	}
 
 	return Load(
-		testSafePassword,
+		[]byte(testSafePassword),
 		backendClient,
 		cryptoClient,
 		config,
 	)
-}
-
-func removeTestSafe() {
-	_ = os.Remove(testSafeName)
 }

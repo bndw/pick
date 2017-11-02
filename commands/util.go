@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/bndw/pick/backends"
+	fileBackend "github.com/bndw/pick/backends/file"
+	s3Backend "github.com/bndw/pick/backends/s3"
 	"github.com/bndw/pick/crypto"
 	"github.com/bndw/pick/errors"
 	"github.com/bndw/pick/safe"
@@ -141,4 +143,9 @@ func newCryptoClient() (crypto.Client, error) {
 func handleError(err error) int {
 	fmt.Println(err)
 	return 1
+}
+
+func init() {
+	fileBackend.Register()
+	s3Backend.Register()
 }

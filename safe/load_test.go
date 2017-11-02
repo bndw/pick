@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/bndw/pick/backends"
+	mockBackend "github.com/bndw/pick/backends/mock"
 	"github.com/bndw/pick/config"
 	"github.com/bndw/pick/crypto"
 	"github.com/bndw/pick/crypto/pbkdf2"
@@ -40,12 +41,10 @@ func TestLoadWithUpdatedConfig(t *testing.T) {
 
 	conf := &config.Config{
 		Encryption: cryptoConfig,
-		Storage: backends.Config{
-			Type: backends.ConfigTypeMock,
-		},
-		Version: "0.6.0",
+		Storage:    backends.NewDefaultConfig(),
+		Version:    "0.6.0",
 	}
-	backendClient := backends.NewMockBackend()
+	backendClient := mockBackend.NewForTesting(t, &conf.Storage)
 	backendClient.Data = data
 
 	s, err := safe.Load([]byte(password), backendClient, cryptoClient, conf)
@@ -64,10 +63,8 @@ func TestLoadWithUpdatedConfig(t *testing.T) {
 }
 
 func TestLoad(t *testing.T) {
-	backendConfig := backends.Config{
-		Type: backends.ConfigTypeMock,
-	}
-	backendClient := backends.NewMockBackend()
+	backendConfig := backends.NewDefaultConfig()
+	backendClient := mockBackend.NewForTesting(t, &backendConfig)
 	for i, cryptoConfig := range safeCryptoConfigs {
 		cryptoClient, err := crypto.New(&cryptoConfig)
 		if err != nil {

@@ -9,7 +9,7 @@ import (
 	"github.com/bndw/pick/crypto"
 	"github.com/bndw/pick/utils/clipboard"
 	"github.com/bndw/pick/utils/pswdgen"
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 )
 
 const (

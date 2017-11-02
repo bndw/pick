@@ -5,11 +5,10 @@ import (
 )
 
 func TestEdit(t *testing.T) {
-	safe, err := createTestSafe()
+	safe, err := createTestSafe(t)
 	if err != nil {
 		t.Error(err)
 	}
-	defer removeTestSafe()
 
 	account, err := safe.Edit("foo", "Bubbles", "kitt3ns")
 	if err != nil {

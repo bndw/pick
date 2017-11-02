@@ -1,24 +1,24 @@
-package backends_test
+package mock_test
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/bndw/pick/backends"
+	mockBackend "github.com/bndw/pick/backends/mock"
 )
 
 var (
 	mockTestData = []byte("This is only a test")
 )
 
-func TestNewMockBackend(t *testing.T) {
-	if b := backends.NewMockBackend(); b == nil {
+func TestNewBackend(t *testing.T) {
+	if b := mockBackend.NewForTesting(t, nil); b == nil {
 		t.Errorf("Expected new mockBackend, got nil")
 	}
 }
 
 func TestMockBackup(t *testing.T) {
-	b := backends.NewMockBackend()
+	b := mockBackend.NewForTesting(t, nil)
 
 	if err := b.Backup(); err != nil {
 		t.Errorf("Backup failed with %s", err)
@@ -26,7 +26,7 @@ func TestMockBackup(t *testing.T) {
 }
 
 func TestMockLoad(t *testing.T) {
-	b := backends.NewMockBackend()
+	b := mockBackend.NewForTesting(t, nil)
 	b.Data = mockTestData
 
 	data, err := b.Load()
@@ -39,7 +39,7 @@ func TestMockLoad(t *testing.T) {
 }
 
 func TestMockSave(t *testing.T) {
-	b := backends.NewMockBackend()
+	b := mockBackend.NewForTesting(t, nil)
 
 	if err := b.Save(mockTestData); err != nil {
 		t.Errorf("Load failed with %s", err)

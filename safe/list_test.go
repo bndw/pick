@@ -5,11 +5,10 @@ import (
 )
 
 func TestList(t *testing.T) {
-	safe, err := createTestSafe()
+	safe, err := createTestSafe(t)
 	if err != nil {
 		t.Error(err)
 	}
-	defer removeTestSafe()
 
 	accounts := safe.List()
 	if len(accounts) < 1 {

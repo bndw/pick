@@ -1,17 +1,13 @@
-package backends
+package s3
 
 import (
 	"testing"
+
+	"github.com/bndw/pick/backends"
 )
 
 func TestNewDefaultS3Backend(t *testing.T) {
-	backend, err := NewS3Backend(Config{
-		Type: ConfigTypeS3,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
+	backend := newS3Backend(t, nil)
 	if backend == nil {
 		t.Fatalf("Expected new S3Backend, got nil")
 	}
@@ -27,16 +23,11 @@ func TestNewDefaultS3Backend(t *testing.T) {
 func TestNewS3BackendWithBucket(t *testing.T) {
 	const bucket = "pick"
 
-	backend, err := NewS3Backend(Config{
-		Type: ConfigTypeS3,
+	backend := newS3Backend(t, &backends.Config{
 		Settings: map[string]interface{}{
 			"bucket": bucket,
 		},
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	if backend == nil {
 		t.Fatalf("Expected new S3Backend, got nil")
 	}
@@ -55,17 +46,12 @@ func TestNewS3BackendWithBucketAndKey(t *testing.T) {
 		key    = "public/default.safe"
 	)
 
-	backend, err := NewS3Backend(Config{
-		Type: ConfigTypeS3,
+	backend := newS3Backend(t, &backends.Config{
 		Settings: map[string]interface{}{
 			"bucket": bucket,
 			"key":    key,
 		},
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	if backend == nil {
 		t.Fatalf("Expected new S3Backend, got nil")
 	}
@@ -86,8 +72,7 @@ func TestNewS3BackendWithAllOverrides(t *testing.T) {
 		profile = "dev"
 	)
 
-	backend, err := NewS3Backend(Config{
-		Type: ConfigTypeS3,
+	backend := newS3Backend(t, &backends.Config{
 		Settings: map[string]interface{}{
 			"bucket":  bucket,
 			"key":     key,
@@ -95,10 +80,6 @@ func TestNewS3BackendWithAllOverrides(t *testing.T) {
 			"profile": profile,
 		},
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	if backend == nil {
 		t.Fatalf("Expected new S3Backend, got nil")
 	}
@@ -109,4 +90,21 @@ func TestNewS3BackendWithAllOverrides(t *testing.T) {
 	if backend.Key != key {
 		t.Errorf("Expected new key %s to be used, got %s", key, backend.Key)
 	}
+}
+
+func newS3Backend(t *testing.T, config *backends.Config) *client {
+	// t.Helper() // TOOD(leon): Go 1.9 only :(
+	if config == nil {
+		tmp := backends.NewDefaultConfig()
+		config = &tmp
+	}
+	c, err := backends.NewWithType(ClientName, config)
+	if err != nil {
+		t.Fatalf("Failed to create S3 backend: %v", err)
+	}
+	return c.(*client)
+}
+
+func init() {
+	Register()
 }

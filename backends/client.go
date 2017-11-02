@@ -8,14 +8,14 @@ type Client interface {
 }
 
 func New(config *Config) (Client, error) {
-	switch config.Type {
-	default:
-		fallthrough
-	case ConfigTypeFile:
-		return NewDiskBackend(*config)
-	case ConfigTypeS3:
-		return NewS3Backend(*config)
-	case ConfigTypeMock:
-		return NewMockBackend(), nil
+	c, err := clientByName(config.Type)
+	if err != nil {
+		return nil, err
 	}
+	return c.newClientFunc(config)
+}
+
+func NewWithType(t string, config *Config) (Client, error) {
+	config.Type = t
+	return New(config)
 }
