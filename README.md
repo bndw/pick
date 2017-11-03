@@ -20,20 +20,21 @@ A secure and easy-to-use password manager for macOS and Linux.
 * No external dependencies
 
 ## Install
-**go get**
+
+#### go get
 
 ```sh
 go get -u github.com/bndw/pick
 ```
 
-**Homebrew**
+#### Homebrew
 
 ```sh
 brew install bndw/pick/pick-pass
 ```
 
 
-**From source**
+#### From source
 
 ```sh
 git clone https://github.com/bndw/pick && cd pick
@@ -50,25 +51,25 @@ pick init
 Make your master password strong, unique, and don't forget it! You'll need
 your master password to access your safe. Without it your safe can not be unlocked.
 
-**Add an account**
+#### Add an account
 
 ```sh
 pick add work/email
 ```
 
-**List accounts**
+#### List accounts
  
 ```sh
 pick ls
 ```
 
-**View an account**
+#### View an account
 
 ```sh
 pick cat work/email
 ```
 
-**Copy a password to the clipboard**
+#### Copy a password to the clipboard
 
 ```sh
 pick cp work/email
@@ -104,7 +105,11 @@ Use "pick [command] --help" for more information about a command.
 
 ## Security
 
-While `pick` is focused on security, vulnerabilities or backdoors in hardware, including hard drives, memory chips, CPU or peripherals are outside of our threat model.
+`pick` is focused on security and to this end it is _essential_ to only run the `pick` binary on a
+trusted computer. Conversely, you don't necessarily need to trust the computer or server
+storing the pick safe (e.g. `Amazon S3`). This is because the pick safe is encrypted and
+authenticated and cannot by decrypted or unnoticeably modified without the
+master password.
 
 If you've found a vulnerability or a potential vulnerability in pick please email us at pick-security@bndw.co. We'll send a confirmation email to acknowledge your report, and we'll send an additional email when we've identified the issue positively or negatively.
 
