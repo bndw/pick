@@ -44,12 +44,13 @@ make install
 
 ## Getting started
 
-If you haven't used `pick` before, first initialize your safe to set a master password:
+If you haven't used `pick` before, first initialize your safe to set a master
+password:
 ```sh
 pick init
 ```
-Make your master password strong, unique, and don't forget it! You'll need
-your master password to access your safe. Without it your safe can not be unlocked.
+Make your master password strong, unique, and don't forget it! You'll need your
+master password to access your safe. Without it your safe can not be unlocked.
 
 #### Add an account
 
@@ -105,13 +106,16 @@ Use "pick [command] --help" for more information about a command.
 
 ## Security
 
-`pick` is focused on security and to this end it is _essential_ to only run the `pick` binary on a
-trusted computer. Conversely, you don't necessarily need to trust the computer or server
-storing the pick safe (e.g. `Amazon S3`). This is because the pick safe is encrypted and
-authenticated and cannot by decrypted or unnoticeably modified without the
-master password.
+`pick` is focused on security and to this end it is _essential_ to only run the 
+`pick` binary on a trusted computer. Conversely, you don't necessarily need to 
+trust the computer or server storing the pick safe (e.g. `Amazon S3`). This is
+because the pick safe is encrypted and authenticated and cannot by decrypted or
+unnoticeably modified without the master password.
 
-If you've found a vulnerability or a potential vulnerability in pick please email us at pick-security@bndw.co. We'll send a confirmation email to acknowledge your report, and we'll send an additional email when we've identified the issue positively or negatively.
+If you've found a vulnerability or a potential vulnerability in pick please
+email us at pick-security@bndw.co. We'll send a confirmation email to
+acknowledge your report, and we'll send an additional email when we've
+identified the issue positively or negatively.
 
 ## Similar software
 * [pwd.sh: Unix shell, GPG-based password manager](https://github.com/drduh/pwd.sh)
