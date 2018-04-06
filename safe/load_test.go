@@ -44,7 +44,7 @@ func TestLoadWithUpdatedConfig(t *testing.T) {
 		Storage:    backends.NewDefaultConfig(),
 		Version:    "0.6.0",
 	}
-	backendClient := mockBackend.NewForTesting(t, &conf.Storage)
+	backendClient := mockBackend.NewForTesting(t, &conf.Storage, false)
 	backendClient.Data = data
 
 	s, err := safe.Load([]byte(password), backendClient, cryptoClient, conf)
@@ -64,7 +64,7 @@ func TestLoadWithUpdatedConfig(t *testing.T) {
 
 func TestLoad(t *testing.T) {
 	backendConfig := backends.NewDefaultConfig()
-	backendClient := mockBackend.NewForTesting(t, &backendConfig)
+	backendClient := mockBackend.NewForTesting(t, &backendConfig, false)
 	for i, cryptoConfig := range safeCryptoConfigs {
 		cryptoClient, err := crypto.New(&cryptoConfig)
 		if err != nil {

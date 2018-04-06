@@ -6,7 +6,12 @@ import (
 	"strings"
 
 	"github.com/bndw/pick/backends"
+	"github.com/marcsauter/single"
 	homedir "github.com/mitchellh/go-homedir"
+)
+
+const (
+	lockFileName = "pick"
 )
 
 func _new(config *backends.Config) (backends.Client, error) {
@@ -27,10 +32,14 @@ func _new(config *backends.Config) (backends.Client, error) {
 
 	config.Backup.DirPath = fmt.Sprintf(defaultBackupDir, homeDir, defaultSafeDirName)
 
-	return &client{
+	lock := single.New(lockFileName)
+	c := &client{
+		lock:         lock,
 		path:         safePath,
 		backupConfig: config.Backup,
-	}, nil
+	}
+
+	return c, nil
 }
 
 func formatHomeDir(str, home string) string {

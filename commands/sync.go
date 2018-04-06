@@ -25,7 +25,7 @@ func Sync(args []string, flags *pflag.FlagSet) error {
 		return err
 	}
 
-	safeLoader := newSafeLoader()
+	safeLoader := newSafeLoader(true)
 
 	safe, err := safeLoader.Load()
 	if err != nil {

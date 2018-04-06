@@ -5,7 +5,7 @@ import (
 )
 
 func TestGet(t *testing.T) {
-	safe, err := createTestSafe(t)
+	safe, err := createTestSafe(t, false)
 	if err != nil {
 		t.Error(err)
 	}

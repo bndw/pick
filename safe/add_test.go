@@ -11,7 +11,7 @@ const (
 )
 
 func TestAdd(t *testing.T) {
-	safe, err := createTestSafe(t)
+	safe, err := createTestSafe(t, true)
 	if err != nil {
 		t.Error(err)
 	}

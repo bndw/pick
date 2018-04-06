@@ -6,6 +6,7 @@ import (
 
 	"github.com/bndw/pick/backends"
 	"github.com/bndw/pick/errors"
+	"github.com/marcsauter/single"
 )
 
 const (
@@ -17,6 +18,9 @@ const (
 )
 
 type client struct {
+	writable bool
+	lock     *single.Single
+
 	path         string
 	backupConfig backends.BackupConfig
 }
@@ -34,6 +38,10 @@ func (c *client) Load() ([]byte, error) {
 }
 
 func (c *client) Save(data []byte) error {
+	if !c.writable {
+		return errors.ErrSafeNotWritable
+	}
+
 	tmpFile := c.path + ".tmp"
 	if err := ioutil.WriteFile(tmpFile, data, defaultSafeFileMode); err != nil {
 		_ = os.Remove(tmpFile)
@@ -48,4 +56,29 @@ func (c *client) Save(data []byte) error {
 
 func (c *client) SafeLocation() string {
 	return c.path
+}
+
+func (c *client) IsWritable() bool {
+	return c.writable
+}
+
+func (c *client) SetWritable(writable bool) error {
+	c.writable = writable
+	if writable {
+		// NOTE(leon): No need to call c.Unlock(). The lock is automatically released again once this instance of pick terminates.
+		if err := c.Lock(); err == single.ErrAlreadyRunning {
+			return errors.ErrAlreadyRunning
+		} else {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *client) Lock() error {
+	return c.lock.CheckLock()
+}
+
+func (c *client) Unlock() error {
+	return c.lock.TryUnlock()
 }

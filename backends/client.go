@@ -5,6 +5,10 @@ type Client interface {
 	Save(data []byte) error
 	Backup() error
 	SafeLocation() string
+	IsWritable() bool
+	SetWritable(writable bool) error
+	Lock() error
+	Unlock() error
 }
 
 func New(config *Config) (Client, error) {

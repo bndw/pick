@@ -22,11 +22,11 @@ Jn766KqjJFAUxwvguuNHI0fMMcIyfeA+4uNDsmXg+uRsGhwVdCP509FRtqes0EPh
 -----END PGP MESSAGE-----`
 )
 
-func createTestSafe(t *testing.T) (*Safe, error) {
+func createTestSafe(t *testing.T, writable bool) (*Safe, error) {
 	// t.Helper() // TOOD(leon): Go 1.9 only :(
 
 	backendConfig := backends.NewDefaultConfig()
-	backendClient := mockBackend.NewForTesting(t, &backendConfig)
+	backendClient := mockBackend.NewForTesting(t, &backendConfig, writable)
 	backendClient.Data = []byte(testSafeContent)
 
 	cryptoConfig := crypto.Config{

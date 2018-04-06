@@ -2,6 +2,7 @@ package s3
 
 import (
 	"bytes"
+	builtinerrors "errors"
 	"fmt"
 	"io"
 	"time"
@@ -29,6 +30,8 @@ const (
 //		AWS_REGION
 //
 type client struct {
+	writable bool
+
 	Bucket string
 	Key    string
 	svc    *s3.S3
@@ -52,6 +55,10 @@ func (c *client) Load() ([]byte, error) {
 
 // Save writes data to S3
 func (c *client) Save(data []byte) error {
+	if !c.writable {
+		return errors.ErrSafeNotWritable
+	}
+
 	return c.putObject(bytes.NewReader(data), c.Bucket, c.Key)
 }
 
@@ -73,6 +80,26 @@ func (c *client) Backup() error {
 	}
 
 	return c.putObject(bytes.NewReader(data), c.Bucket, backupKey)
+}
+
+func (c *client) IsWritable() bool {
+	return c.writable
+}
+
+func (c *client) SetWritable(writable bool) error {
+	c.writable = writable
+	// TODO: Implement me!
+	return builtinerrors.New("not implemented")
+}
+
+func (c *client) Lock() error {
+	// TODO: Implement me!
+	return builtinerrors.New("not implemented")
+}
+
+func (c *client) Unlock() error {
+	// TODO: Implement me!
+	return builtinerrors.New("not implemented")
 }
 
 func (c *client) getObject(bucket, key string) (io.ReadCloser, error) {

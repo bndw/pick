@@ -16,11 +16,11 @@ const (
 )
 
 func TestSyncSameHistory(t *testing.T) {
-	safe1, err := createTestSafe(t)
+	safe1, err := createTestSafe(t, true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	safe2, err := createTestSafe(t)
+	safe2, err := createTestSafe(t, true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,11 +77,11 @@ func TestSyncSameHistory(t *testing.T) {
 }
 
 func TestSyncDifferentHistory(t *testing.T) {
-	safe1, err := createTestSafe(t)
+	safe1, err := createTestSafe(t, true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	safe2, err := createTestSafe(t)
+	safe2, err := createTestSafe(t, true)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -69,6 +69,11 @@
   version = "v1.0"
 
 [[projects]]
+  name = "github.com/marcsauter/single"
+  packages = ["."]
+  revision = "3f6ac6766709f17b529a516abd96745824431eb0"
+
+[[projects]]
   name = "github.com/mitchellh/go-homedir"
   packages = ["."]
   revision = "b8bc1bf767474819792c23f32d8286a45736f1c6"

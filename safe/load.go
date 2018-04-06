@@ -65,6 +65,12 @@ func Load(password []byte, backendClient backends.Client, cryptoClient crypto.Cl
 	}
 
 	if configChanged {
+		w := backendClient.IsWritable()
+		// Make safe writable
+		backendClient.SetWritable(true)
+		// Restore old mode
+		defer backendClient.SetWritable(w)
+
 		fmt.Println("Upgrading safe")
 		if err := s.save(); err != nil { // nolint: vetshadow
 			fmt.Println("Error saving safe", err.Error())

@@ -19,7 +19,7 @@ Jn766KqjJFAUxwvguuNHI0fMMcIyfeA+4uNDsmXg+uRsGhwVdCP509FRtqes0EPh
 	return &client{Data: safeData}, nil
 }
 
-func NewForTesting(t *testing.T, config *backends.Config) *client {
+func NewForTesting(t *testing.T, config *backends.Config, writable bool) *client {
 	// t.Helper() // TOOD(leon): Go 1.9 only :(
 	if config == nil {
 		tmp := backends.NewDefaultConfig()
@@ -32,5 +32,6 @@ func NewForTesting(t *testing.T, config *backends.Config) *client {
 	if err != nil {
 		t.Fatalf("Failed to create mock backend: %v", err)
 	}
+	c.SetWritable(writable)
 	return c.(*client)
 }
