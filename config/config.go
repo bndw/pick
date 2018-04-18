@@ -46,8 +46,8 @@ func Load(rootCmd *cobra.Command, version string) (*Config, error) {
 	viper.SetConfigType("toml")
 
 	rootCmd.PersistentFlags().String("safe", "", "Overwrite path to safe file")
-	viper.BindPFlag("storage.settings.path", rootCmd.PersistentFlags().Lookup("safe"))   // file backend
-	viper.BindPFlag("storage.settings.bucket", rootCmd.PersistentFlags().Lookup("safe")) // s3 backend
+	viper.BindPFlag("storage.settings.path", rootCmd.PersistentFlags().Lookup("safe")) // file backend
+	viper.BindPFlag("storage.settings.key", rootCmd.PersistentFlags().Lookup("safe"))  // s3 backend
 
 	// Ugly, I know. See https://github.com/spf13/viper/issues/472
 	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
