@@ -3,9 +3,11 @@ package file
 import (
 	"fmt"
 	"os"
+	builtinpath "path"
 	"strings"
 
 	"github.com/bndw/pick/backends"
+	"github.com/bndw/pick/utils/path"
 	"github.com/marcsauter/single"
 	homedir "github.com/mitchellh/go-homedir"
 )
@@ -28,6 +30,11 @@ func _new(config *backends.Config) (backends.Client, error) {
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	// Adding support for paths relative to the default pick dir
+	if !path.IsAbs(safePath) && !path.IsRel(safePath) {
+		safePath = builtinpath.Join(homeDir, defaultSafeDirName, safePath)
 	}
 
 	config.Backup.DirPath = fmt.Sprintf(defaultBackupDir, homeDir, defaultSafeDirName)

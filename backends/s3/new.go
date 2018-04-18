@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/bndw/pick/backends"
+	"github.com/bndw/pick/utils/path"
 )
 
 const (
@@ -30,6 +31,7 @@ func _new(config *backends.Config) (backends.Client, error) {
 	if !ok {
 		key = defaultS3Key
 	}
+	key = path.TrimModPrefix(key)
 
 	// TODO(bndw): Consider creating the bucket if it does not exist
 

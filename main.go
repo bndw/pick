@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	cfg, err := config.Load(version)
+	cfg, err := config.Load(commands.RootCmd(), version)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)

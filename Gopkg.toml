@@ -22,10 +22,6 @@
 
 
 [[constraint]]
-  name = "github.com/BurntSushi/toml"
-  version = "0.3.0"
-
-[[constraint]]
   name = "github.com/atotto/clipboard"
   revision = "bb272b845f1112e10117e3e45ce39f690c0001ad"
 
@@ -60,3 +56,7 @@
 [[constraint]]
   name = "golang.org/x/crypto"
   revision = "b176d7def5d71bdd214203491f89843ed217f420"
+
+[[constraint]]
+  name = "github.com/spf13/viper"
+  version = "1.0.2"
