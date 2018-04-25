@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 	"golang.leonklingele.de/securetemp"
 )
 

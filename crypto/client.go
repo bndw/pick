@@ -10,8 +10,8 @@ type Client interface {
 }
 
 type KeyDerivation interface {
-	DeriveKey(password []byte, keyLen int) ([]byte, []byte, error)
-	DeriveKeyWithSalt(password, salt []byte, keyLen int) ([]byte, error)
+	DeriveKey(password []byte, keyLen int) (key []byte, salt []byte, err error)
+	DeriveKeyWithSalt(password, salt []byte, keyLen int) (key []byte, err error)
 }
 
 func New(config *Config) (Client, error) {

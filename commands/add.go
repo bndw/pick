@@ -14,7 +14,7 @@ import (
 
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
-		Use:   "add [name] [username] [password]",
+		Use:   "add [name] [username]",
 		Short: "Add a credential",
 		Long:  "The add command is used to add a new credential.",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -24,14 +24,27 @@ func init() {
 }
 
 func Add(args []string, flags *pflag.FlagSet) error {
-	safe, err := newSafeLoader().Load()
+	safe, err := newSafeLoader(true).Load()
 	if err != nil {
 		return err
 	}
 
-	name, username, password, err := parseAddArgs(args)
+	name, username, err := parseAddArgs(args)
 	if err != nil {
 		return err
+	}
+
+	var password string
+	if utils.Confirm("Generate password", true) {
+		if password, err = pswdgen.Generate(config.General.Password); err != nil {
+			return err
+		}
+	} else {
+		var tmp []byte
+		if tmp, err = utils.GetPasswordInput(fmt.Sprintf("Enter a password for %s", name)); err != nil {
+			return err
+		}
+		password = string(tmp)
 	}
 
 	account, err := safe.Add(name, username, password)
@@ -59,16 +72,13 @@ func overwrite(name string) bool {
 	return utils.Confirm(prompt, false)
 }
 
-func parseAddArgs(args []string) (name, username, password string, err error) {
-	if len(args) > 3 {
+func parseAddArgs(args []string) (name, username string, err error) {
+	if len(args) > 2 {
 		err = errors.ErrInvalidCommandUsage
 		return
 	}
 
 	switch len(args) {
-	case 3:
-		password = args[2]
-		fallthrough
 	case 2:
 		username = args[1]
 		fallthrough
@@ -85,21 +95,6 @@ func parseAddArgs(args []string) (name, username, password string, err error) {
 	if username == "" {
 		if username, err = utils.GetInput(fmt.Sprintf("Enter a username for %s", name)); err != nil {
 			return
-		}
-	}
-
-	if password == "" {
-		if utils.Confirm("Generate password", true) {
-			if password, err = pswdgen.Generate(config.General.Password); err != nil {
-				return
-			}
-		} else {
-			var _password []byte
-			if _password, err = utils.GetPasswordInput(fmt.Sprintf("Enter a password for %s", name)); err != nil {
-				return
-			}
-
-			password = string(_password)
 		}
 	}
 

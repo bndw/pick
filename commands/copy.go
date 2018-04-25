@@ -27,7 +27,7 @@ func Copy(args []string, flags *pflag.FlagSet) error {
 	}
 	name := args[0]
 
-	safe, err := newSafeLoader().Load()
+	safe, err := newSafeLoader(false).Load()
 	if err != nil {
 		return err
 	}

@@ -3,24 +3,39 @@ pick
 [![Build Status](https://travis-ci.org/bndw/pick.svg?branch=master)](https://travis-ci.org/bndw/pick)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bndw/pick)](https://goreportcard.com/report/github.com/bndw/pick)
 
-A minimal password manager for macOS and Linux.
+A secure and easy-to-use password manager for macOS and Linux.
 
-![demo](./demo.gif)
+![demo](https://user-images.githubusercontent.com/4248167/29298817-564f4f54-811f-11e7-9a54-934afa1374df.gif)
+
+## Features
+
+* Strong, modern encryption with sensible defaults (ChaCha20-Poly1305, AES-GCM, OpenPGP)
+* Configurable safe storage (file, AWS S3)
+* Secure notes
+* Built-in password generator
+* Clipboard support
+* Automatic backups
+* Sync multiple safes
+* Export accounts to JSON
+* No external dependencies
 
 ## Install
 
 #### go get
+
 ```sh
 go get -u github.com/bndw/pick
 ```
 
 #### Homebrew
+
 ```sh
-brew tap bndw/pick
 brew install bndw/pick/pick-pass
 ```
 
-#### make
+
+#### From source
+
 ```sh
 git clone https://github.com/bndw/pick && cd pick
 make
@@ -29,64 +44,78 @@ make install
 
 ## Getting started
 
-If you haven't used `pick` before, you first need to initialize your pick safe. This is straightforward:
+If you haven't used `pick` before, first initialize your safe to set a master
+password:
 ```sh
 pick init
 ```
-Running `pick init` will ask you for a master password. Your master password is used to encrypt your pick safe. As this is the only password you need to remember to access all passwords and notes stored in your pick safe, make this a strong and unique one! Use `pick pass` to generate a strong password if you think you're not creative enough :).
+Make your master password strong, unique, and don't forget it! You'll need your
+master password to access your safe. Without it your safe can not be unlocked.
 
-### Adding a credential
+#### Add an account
 
-Once `pick` has been initialized, adding a new credential is easy:
 ```sh
-pick add github
+pick add work/email
 ```
-This will ask you for your master password first which is required to store something in the pick safe.
-Then type in your username which should be used for the `github` credential.
-`pick` will now ask you if you already have a password for `github` or if should create a new one for you.
-Done. Credential added.
 
-### Listing your credentials
-
+#### List accounts
+ 
 ```sh
 pick ls
 ```
 
-### Copy a credential's password to your clipboard
+#### View an account
 
 ```sh
-pick cp github
+pick cat work/email
 ```
 
-For all commands, please refer to [Usage](#usage).
+#### Copy a password to the clipboard
+
+```sh
+pick cp work/email
+```
+
+*For all commands, please refer to the [Usage](#usage) section with `pick --help`.*
 
 ## Usage
+
 ```
 Usage:
   pick [command]
 
 Available Commands:
-  add         Add a credential
-  backup      Backup the safe
-  cat         Cat a credential
-  cp          Copy a credential to the clipboard
-  edit        Edit a credential
-  export      Export decrypted credentials in JSON format
-  ls          List all credentials
-  mv          Rename a credential
-  note        Create a note
-  pass        Generate a password without storing it
-  rm          Remove a credential
-  sync        Sync current safe with another pick safe
-  version     Print the version number of pick
+  add             Add a credential
+  backup          Backup the safe
+  cat             Cat a credential
+  cp              Copy a credential to the clipboard
+  edit            Edit a credential
+  export          Export decrypted credentials in JSON format
+  help            Help about any command
+  init            Initialize pick
+  ls              List all credentials
+  mv              Rename a credential
+  note            Create a note
+  pass            Generate a password without storing it
+  rm              Remove a credential
+  sync            Sync current safe with another pick safe
+  version         Print the version number of pick
 
 Use "pick [command] --help" for more information about a command.
 ```
 
-## Threat model
+## Security
 
-Although `pick` is focused on security, once an adversary somehow gains write access to your computer where the `pick` binary is stored, he can simply exchange it and record your master password to decrypt your pick safe.
-If you decide to store the pick safe on a remote drive (e.g. a remote server), the system will be secure even if an adversary can modify the pick safe. As this safe is encrypted and authenticated, he can not modify or decrypt it.
+`pick` is focused on security and to this end it is _essential_ to only run the 
+`pick` binary on a trusted computer. Conversely, you don't necessarily need to 
+trust the computer or server storing the pick safe (e.g. `Amazon S3`). This is
+because the pick safe is encrypted and authenticated and cannot by decrypted or
+unnoticeably modified without the master password.
+
+If you've found a vulnerability or a potential vulnerability in pick please
+email us at pick-security@bndw.co. We'll send a confirmation email to
+acknowledge your report, and we'll send an additional email when we've
+identified the issue positively or negatively.
 
 ## Similar software
 * [pwd.sh: Unix shell, GPG-based password manager](https://github.com/drduh/pwd.sh)

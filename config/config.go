@@ -2,18 +2,13 @@ package config
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/BurntSushi/toml"
 	"github.com/bndw/pick/backends"
 	"github.com/bndw/pick/crypto"
 	"github.com/bndw/pick/utils/clipboard"
 	"github.com/bndw/pick/utils/pswdgen"
-	"github.com/mitchellh/go-homedir"
-)
-
-const (
-	defaultConfigFileTmpl = "%s/.pick/config.toml"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 type Config struct {
@@ -30,13 +25,7 @@ type generalConfig struct {
 	Clipboard   clipboard.Config
 }
 
-func Load(version string) (*Config, error) {
-	home, err := homedir.Dir()
-	if err != nil {
-		return nil, err
-	}
-
-	configFile := fmt.Sprintf(defaultConfigFileTmpl, home)
+func Load(rootCmd *cobra.Command, version string) (*Config, error) {
 	config := Config{
 		Storage:    backends.NewDefaultConfig(),
 		Encryption: crypto.NewDefaultConfig(),
@@ -44,23 +33,32 @@ func Load(version string) (*Config, error) {
 			Password:  pswdgen.NewDefaultConfig(),
 			Clipboard: clipboard.NewDefaultConfig(),
 		},
-	}
-	if _, err := os.Stat(configFile); err != nil {
-		if os.IsNotExist(err) {
-			// TODO(): No config found, should we create one?
-		} else {
-			return nil, err
-		}
-	} else {
-		if _, err := toml.DecodeFile(configFile, &config); err != nil {
-			return nil, err
-		}
+		Version: version,
 	}
 
-	config.Version = version
 	// Warning: Deprecated. The PasswordLen field is required for backwards-compatibility :(
 	if l := config.General.PasswordLen; l > 0 {
 		config.General.Password.Length = l
+	}
+
+	viper.AddConfigPath("$HOME/.pick")
+	viper.SetConfigName("config")
+	viper.SetConfigType("toml")
+
+	rootCmd.PersistentFlags().String("safe", "", "Overwrite path to safe file")
+	viper.BindPFlag("storage.settings.path", rootCmd.PersistentFlags().Lookup("safe")) // file backend
+	viper.BindPFlag("storage.settings.key", rootCmd.PersistentFlags().Lookup("safe"))  // s3 backend
+
+	// Ugly, I know. See https://github.com/spf13/viper/issues/472
+	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		if err := viper.ReadInConfig(); err != nil {
+			// Return `nil` to avoid printing an unneccesary error message
+			return nil
+		}
+		if err := viper.Unmarshal(&config); err != nil {
+			return fmt.Errorf("failed to unmarshal into config: %v", err)
+		}
+		return nil
 	}
 
 	return &config, nil

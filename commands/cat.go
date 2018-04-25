@@ -64,7 +64,7 @@ func Cat(args []string, flags *pflag.FlagSet) error {
 		return err
 	}
 
-	safe, err := newSafeLoader().Load()
+	safe, err := newSafeLoader(false).Load()
 	if err != nil {
 		return err
 	}

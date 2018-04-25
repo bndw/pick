@@ -5,7 +5,7 @@ import (
 )
 
 func (s *Safe) Add(name, username, password string) (*Account, error) {
-	if existingAccount, _ := s.Get(name); existingAccount != nil {
+	if existingAccount, err := s.Get(name); err == nil {
 		return existingAccount, errors.ErrAccountAlreadyExists
 	}
 

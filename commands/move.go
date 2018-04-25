@@ -2,50 +2,49 @@ package commands
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/bndw/pick/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "mv [name] [new-name]",
 		Short: "Rename a credential",
-		Long: `The move command is used to rename a credential.
-            `,
+		Long:  "The move command is used to rename a credential.",
 		Run: func(cmd *cobra.Command, args []string) {
-			os.Exit(Move(args...))
+			runCommand(Move, cmd, args)
 		},
 	})
 }
 
-func Move(args ...string) int {
-	safe, err := newSafeLoader().Load()
+func Move(args []string, flags *pflag.FlagSet) error {
+	safe, err := newSafeLoader(true).Load()
 	if err != nil {
-		return handleError(err)
+		return err
 	}
 
-	name, newName, errCode := parseMoveArgs(args)
-	if errCode > 0 {
-		return errCode
+	name, newName, err := parseMoveArgs(args)
+	if err != nil {
+		return err
 	}
 
 	if err := safe.Move(name, newName); err != nil {
-		return handleError(err)
+		return err
 	}
 
 	fmt.Println("Credential renamed")
-	return 0
+	return nil
 }
 
-func parseMoveArgs(args []string) (name, newName string, errCode int) {
+func parseMoveArgs(args []string) (name, newName string, err error) {
 	if len(args) != 2 {
-		fmt.Println("mv [name] [new-name]")
-		return "", "", 1
+		err = errors.ErrInvalidCommandUsage
+		return
 	}
 
 	name, newName = args[0], args[1]
 
-	errCode = 0
 	return
 }

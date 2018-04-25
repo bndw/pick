@@ -5,11 +5,10 @@ import (
 )
 
 func TestMove(t *testing.T) {
-	safe, err := createTestSafe()
+	safe, err := createTestSafe(t, true)
 	if err != nil {
 		t.Error(err)
 	}
-	defer removeTestSafe()
 
 	name := "foo"
 	newName := "foo-renamed"

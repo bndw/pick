@@ -5,11 +5,10 @@ import (
 )
 
 func TestGet(t *testing.T) {
-	safe, err := createTestSafe()
+	safe, err := createTestSafe(t, false)
 	if err != nil {
 		t.Error(err)
 	}
-	defer removeTestSafe()
 
 	if _, err = safe.Get("foo"); err != nil {
 		t.Error(err)

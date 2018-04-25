@@ -21,7 +21,7 @@ func init() {
 }
 
 func List(args []string, flags *pflag.FlagSet) error {
-	safe, err := newSafeLoader().Load()
+	safe, err := newSafeLoader(false).Load()
 	if err != nil {
 		return err
 	}

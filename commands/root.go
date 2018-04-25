@@ -14,6 +14,10 @@ var rootCmd = &cobra.Command{
 	Long:  "pick is a minimal password manager",
 }
 
+func RootCmd() *cobra.Command {
+	return rootCmd
+}
+
 func Execute(cfg *c.Config) error {
 	config = cfg
 

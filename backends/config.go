@@ -2,26 +2,20 @@ package backends
 
 type Config struct {
 	Type     string                 `toml:"type"`
-	Backup   backupConfig           `toml:"backup"`
+	Backup   BackupConfig           `toml:"backup"`
 	Settings map[string]interface{} `toml:"settings"`
 }
 
-type backupConfig struct {
+type BackupConfig struct {
 	DirPath     string
 	AutoEnabled bool `toml:"auto"`
 	MaxFiles    int  `toml:"max"`
 }
 
-const (
-	ConfigTypeFile = "file"
-	ConfigTypeS3   = "s3"
-	ConfigTypeMock = "mock"
-)
-
 func NewDefaultConfig() Config {
 	return Config{
-		Type: ConfigTypeFile,
-		Backup: backupConfig{
+		Type: defaultClient().name,
+		Backup: BackupConfig{
 			AutoEnabled: true,
 			MaxFiles:    100,
 		},

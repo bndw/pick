@@ -25,7 +25,7 @@ func Export(args []string, flags *pflag.FlagSet) error {
 		return errors.New("Aborted as requested")
 	}
 
-	safe, err := newSafeLoader().Load()
+	safe, err := newSafeLoader(false).Load()
 	if err != nil {
 		return err
 	}

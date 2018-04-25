@@ -5,11 +5,10 @@ import (
 )
 
 func TestRemove(t *testing.T) {
-	safe, err := createTestSafe()
+	safe, err := createTestSafe(t, true)
 	if err != nil {
 		t.Error(err)
 	}
-	defer removeTestSafe()
 
 	if err = safe.Remove("foo"); err != nil {
 		t.Error(err)

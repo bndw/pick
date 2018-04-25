@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/bndw/pick/backends"
+	fileBackend "github.com/bndw/pick/backends/file"
+	s3Backend "github.com/bndw/pick/backends/s3"
 	"github.com/bndw/pick/crypto"
 	"github.com/bndw/pick/errors"
 	"github.com/bndw/pick/safe"
@@ -27,13 +29,15 @@ func runCommand(c func([]string, *pflag.FlagSet) error, cmd *cobra.Command, args
 }
 
 type safeLoader struct {
+	writable     bool
 	password     *[]byte
 	maxLoadTries int
 	loadTries    int
 }
 
-func newSafeLoader() *safeLoader {
+func newSafeLoader(writable bool) *safeLoader {
 	return &safeLoader{
+		writable:     writable,
 		maxLoadTries: 0,
 	}
 }
@@ -54,6 +58,10 @@ func (sl *safeLoader) Load() (*safe.Safe, error) {
 }
 
 func (sl *safeLoader) LoadWithBackendClient(backendClient backends.Client) (*safe.Safe, error) {
+	if err := backendClient.SetWritable(sl.writable); err == errors.ErrAlreadyRunning {
+		return nil, err
+	}
+
 	if sl.password == nil {
 		password, err := utils.GetPasswordInput(fmt.Sprintf("Enter your master password for safe '%s'", backendClient.SafeLocation()))
 		if err != nil {
@@ -93,6 +101,10 @@ func initSafe() error {
 
 	if _, err := backendClient.Load(); err == nil { // nolint: vetshadow
 		return builtinerrors.New("pick was already initialized")
+	}
+
+	if err := backendClient.SetWritable(true); err == errors.ErrAlreadyRunning {
+		return err
 	}
 
 	password, err := utils.GetPasswordInput("Please set a master password. This is the only password you need to remember")
@@ -141,4 +153,9 @@ func newCryptoClient() (crypto.Client, error) {
 func handleError(err error) int {
 	fmt.Println(err)
 	return 1
+}
+
+func init() {
+	fileBackend.Register()
+	s3Backend.Register()
 }

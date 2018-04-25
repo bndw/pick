@@ -1,6 +1,8 @@
 package safe
 
-import "testing"
+import (
+	"testing"
+)
 
 const (
 	accountName = "name2"
@@ -14,15 +16,14 @@ const (
 )
 
 func TestSyncSameHistory(t *testing.T) {
-	safe1, err := createTestSafe()
+	safe1, err := createTestSafe(t, true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	safe2, err := createTestSafe()
+	safe2, err := createTestSafe(t, true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer removeTestSafe()
 
 	if acc1, err := safe1.Add(accountName, initialUser, initialPswd); err != nil {
 		t.Fatal(err)
@@ -76,15 +77,14 @@ func TestSyncSameHistory(t *testing.T) {
 }
 
 func TestSyncDifferentHistory(t *testing.T) {
-	safe1, err := createTestSafe()
+	safe1, err := createTestSafe(t, true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	safe2, err := createTestSafe()
+	safe2, err := createTestSafe(t, true)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer removeTestSafe()
 
 	if acc1, err := safe1.Add(accountName, initialUser, initialPswd); err != nil {
 		t.Fatal(err)
