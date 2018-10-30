@@ -9,13 +9,15 @@ import (
 )
 
 func init() {
+	// TODO: This command is deprecated and will be removed soon.
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "sync [other-pick-safe]",
 		Short: "Sync current safe with another pick safe",
 		Long:  "The sync command is used to sync the current pick safe with another pick safe.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runCommand(Sync, cmd, args)
+			runMovedCommand(Sync, cmd, args, "safe sync")
 		},
+		Hidden: true,
 	})
 }
 

@@ -13,6 +13,7 @@ import (
 	"github.com/bndw/pick/errors"
 	"github.com/bndw/pick/safe"
 	"github.com/bndw/pick/utils"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -26,6 +27,12 @@ func runCommand(c func([]string, *pflag.FlagSet) error, cmd *cobra.Command, args
 		os.Exit(handleError(err))
 	}
 	os.Exit(0)
+}
+
+func runMovedCommand(c func([]string, *pflag.FlagSet) error, cmd *cobra.Command, args []string, nl string) {
+	red := color.New(color.FgRed).PrintfFunc()
+	red(fmt.Sprintf("NOTE: This command has moved to %q and will be removed soon.\n\n", nl))
+	runCommand(c, cmd, args)
 }
 
 type safeLoader struct {
