@@ -100,6 +100,27 @@ func (sl *safeLoader) LoadWithBackendClient(backendClient backends.Client) (*saf
 	return s, nil
 }
 
+func readMasterPassConfirmed(n bool) ([]byte, error) {
+	var add string
+	if n {
+		add = "new "
+	}
+	msg1 := fmt.Sprintf("Please set a %smaster password. This is the only password you need to remember", add)
+	password, err := utils.GetPasswordInput(msg1)
+	if err != nil {
+		return nil, err
+	}
+	msg2 := fmt.Sprintf("Please confirm your %smaster password", add)
+	passwordConfirm, err := utils.GetPasswordInput(msg2)
+	if err != nil {
+		return nil, err
+	}
+	if !bytes.Equal(password, passwordConfirm) {
+		return nil, builtinerrors.New("Master passwords do not match")
+	}
+	return password, nil
+}
+
 func initSafe() error {
 	backendClient, err := newBackendClient()
 	if err != nil {
@@ -114,16 +135,9 @@ func initSafe() error {
 		return err
 	}
 
-	password, err := utils.GetPasswordInput("Please set a master password. This is the only password you need to remember")
+	password, err := readMasterPassConfirmed(false)
 	if err != nil {
 		return err
-	}
-	passwordConfirm, err := utils.GetPasswordInput("Please confirm your master password")
-	if err != nil {
-		return err
-	}
-	if !bytes.Equal(password, passwordConfirm) {
-		return builtinerrors.New("Master passwords do not match")
 	}
 
 	cryptoClient, err := newCryptoClient()

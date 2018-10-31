@@ -30,6 +30,14 @@ func init() {
 		},
 	})
 	safeCmd.AddCommand(&cobra.Command{
+		Use:   "pass",
+		Short: "Change safe master password",
+		Long:  "The pass command is used to change the master password of your pick safe.",
+		Run: func(cmd *cobra.Command, args []string) {
+			runCommand(SafePass, cmd, args)
+		},
+	})
+	safeCmd.AddCommand(&cobra.Command{
 		Use:   "sync [other-pick-safe]",
 		Short: "Sync current safe with another pick safe",
 		Long:  "The sync command is used to sync the current pick safe with another pick safe.",
