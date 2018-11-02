@@ -9,15 +9,16 @@ import (
 )
 
 func init() {
+	// TODO: This command is deprecated and will be removed soon.
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "export",
 		Short: "Export decrypted credentials in JSON format",
 		Long:  "The export command is used to export decrypted credentials in JSON format.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runCommand(Export, cmd, args)
+			runMovedCommand(Export, cmd, args, "safe export")
 		},
+		Hidden: true,
 	})
-
 }
 
 func Export(args []string, flags *pflag.FlagSet) error {

@@ -9,13 +9,15 @@ import (
 )
 
 func init() {
+	// TODO: This command is deprecated and will be removed soon.
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "backup",
 		Short: "Backup the safe",
 		Long:  "The backup command is used to backup your current safe.",
 		Run: func(cmd *cobra.Command, args []string) {
-			runCommand(Backup, cmd, args)
+			runMovedCommand(Backup, cmd, args, "safe backup")
 		},
+		Hidden: true,
 	})
 }
 
