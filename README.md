@@ -30,7 +30,7 @@ go get -u github.com/bndw/pick
 #### Homebrew
 
 ```sh
-brew install bndw/pick/pick-pass
+brew install bndw/pick/pick-pass --build-from-source
 ```
 
 
