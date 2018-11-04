@@ -2,6 +2,7 @@ pick
 ====
 [![Build Status](https://travis-ci.org/bndw/pick.svg?branch=master)](https://travis-ci.org/bndw/pick)
 [![Go Report Card](https://goreportcard.com/badge/github.com/bndw/pick)](https://goreportcard.com/report/github.com/bndw/pick)
+[![Version](https://img.shields.io/github/release/bndw/pick.svg)](https://github.com/bndw/pick/releases/latest)
 
 A secure and easy-to-use password manager for macOS and Linux.
 
