@@ -1,3 +1,5 @@
+// +build freebsd openbsd netbsd dragonfly
+
 package single
 
 import (

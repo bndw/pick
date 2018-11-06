@@ -23,11 +23,15 @@
 
 [[constraint]]
   name = "github.com/atotto/clipboard"
-  revision = "bb272b845f1112e10117e3e45ce39f690c0001ad"
+  version = "v0.1.1"
 
 [[constraint]]
   name = "github.com/aws/aws-sdk-go"
   version = "v1.10.22"
+
+[[constraint]]
+  name = "github.com/marcsauter/single"
+  revision = "f8bf46f26ec011cb275d59dbb51d1fae0a0a18a6"
 
 [[constraint]]
   name = "github.com/leonklingele/randomstring"
@@ -39,7 +43,7 @@
 
 [[constraint]]
   name = "github.com/pkg/term"
-  revision = "b1f72af2d63057363398bec5873d16a98b453312"
+  revision = "93e6c91493094ff99a036fea0040802a1e0a4f69"
 
 [[constraint]]
   name = "github.com/spf13/cobra"

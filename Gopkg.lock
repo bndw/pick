@@ -2,11 +2,12 @@
 
 
 [[projects]]
-  digest = "1:01211d9a9303680551230d477e61f4e60cac079a115f4c227ec2143d0d7db9f7"
+  digest = "1:f0e10a247a98558024f52c57d3ee725a01847ca06914655ac4b63220e97b869a"
   name = "github.com/atotto/clipboard"
   packages = ["."]
   pruneopts = ""
-  revision = "bb272b845f1112e10117e3e45ce39f690c0001ad"
+  revision = "aa9549103943c05f3e8951009cdb6a0bec2c8949"
+  version = "v0.1.1"
 
 [[projects]]
   digest = "1:a3dfc9ce62b33a7bc9d03fb049552d95a2b740387d086858e56853f32e43af3e"
@@ -118,11 +119,11 @@
   version = "v1.7.6"
 
 [[projects]]
-  digest = "1:6a2993e0132764bf3af555645a7194621b0869afa3ec67152cd0f9af27fe6d8b"
+  digest = "1:77d9f354d5edbe0f029d65704d6e407a5f186ce292ba7873bae9683f9cfc7b92"
   name = "github.com/marcsauter/single"
   packages = ["."]
   pruneopts = ""
-  revision = "3f6ac6766709f17b529a516abd96745824431eb0"
+  revision = "f8bf46f26ec011cb275d59dbb51d1fae0a0a18a6"
 
 [[projects]]
   digest = "1:9ea83adf8e96d6304f394d40436f2eb44c1dc3250d223b74088cc253a6cd0a1c"
@@ -164,14 +165,14 @@
   version = "v1.1.0"
 
 [[projects]]
-  digest = "1:876666e3416bc4357068fd10b4e5989346d561550e061f62998ca9bec6639750"
+  digest = "1:a5ea8547825ba3fa70b1095f2f39380cdccf75f88c4eeeed063ffbd6bdc9c551"
   name = "github.com/pkg/term"
   packages = [
     ".",
     "termios",
   ]
   pruneopts = ""
-  revision = "b1f72af2d63057363398bec5873d16a98b453312"
+  revision = "93e6c91493094ff99a036fea0040802a1e0a4f69"
 
 [[projects]]
   digest = "1:dae0d7dd55563fd389e7263a32d2030022ef29cceff941336e53f6520e0308c0"
