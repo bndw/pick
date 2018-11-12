@@ -22,7 +22,6 @@ const (
 
 func NewDefaultConfig() Config {
 	return Config{
-		Type:                     ConfigTypeOpenPGP,
 		OpenPGPSettings:          DefaultOpenPGPSettings(),
 		AESGCMSettings:           DefaultAESGCMSettings(),
 		ChaCha20Poly1305Settings: DefaultChaCha20Poly1305Settings(),
