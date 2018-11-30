@@ -1,9 +1,16 @@
 language: go
-go:
-  - 1.6
-  - 1.7
-  - 1.8
-  - tip
+matrix:
+  include:
+    # "1.x" always refers to the latest Go version, inc. the patch release.
+    # # e.g. "1.x" is 1.11 until 1.11.1 is available.
+    - go: "1.x"
+    - go: "1.9.x"
+    - go: "1.10.x"
+    - go: "1.11.x"
+    - go: "tip"
+  allow_failures:
+    - go: "tip"
+
 install: 
   - make
 script:
