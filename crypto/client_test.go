@@ -7,39 +7,39 @@ import (
 func TestNew(t *testing.T) {
 	fixtures := []struct {
 		t  string
-		fn func(interface{}) bool
+		fn func(Client) bool
 	}{
 		{
 			t: "",
-			fn: func(c interface{}) bool {
+			fn: func(c Client) bool {
 				_, ok := c.(*ChaCha20Poly1305Client)
 				return ok
 			},
 		},
 		{
 			t: "asdf",
-			fn: func(c interface{}) bool {
+			fn: func(c Client) bool {
 				_, ok := c.(*ChaCha20Poly1305Client)
 				return ok
 			},
 		},
 		{
 			t: ConfigTypeChaChaPoly,
-			fn: func(c interface{}) bool {
+			fn: func(c Client) bool {
 				_, ok := c.(*ChaCha20Poly1305Client)
 				return ok
 			},
 		},
 		{
 			t: ConfigTypeOpenPGP,
-			fn: func(c interface{}) bool {
+			fn: func(c Client) bool {
 				_, ok := c.(*OpenPGPClient)
 				return ok
 			},
 		},
 		{
 			t: ConfigTypeAESGCM,
-			fn: func(c interface{}) bool {
+			fn: func(c Client) bool {
 				_, ok := c.(*AESGCMClient)
 				return ok
 			},
