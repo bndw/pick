@@ -24,21 +24,21 @@ func TestNew(t *testing.T) {
 			},
 		},
 		{
-			t: "chachapoly",
+			t: ConfigTypeChaChaPoly,
 			fn: func(c interface{}) bool {
 				_, ok := c.(*ChaCha20Poly1305Client)
 				return ok
 			},
 		},
 		{
-			t: "openpgp",
+			t: ConfigTypeOpenPGP,
 			fn: func(c interface{}) bool {
 				_, ok := c.(*OpenPGPClient)
 				return ok
 			},
 		},
 		{
-			t: "aes_gcm",
+			t: ConfigTypeAESGCM,
 			fn: func(c interface{}) bool {
 				_, ok := c.(*AESGCMClient)
 				return ok
