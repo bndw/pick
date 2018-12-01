@@ -66,25 +66,30 @@ func TestLoad(t *testing.T) {
 	backendConfig := backends.NewDefaultConfig()
 	backendClient := mockBackend.NewForTesting(t, &backendConfig, false)
 	for i, cryptoConfig := range safeCryptoConfigs {
-		cryptoClient, err := crypto.New(&cryptoConfig)
-		if err != nil {
-			t.Fatalf("#%d: failed to create crypto client: %s", i, err.Error())
-		}
-		conf := &config.Config{
-			Encryption: cryptoConfig,
-			Storage:    backendConfig,
-			Version:    "1.2.3",
-		}
-		for j, data := range safeData {
-			backendClient.Data = []byte(data)
-			s, err := safe.Load([]byte(password), backendClient, cryptoClient, conf)
+		i, cryptoConfig := i, cryptoConfig
+		t.Run(cryptoConfig.Type, func(t *testing.T) {
+			t.Parallel()
+
+			cryptoClient, err := crypto.New(&cryptoConfig)
 			if err != nil {
-				t.Fatalf("#%d.#%d: failed to load safe: %s", i, j, err.Error())
+				t.Fatalf("#%d: failed to create crypto client: %s", i, err.Error())
 			}
-			if _, err := s.Get("foo"); err != nil {
-				t.Fatalf("#%d.#%d: failed to get 'foo' safe account: %s", i, j, err.Error())
+			conf := &config.Config{
+				Encryption: cryptoConfig,
+				Storage:    backendConfig,
+				Version:    "1.2.3",
 			}
-		}
+			for j, data := range safeData {
+				backendClient.Data = []byte(data)
+				s, err := safe.Load([]byte(password), backendClient, cryptoClient, conf)
+				if err != nil {
+					t.Fatalf("#%d.#%d: failed to load safe: %s", i, j, err.Error())
+				}
+				if _, err := s.Get("foo"); err != nil {
+					t.Fatalf("#%d.#%d: failed to get 'foo' safe account: %s", i, j, err.Error())
+				}
+			}
+		})
 	}
 }
 
