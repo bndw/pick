@@ -51,12 +51,12 @@ func NewChaCha20Poly1305Client(settings *ChaCha20Poly1305Settings) (*ChaCha20Pol
 		fallthrough
 	case keyDerivationTypePBKDF2:
 		// Remove other settings
-		// TODO(leon): This is shitty.
+		// TODO: Remove other settings in a more elegant way
 		settings.Scrypt = nil
 		kdf = settings.PBKDF2
 	case keyDerivationTypeScrypt:
 		// Remove other settings
-		// TODO(leon): This is shitty.
+		// TODO: Remove other settings in a more elegant way
 		settings.PBKDF2 = nil
 		kdf = settings.Scrypt
 	}

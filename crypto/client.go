@@ -15,27 +15,27 @@ type KeyDerivation interface {
 }
 
 func New(config *Config) (Client, error) {
-	switch config.Type {
+	switch t := config.Type; t {
 	default:
-		if config.Type != "" {
-			fmt.Println("Invalid encryption type, using default")
-		}
-		fallthrough
+		config.Type = DefaultConfigType
+		fmt.Printf("Invalid encryption type %q, using default %q\n", t, DefaultConfigType)
+		// This won't recurse indefinitely as we have provided a valid config type above
+		return New(config)
 	case ConfigTypeChaChaPoly:
 		// Remove other settings
-		// TODO(leon): This is shitty.
+		// TODO: Remove other settings in a more elegant way
 		config.OpenPGPSettings = nil
 		config.AESGCMSettings = nil
 		return NewChaCha20Poly1305Client(config.ChaCha20Poly1305Settings)
 	case ConfigTypeOpenPGP:
 		// Remove other settings
-		// TODO(leon): This is shitty.
+		// TODO: Remove other settings in a more elegant way
 		config.AESGCMSettings = nil
 		config.ChaCha20Poly1305Settings = nil
 		return NewOpenPGPClient(config.OpenPGPSettings)
 	case ConfigTypeAESGCM:
 		// Remove other settings
-		// TODO(leon): This is shitty.
+		// TODO: Remove other settings in a more elegant way
 		config.OpenPGPSettings = nil
 		config.ChaCha20Poly1305Settings = nil
 		return NewAESGCMClient(config.AESGCMSettings)

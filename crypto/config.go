@@ -8,6 +8,11 @@ type Config struct {
 }
 
 const (
+	// Make sure this stays in sync with the example config in config.toml.in
+	DefaultConfigType = ConfigTypeChaChaPoly
+)
+
+const (
 	ConfigTypeOpenPGP       = "openpgp"
 	ConfigTypeAESGCM        = "aes_gcm"
 	ConfigTypeChaChaPoly    = "chachapoly"
@@ -22,6 +27,7 @@ const (
 
 func NewDefaultConfig() Config {
 	return Config{
+		Type:                     DefaultConfigType,
 		OpenPGPSettings:          DefaultOpenPGPSettings(),
 		AESGCMSettings:           DefaultAESGCMSettings(),
 		ChaCha20Poly1305Settings: DefaultChaCha20Poly1305Settings(),

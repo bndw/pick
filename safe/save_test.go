@@ -43,8 +43,7 @@ func TestSaveWithDefaultCrypto(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Assert the default safe encryption is ChaChaPoly
-	if dto.Config.ChaCha20Poly1305Settings == nil {
-		t.Errorf("Expected safe to be encrypted with chachapoly client")
+	if dto.Config.Type != crypto.DefaultConfigType {
+		t.Errorf("Expected safe to be encrypted with %q client, got %q", crypto.DefaultConfigType, dto.Config.Type)
 	}
 }
