@@ -58,7 +58,7 @@ gofmt:
 	GOPATH=$(GOPATH) go fmt $(FOLDERS)
 
 govet:
-	GOPATH=$(GOPATH) go tool vet $(FOLDERS)
+	GOPATH=$(GOPATH) go vet $(FOLDERS)
 
 config:
 	@if [ ! -f "$(PICK_DIR)/config.toml" ]; then \
