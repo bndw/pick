@@ -12,8 +12,8 @@ import (
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "ls",
-		Short: "List all credentials",
-		Long:  "The list command is used to list the saved credentials.",
+		Short: "List all accounts",
+		Long:  "The list command is used to list the saved accounts.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runCommand(List, cmd, args)
 		},

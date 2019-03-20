@@ -15,8 +15,8 @@ import (
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "add [name] [username]",
-		Short: "Add a credential",
-		Long:  "The add command is used to add a new credential.",
+		Short: "Add an account",
+		Long:  "The add command is used to add a new account.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runCommand(Add, cmd, args)
 		},
@@ -57,7 +57,7 @@ func Add(args []string, flags *pflag.FlagSet) error {
 		return err
 	}
 
-	fmt.Println("Credential added")
+	fmt.Println("Account added")
 	if utils.Confirm("Copy password to clipboard", true) {
 		if err := clipboard.Copy(account.Password, safe.Config.General.Clipboard.ClearAfter); err != nil {
 			return err
@@ -87,7 +87,7 @@ func parseAddArgs(args []string) (name, username string, err error) {
 	}
 
 	if name == "" {
-		if name, err = utils.GetInput("Enter a credential name"); err != nil {
+		if name, err = utils.GetInput("Enter an account name"); err != nil {
 			return
 		}
 	}

@@ -13,8 +13,8 @@ import (
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "cp [name]",
-		Short: "Copy a credential to the clipboard",
-		Long:  "The copy command is used to copy a credential's password to the clipboard.",
+		Short: "Copy an account to the clipboard",
+		Long:  "The copy command is used to copy an account's password to the clipboard.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runCommand(Copy, cmd, args)
 		},

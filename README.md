@@ -86,17 +86,17 @@ Usage:
   pick [command]
 
 Available Commands:
-  add             Add a credential
-  cat             Cat a credential
-  cp              Copy a credential to the clipboard
-  edit            Edit a credential
+  add             Add an account
+  cat             Cat an account
+  cp              Copy an account to the clipboard
+  edit            Edit an account
   help            Help about any command
   init            Initialize pick
-  ls              List all credentials
-  mv              Rename a credential
+  ls              List all accounts
+  mv              Rename an account
   note            Create a note
   pass            Generate a password without storing it
-  rm              Remove a credential
+  rm              Remove an account
   safe            Perform operations on safe
   version         Print the version number of pick
 

@@ -14,7 +14,7 @@ func (s *Safe) Move(name, newName string) error {
 		return fmt.Errorf("New name must be different")
 	}
 	if _, err := s.Get(newName); err == nil {
-		return fmt.Errorf("Credential with new name already exists")
+		return fmt.Errorf("Account with new name already exists")
 	}
 
 	s.Accounts[newName] = *account

@@ -13,13 +13,13 @@ import (
 func init() {
 	cmd := &cobra.Command{
 		Use:   "cat [name]",
-		Short: "Cat a credential",
-		Long:  "The cat command is used to print a credential to stdout.",
+		Short: "Cat an account",
+		Long:  "The cat command is used to print an account to stdout.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runCommand(Cat, cmd, args)
 		},
 	}
-	cmd.Flags().Bool("history", false, "show credential history")
+	cmd.Flags().Bool("history", false, "show account history")
 	rootCmd.AddCommand(cmd)
 }
 
@@ -30,16 +30,14 @@ func printAccount(account *safe.Account, showHistory bool) {
 		account.History = nil
 		history = append(history, *account)
 		for i, l := 0, len(history); i < l; i++ {
-			printCredential(&history[i], "  ", i == 0)
+			print(&history[i], "  ", i == 0)
 		}
 	} else {
-		// Print a credential
-		printCredential(account, "", true)
+		print(account, "", true)
 	}
 }
 
-func printCredential(account *safe.Account, printPrefix string, isInitialAccount bool) {
-	// Print a credential
+func print(account *safe.Account, printPrefix string, isInitialAccount bool) {
 	var createdOrModified string
 	if isInitialAccount {
 		createdOrModified = "created"

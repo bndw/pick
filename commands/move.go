@@ -11,8 +11,8 @@ import (
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "mv [name] [new-name]",
-		Short: "Rename a credential",
-		Long:  "The move command is used to rename a credential.",
+		Short: "Rename an account",
+		Long:  "The move command is used to rename an account.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runCommand(Move, cmd, args)
 		},
@@ -34,7 +34,7 @@ func Move(args []string, flags *pflag.FlagSet) error {
 		return err
 	}
 
-	fmt.Println("Credential renamed")
+	fmt.Println("Account renamed")
 	return nil
 }
 

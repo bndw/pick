@@ -15,8 +15,8 @@ import (
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   `edit name ("username" | "password")`,
-		Short: "Edit a credential",
-		Long:  "The edit command is used to edit an existing credential.",
+		Short: "Edit an account",
+		Long:  "The edit command is used to edit an existing account.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runCommand(Edit, cmd, args)
 		},
@@ -39,7 +39,7 @@ func Edit(args []string, flags *pflag.FlagSet) error {
 		return err
 	}
 
-	fmt.Println("Credential updated")
+	fmt.Println("Account updated")
 	if utils.Confirm("Copy password to clipboard", true) {
 		if err := clipboard.Copy(account.Password, safe.Config.General.Clipboard.ClearAfter); err != nil {
 			return err

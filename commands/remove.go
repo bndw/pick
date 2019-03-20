@@ -11,8 +11,8 @@ import (
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "rm [name]",
-		Short: "Remove a credential",
-		Long:  "The remove command is used to remove a saved credential.",
+		Short: "Remove an account",
+		Long:  "The remove command is used to remove a saved account.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runCommand(Remove, cmd, args)
 		},
@@ -34,6 +34,6 @@ func Remove(args []string, flags *pflag.FlagSet) error {
 		return err
 	}
 
-	fmt.Println("Credential removed")
+	fmt.Println("Account removed")
 	return nil
 }

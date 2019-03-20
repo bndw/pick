@@ -23,8 +23,8 @@ func init() {
 	})
 	safeCmd.AddCommand(&cobra.Command{
 		Use:   "export",
-		Short: "Export decrypted credentials in JSON format",
-		Long:  "The export command is used to export decrypted credentials in JSON format.",
+		Short: "Export decrypted accounts in JSON format",
+		Long:  "The export command is used to export decrypted accounts in JSON format.",
 		Run: func(cmd *cobra.Command, args []string) {
 			runCommand(Export, cmd, args)
 		},
