@@ -22,14 +22,15 @@ func _new(config *backends.Config) (backends.Client, error) {
 		return nil, err
 	}
 
-	safePath, ok := config.Settings["path"].(string)
-	if ok {
-		safePath = formatHomeDir(safePath, homeDir)
-	} else {
+	safePath, _ := config.Settings["path"].(string)
+	// TODO: Should only check the `ok` variable! Current implementation is a workaround for https://github.com/spf13/viper/issues/472
+	if safePath == "" {
 		safePath, err = defaultSafePath(homeDir)
 		if err != nil {
 			return nil, err
 		}
+	} else {
+		safePath = formatHomeDir(safePath, homeDir)
 	}
 
 	// Adding support for paths relative to the default pick dir

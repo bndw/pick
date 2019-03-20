@@ -49,12 +49,13 @@ func Load(rootCmd *cobra.Command, version string) (*Config, error) {
 	viper.BindPFlag("storage.settings.path", rootCmd.PersistentFlags().Lookup("safe")) // file backend
 	viper.BindPFlag("storage.settings.key", rootCmd.PersistentFlags().Lookup("safe"))  // s3 backend
 
-	// Ugly, I know. See https://github.com/spf13/viper/issues/472
-	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
-		if err := viper.ReadInConfig(); err != nil {
-			// Return `nil` to avoid printing an unneccesary error message
-			return nil
+	if err := viper.ReadInConfig(); err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
+			return nil, fmt.Errorf("failed to read config file: %v", err)
 		}
+	}
+	// TODO: https://github.com/spf13/viper/issues/472
+	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
 		if err := viper.Unmarshal(&config); err != nil {
 			return fmt.Errorf("failed to unmarshal into config: %v", err)
 		}

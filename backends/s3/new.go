@@ -22,13 +22,15 @@ const (
 //		key:	 	 AWS S3 Key name for storing the safe. Defaults to `defaultS3Key`
 func _new(config *backends.Config) (backends.Client, error) {
 	// AWS S3 Bucket overrides
-	bucket, ok := config.Settings["bucket"].(string)
-	if !ok {
+	bucket, _ := config.Settings["bucket"].(string)
+	// TODO: Should only check the `ok` variable! Current implementation is a workaround for https://github.com/spf13/viper/issues/472
+	if bucket == "" {
 		bucket = defaultS3Bucket
 	}
 
-	key, ok := config.Settings["key"].(string)
-	if !ok {
+	key, _ := config.Settings["key"].(string)
+	// TODO: Should only check the `ok` variable! Current implementation is a workaround for https://github.com/spf13/viper/issues/472
+	if key == "" {
 		key = defaultS3Key
 	}
 	key = path.TrimModPrefix(key)
